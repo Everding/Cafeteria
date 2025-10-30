@@ -1,0 +1,50 @@
+.category-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.category-card {
+  background-color: #222;
+  border-radius: 12px;
+  width: 400px;
+  height: 400px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.category-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.category-image-container {
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-top: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f3f3f3; /* color de fondo del círculo */
+}
+
+.category-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.category-name {
+  color: #ffb347;
+  font-size: 25px;
+  font-weight: 600;
+  margin-top: 15px;
+  text-align: center;
+}

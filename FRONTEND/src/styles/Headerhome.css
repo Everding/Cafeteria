@@ -1,0 +1,180 @@
+/* HeaderHome general */
+.headerhome-header {
+  width: 100%;
+  background: url('https://i.redd.it/a30hhynzs7h81.jpg') no-repeat center center;
+  background-size: cover;
+  padding: 30px 0; /* quitar el padding lateral */
+  display: flex;
+  height: 1000px;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.headerhome-nav-container {
+  width: 100%;   /* ocupar todo el ancho */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 30px; /* si querés algo de separación lateral */
+  box-sizing: border-box;
+}
+
+/* Nav */
+.headerhome-nav {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 50px;
+}
+
+.headerhome-logo {
+  max-height: 200px;
+  cursor: pointer;
+}
+
+/* Nav Links */
+.headerhome-nav-links {
+  display: flex;
+  gap: 40px;
+  list-style: none;
+}
+
+.headerhome-nav-item {
+  position: relative;
+}
+
+.headerhome-nav-link {
+  text-decoration: none;
+  color: #fff;
+  font-size: 1.3rem;
+  font-weight: 600;
+  padding: 10px 15px;
+  text-transform: uppercase;
+  transition: background-color 0.3s;
+}
+
+.headerhome-nav-link:hover {
+  background-color: #fff;
+  color: #000;
+  border-radius: 5px;
+}
+
+/* Dropdown */
+.headerhome-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #ffffff;
+  color: #333;
+  font-size: 1rem;
+  padding: 12px;
+  border-radius: 10px;
+  min-width: 180px;
+  z-index: 1000;
+}
+
+.headerhome-dropdown.open {
+  display: block;
+}
+
+.headerhome-dropdown-item {
+  color: #333;
+  padding: 8px 12px;
+  display: block;
+  text-decoration: none;
+}
+
+.headerhome-dropdown-item:hover {
+  background: #ffb347;
+  color: #000;
+  border-radius: 10px;
+  font-size: 1.3rem;
+}
+
+/* Icons */
+.headerhome-nav-icons {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: transform 0.2s ease;
+}
+
+.headerhome-cart-icon {
+  color: #fff;
+  font-size: 40px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.headerhome-profile-container {
+  position: relative;
+  cursor: pointer;
+}
+
+.headerhome-profile-icon {
+  font-size: 45px;
+  color: #fff;
+  transition: transform 0.2s ease;
+}
+
+.headerhome-profile-dropdown {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: #ffffff;
+  padding: 12px;
+  border-radius: 8px;
+  min-width: 150px;
+  z-index: 1000;
+}
+
+.headerhome-profile-dropdown.open {
+  display: block;
+}
+
+/* Promo banner */
+.headerhome-promo-banner {
+  margin: 250px auto;
+  padding: 6px;
+  width: 70%;
+  text-align: center;
+  background-color: #ffb347;
+  border-radius: 12px;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Order button */
+.headerhome-order-button-container {
+  margin: -200px auto;
+}
+
+.headerhome-order-button {
+  text-decoration: none;
+  background-color: #ffffff;
+  color: #000;
+  font-weight: bold;
+  font-size: 1.2rem;
+  padding: 12px 25px;
+  border-radius: 8px;
+  transition: transform 0.2s;
+}
+
+.headerhome-order-button:hover {
+  transform: scale(1.05);
+}
+
+.headerhome-location-banner {
+  position: absolute;
+  top: 800px;        /* desde arriba del header */
+  right: 30px;       /* separación desde el borde derecho */
+  background: #ffb347;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  color: #000;
+}

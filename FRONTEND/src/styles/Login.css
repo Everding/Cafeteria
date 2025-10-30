@@ -1,0 +1,106 @@
+/* Login.css */
+
+.login-container {
+  min-height: 100vh; /* ocupa toda la pantalla */
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  background: linear-gradient(135deg, #d7b89e, #442200);
+}
+
+.page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* siempre ocupa toda la pantalla */
+}
+
+/* Contenedor entre Header y Footer */
+.login-wrapper {
+  flex: 1; /* ocupa todo el espacio disponible */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* Fondo degradado */
+  background: linear-gradient(135deg, #d7b89e, #442200);
+}
+
+/* Formulario */
+.login-form {
+  background-color: #fff3e6;
+  padding: 40px 30px;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* Título */
+.login-form h2 {
+  color: #6b4f3b;
+  margin-bottom: 25px;
+  font-size: 28px;
+}
+
+/* Inputs */
+.login-form input {
+  width: 100%;
+  padding: 12px 15px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 1px solid #d9b89e;
+  font-size: 16px;
+  background-color: #fff8f0;
+  color: #5a3e2b;
+  box-sizing: border-box;
+}
+
+/* Inputs al enfocar */
+.login-form input:focus {
+  outline: none;
+  border-color: #a67c52;
+  box-shadow: 0 0 5px #a67c52;
+}
+
+/* Botón */
+.login-form button {
+  width: 100%;
+  padding: 12px 15px;
+  margin-top: 15px;
+  border: none;
+  border-radius: 8px;
+  background-color: #6b4f3b;
+  color: #fff3e6;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+/* Botón hover */
+.login-form button:hover {
+  background-color: #5a3e2b;
+}
+
+/* Placeholder */
+.login-form input::placeholder {
+  color: #a67c52;
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .login-form {
+    padding: 30px 20px;
+    border-radius: 12px;
+  }
+
+  .login-form h2 {
+    font-size: 24px;
+  }
+}

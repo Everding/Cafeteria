@@ -1,0 +1,122 @@
+.PostresPage {
+  background: linear-gradient(135deg, #d7b89e, #442200);
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.PostresPage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.PostresPage h2 {
+  margin: 0;
+  color: black;
+  background-color: #ffb347;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.PostresPage-addProduct {
+  padding: 10px 20px;
+  border-radius: 5px;
+  background-color: #ffb347;
+  color: black;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.PostresPage-addProduct:hover {
+  transform: translateY(-2px);
+}
+
+/* Grid de cards */
+.PostresPage-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* máximo 8 cards por fila adaptables */
+  gap: 20px;
+  justify-content: center;
+}
+
+/* Wrapper de cada card con botones externos */
+.PostresCard-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Botones Editar / Eliminar fuera de la card */
+.PostresCard-editDelete {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.PostresCard-editDelete button {
+  padding: 8px 15px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  color: white;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.PostresCard-editDelete button:first-child {
+  background-color: #00cc00;
+}
+
+.PostresCard-editDelete button:first-child:hover {
+  background-color: #009900;
+  transform: translateY(-2px);
+}
+
+.PostresCard-editDelete button:last-child {
+  background-color: #ff3333;
+}
+
+.PostresCard-editDelete button:last-child:hover {
+  background-color: #cc0000;
+  transform: translateY(-2px);
+}
+
+/* Contenedor del filtro */
+.PostresPage-filter {
+  margin: 15px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+}
+
+.PostresPage-filter label {
+  font-weight: bold;
+}
+
+/* Select del filtro */
+.PostresPage-filter select {
+  padding: 5px 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.PostresPage-filter select:hover {
+  border-color: #888;
+}
+
+.PostresPage-filter select:focus {
+  border-color: #555;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+

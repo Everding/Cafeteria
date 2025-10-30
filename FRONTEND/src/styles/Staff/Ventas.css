@@ -1,0 +1,99 @@
+.ventas-container {
+  padding: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  background-color: #f9f9f9;
+  border-radius: 16px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  font-family: 'Arial', sans-serif;
+  text-align: center;
+}
+
+.ventas-container h2 {
+  margin-bottom: 1.5rem;
+  color: #4a3f35;
+  font-size: 2rem;
+}
+
+/* Tabla */
+.ventas-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  table-layout: fixed;
+}
+
+.ventas-table th,
+.ventas-table td {
+  border: 1px solid #ddd;
+  padding: 12px 15px;
+  text-align: center;
+  word-wrap: break-word;
+}
+
+.ventas-table th {
+  background-color: #d7b89e;
+  color: #fff;
+  font-weight: bold;
+}
+
+.ventas-table tbody tr:nth-child(even):not(.fila-vacia) {
+  background-color: #f2f2f2;
+}
+
+.ventas-table tbody tr:hover:not(.fila-vacia) {
+  background-color: #e6d4c8;
+  transition: 0.3s;
+}
+
+/* Filas vacías */
+.fila-vacia {
+  background-color: #fafafa;
+  color: #bbb;
+  height: 40px;
+}
+
+/* Productos */
+.producto-item {
+  display: inline-block;
+  margin: 0 3px;
+}
+
+/* Totales */
+.col-total {
+  font-weight: bold;
+  color: #4a3f35;
+  text-align: right;
+}
+
+/* Paginador */
+.paginador {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+  gap: 8px;
+}
+
+.paginador button {
+  background-color: #795548;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-weight: bold;
+}
+
+.paginador button:hover {
+  background-color: #5d4037;
+}
+
+.paginador button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.pagina-activa {
+  background-color: #4a3f35 !important;
+}

@@ -1,0 +1,176 @@
+/* Fondo general */
+.pedidos-container {
+  text-align: center;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #d7b89e, #f3e5ab);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Título principal */
+.pedidos-titulo {
+  font-size: 2.3rem;
+  font-weight: 700;
+  color: #3e2723;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+}
+
+/* Lista de pedidos (una columna centrada) */
+.pedidos-lista {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+}
+
+/* Tarjeta principal */
+.comanda-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff9f3;
+  border: 2px solid #cbb391;
+  border-radius: 20px;
+  padding: 15px 25px;
+  width: 90%;
+  max-width: 900px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.comanda-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.18);
+}
+
+/* === Zona izquierda: Cliente === */
+.comanda-cliente {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 130px;
+}
+
+.cliente-foto {
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #d7b89e;
+  margin-bottom: 8px;
+  background-color: #f5f1eb;
+}
+
+.cliente-nombre {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #4e342e;
+  text-align: center;
+}
+
+/* === Separador visual === */
+.comanda-separador {
+  width: 2px;
+  height: 85px;
+  background-color: #cbb391;
+  margin: 0 20px;
+  border-radius: 2px;
+}
+
+/* === Zona central: Detalle del pedido === */
+.comanda-detalle {
+  flex: 1;
+  text-align: left;
+  padding: 0 10px;
+}
+
+.comanda-detalle h3 {
+  font-size: 1.2rem;
+  color: #5d4037;
+  margin-bottom: 8px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.comanda-productos {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.comanda-productos li {
+  font-size: 0.95rem;
+  color: #3e2723;
+  margin: 3px 0;
+  font-weight: 500;
+}
+
+/* === Zona derecha: Estado === */
+.comanda-estado {
+  text-align: center;
+  min-width: 120px;
+}
+
+.comanda-estado h3 {
+  margin-bottom: 5px;
+  color: #5d4037;
+  font-size: 1.1rem;
+}
+
+.estado-texto {
+  font-weight: bold;
+  font-size: 1rem;
+  text-transform: capitalize;
+}
+
+/* Colores según estado */
+.estado-pendiente {
+  color: #ff9800;
+}
+
+.estado-entregado {
+  color: #4caf50;
+}
+
+.estado-cancelado {
+  color: #e53935;
+}
+
+/* === Botón "Marcar como Entregado" === */
+.boton-entregado {
+  margin-left: 15px;
+  background: linear-gradient(135deg, #7cb342, #558b2f);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: background 0.25s ease, transform 0.15s ease;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+}
+
+.boton-entregado:hover {
+  background: linear-gradient(135deg, #8bc34a, #689f38);
+  transform: translateY(-2px);
+}
+
+/* === Colores de fondo según estado (suave y coherente con tu estilo) === */
+.comanda-card.pendiente {
+  background: #fff7e6;
+}
+
+.comanda-card.entregado {
+  background: #f1fff0;
+}
+
+.comanda-card.cancelado {
+  background: #ffeaea;
+  opacity: 0.85;
+}
+

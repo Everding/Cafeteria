@@ -1,0 +1,91 @@
+/* ===========================
+   Página de Kiosco
+   =========================== */
+.KioscoPage {
+  background: linear-gradient(135deg, #d7b89e, #442200);
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.KioscoPage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.KioscoPage h2 {
+  margin: 0;
+  color: black;
+  background-color: #ffb347;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.KioscoPage-addProduct {
+  padding: 10px 20px;
+  border-radius: 5px;
+  background-color: #ffb347;
+  color: black;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.KioscoPage-addProduct:hover {
+  transform: translateY(-2px);
+}
+
+/* Grid de cards */
+.KioscoPage-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Máximo 8 cards por fila adaptables */
+  gap: 20px;
+  justify-content: center;
+}
+
+/* Wrapper de cada card con botones externos */
+.KioscoCard-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Botones Editar / Eliminar fuera de la card */
+.KioscoCard-editDelete {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.KioscoCard-editDelete button {
+  padding: 8px 15px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  color: white;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.KioscoCard-editDelete button:first-child {
+  background-color: #00cc00;
+}
+
+.KioscoCard-editDelete button:first-child:hover {
+  background-color: #009900;
+  transform: translateY(-2px);
+}
+
+.KioscoCard-editDelete button:last-child {
+  background-color: #ff3333;
+}
+
+.KioscoCard-editDelete button:last-child:hover {
+  background-color: #cc0000;
+  transform: translateY(-2px);
+}

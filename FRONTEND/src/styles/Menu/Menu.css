@@ -1,0 +1,32 @@
+.menu-list {
+  text-align: center;
+  background: linear-gradient(135deg, #d7b89e, #442200);
+}
+
+.menu-list h1 {
+  background-color: #ffb347;
+  color: black;
+  padding: 10px;
+  margin: 0;
+}
+
+.add-menuPage {
+  background-color: #ffb347;
+  border: none;
+  padding: 5px 10px;
+  margin: 10px;
+  cursor: pointer;
+  margin: 15px 0;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  color: black;
+}
+
+.menu-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  background: linear-gradient(135deg, #d7b89e, #442200);
+}

@@ -1,0 +1,52 @@
+/* ===========================
+   Página de Acompañantes
+   =========================== */
+.AcompanantesPage {
+  background: linear-gradient(135deg, #d7b89e, #442200);
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.AcompanantesPage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.AcompanantesPage h2 {
+  margin: 0;
+  color: black;
+  background-color: #ffb347;
+  border-radius: 10px;
+  width: 20%;
+}
+
+.AcompanantesPage-addProduct {
+  padding: 10px 20px;
+  border-radius: 5px;
+  background-color: #ffb347;
+  color: black;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.AcompanantesPage-addProduct:hover {
+  transform: translateY(-2px);
+}
+
+/* Grid de cards con máximo 8 por fila */
+.AcompanantesPage-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  justify-content: center;
+}
+
+.AcompanantesCard-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

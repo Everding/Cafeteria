@@ -1,0 +1,70 @@
+.primer-div {
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#Titulo {
+  font-size: 2rem;
+  margin-bottom: 30px;
+  color: #222;
+  text-align: center;
+  background-color: #ffb347;
+  width: 70%;
+}
+
+/* 🔹 Imagen izquierda, texto derecha */
+.Parrafo-imagenizquierda {
+  display: flex;
+  align-items: stretch; /* misma altura */
+  justify-content: center;
+  gap: 20px;
+  width: 80%;
+  max-width: 1000px;
+  margin-bottom: 40px;
+}
+
+/* 🔹 Imagen derecha, texto izquierda */
+.Parrafo-imagenderecha {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: stretch;
+  justify-content: center;
+  gap: 20px;
+  width: 80%;
+  max-width: 1000px;
+  margin-bottom: 40px;
+}
+
+/* 🔹 Imagen */
+.imagen {
+  width: 50%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+/* 🔹 Párrafo */
+.parrafo {
+  width: 50%;
+  background-color: #f8f8f8;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: justify;
+  line-height: 1.6;
+  display: flex;
+  align-items: center; /* centra verticalmente el texto */
+}
+
+/* 🔹 Responsive (pantallas chicas) */
+@media (max-width: 768px) {
+  .Parrafo-imagenizquierda,
+  .Parrafo-imagenderecha {
+    flex-direction: column;
+  }
+
+  .imagen,
+  .parrafo {
+    width: 100%;
+  }
+}

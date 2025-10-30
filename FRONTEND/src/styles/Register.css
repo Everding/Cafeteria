@@ -1,0 +1,123 @@
+/* Register.css */
+
+/* Contenedor principal */
+.register-container {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  background: linear-gradient(135deg, #d7b89e, #442200);
+}
+
+/* Estructura de página (si usás header/footer) */
+.page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Contenedor intermedio (entre header y footer) */
+.register-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #d7b89e, #442200);
+}
+
+/* Formulario */
+.register-form {
+  background-color: #fff3e6;
+  padding: 40px 30px;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 450px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* Título */
+.register-form h2 {
+  color: #6b4f3b;
+  margin-bottom: 25px;
+  font-size: 28px;
+}
+
+/* Inputs */
+.register-form input {
+  width: 100%;
+  padding: 12px 15px;
+  margin: 8px 0;
+  border-radius: 8px;
+  border: 1px solid #d9b89e;
+  font-size: 16px;
+  background-color: #fff8f0;
+  color: #5a3e2b;
+  box-sizing: border-box;
+}
+
+/* Inputs al enfocar */
+.register-form input:focus {
+  outline: none;
+  border-color: #a67c52;
+  box-shadow: 0 0 5px #a67c52;
+}
+
+/* Botón */
+.register-form button {
+  width: 100%;
+  padding: 12px 15px;
+  margin-top: 15px;
+  border: none;
+  border-radius: 8px;
+  background-color: #6b4f3b;
+  color: #fff3e6;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+/* Hover */
+.register-form button:hover {
+  background-color: #5a3e2b;
+}
+
+/* Placeholder */
+.register-form input::placeholder {
+  color: #a67c52;
+  font-weight: 500;
+}
+
+/* Texto de inicio de sesión */
+.register-form .login-text {
+  margin-top: 15px;
+  color: #6b4f3b;
+  font-size: 14px;
+}
+
+.register-form .login-text a {
+  color: #a67c52;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.register-form .login-text a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .register-form {
+    padding: 30px 20px;
+    border-radius: 12px;
+  }
+
+  .register-form h2 {
+    font-size: 24px;
+  }
+}

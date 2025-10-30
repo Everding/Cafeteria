@@ -1,0 +1,160 @@
+/* MiPerfil.css */
+
+.miperfil-container {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px 20px;
+  background: linear-gradient(135deg, #d7b89e, #442200);
+  box-sizing: border-box;
+}
+
+.miperfil-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.foto-container {
+  position: relative;
+}
+
+.perfil-foto {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #6b4f3b;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.cambiar-foto {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+.tipo-usuario {
+  margin-top: 15px;
+  color: #fff3e6;
+  font-size: 20px;
+  font-weight: bold;
+  text-shadow: 1px 1px 3px #5a3e2b;
+}
+
+.datos-container, .mis-compras, .mis-horarios {
+  background-color: #fff3e6;
+  padding: 25px 20px;
+  border-radius: 15px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 30px;
+}
+
+.datos-container h3, .mis-compras h3, .mis-horarios h3 {
+  color: #6b4f3b;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.datos-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.datos-item label {
+  font-weight: bold;
+  color: #5a3e2b;
+}
+
+.datos-item span {
+  color: #5a3e2b;
+}
+
+.datos-item input {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #d9b89e;
+  background-color: #fff8f0;
+  color: #5a3e2b;
+  width: 60%;
+}
+
+.botones-editar {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.botones-editar button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background-color: #6b4f3b;
+  color: #fff3e6;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.botones-editar button:hover {
+  background-color: #5a3e2b;
+}
+
+/* Tablas */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+thead th {
+  background-color: #6b4f3b;
+  color: #fff3e6;
+  padding: 10px;
+  border-radius: 6px 6px 0 0;
+}
+
+tbody td {
+  padding: 10px;
+  border-bottom: 1px solid #d9b89e;
+  color: #5a3e2b;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Mensaje sin datos */
+.mis-compras p, .mis-horarios p {
+  text-align: center;
+  color: #5a3e2b;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .datos-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .datos-item input {
+    width: 100%;
+    margin-top: 5px;
+  }
+
+  .botones-editar {
+    flex-direction: column;
+    gap: 10px;
+  }
+}

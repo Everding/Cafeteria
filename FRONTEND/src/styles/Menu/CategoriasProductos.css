@@ -1,0 +1,23 @@
+.container {
+  text-align: center;
+  padding: 20px;
+  font-size: 1.3rem;
+  background: linear-gradient(135deg, #d7b89e, #442200);
+}
+
+.header {
+  background-color: #ffb347;
+  color: #222;
+  padding: 10px;
+  font-size: 50px;
+  border-radius: 8px;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 60px; /* separación entre tarjetas */
+  margin: 10px auto 0; /* centrado horizontal */
+  max-width: 60%; /* ajustar según el tamaño de las cards */
+  justify-items: center;
+}
