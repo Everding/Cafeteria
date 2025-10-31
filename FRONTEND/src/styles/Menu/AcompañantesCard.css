@@ -1,8 +1,62 @@
 /* ===========================
+   Página de Acompañantes
+   =========================== */
+.AcompañantesPage {
+  background: linear-gradient(135deg, #d7b89e, #442200);
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.AcompañantesPage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.AcompañantesPage h2 {
+  margin: 0;
+  color: black;
+  background-color: #ffb347;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.AcompañantesPage-addProduct {
+  padding: 10px 20px;
+  border-radius: 5px;
+  background-color: #ffb347;
+  color: black;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.AcompañantesPage-addProduct:hover {
+  transform: translateY(-2px);
+}
+
+/* Grid de cards */
+.AcompañantesPage-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  justify-content: center;
+}
+
+/* Wrapper de cada card con botones externos */
+.AcompañantesCard-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ===========================
    Cards de Acompañantes
    =========================== */
-.AcompanantesCard {
-  background-color: #222;
+.AcompañantesCard {
+  background-color: #222 !important;
   padding: 20px;
   border-radius: 15px;
   width: 100%;
@@ -11,18 +65,18 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: #ffb347;
+  color: #ffb347 !important;
   box-sizing: border-box;
   box-shadow: 0 6px 12px rgba(0,0,0,0.4);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.AcompanantesCard:hover {
+.AcompañantesCard:hover {
   transform: translateY(-5px);
 }
 
 /* Imagen circular */
-.AcompanantesCard img {
+.AcompañantesCard img {
   width: 120px;
   height: 120px;
   border-radius: 50%;
@@ -32,7 +86,7 @@
 }
 
 /* Título */
-.AcompanantesCard-title {
+.AcompañantesCard-title {
   margin: 5px 0;
   text-align: center;
   font-size: 1.1rem;
@@ -40,8 +94,8 @@
 }
 
 /* Descripción */
-.AcompanantesCard-description,
-.AcompanantesCard-description-edit {
+.AcompañantesCard-description,
+.AcompañantesCard-description-edit {
   width: 90%;
   background-color: #fff;
   color: #222;
@@ -51,7 +105,7 @@
   min-height: 50px;
   margin-bottom: 10px;
   font-size: 0.95rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 
   overflow: hidden;
   text-overflow: ellipsis;
@@ -64,8 +118,8 @@
 }
 
 /* Inputs de edición */
-.AcompanantesCard-description-edit,
-.AcompanantesCard-title-edit {
+.AcompañantesCard-description-edit,
+.AcompañantesCard-title-edit {
   display: block;
   width: 90%;
   margin: 5px auto;
@@ -75,14 +129,14 @@
 }
 
 /* Controles de cantidad */
-.AcompanantesCard-quantity {
+.AcompañantesCard-quantity {
   display: flex;
   gap: 10px;
   align-items: center;
   margin-bottom: 10px;
 }
 
-.AcompanantesCard-quantity button {
+.AcompañantesCard-quantity button {
   padding: 5px 10px;
   border: none;
   border-radius: 5px;
@@ -91,21 +145,20 @@
   font-weight: bold;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   transition: transform 0.2s ease, background-color 0.2s ease;
-  font-size: 15px;
 }
 
-.AcompanantesCard-quantity button:hover {
+.AcompañantesCard-quantity button:hover {
   transform: translateY(-2px);
   background-color: #ffaa00;
 }
 
-.AcompanantesCard-quantity-value {
+.AcompañantesCard-quantity-value {
   font-weight: bold;
 }
 
 /* Botón Agregar al carrito */
-.AcompanantesCard-add {
-  background-color: #ff9999;
+.AcompañantesCard-add {
+  background-color: #ff9999 !important;
   border: none;
   border-radius: 5px;
   padding: 8px 15px;
@@ -116,13 +169,13 @@
   transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
-.AcompanantesCard-add:hover {
+.AcompañantesCard-add:hover {
   transform: translateY(-2px);
   background-color: #ff6666;
 }
 
 /* Botones Editar / Eliminar FUERA de la card */
-.AcompanantesCard-editDelete {
+.AcompañantesCard-editDelete {
   display: flex;
   justify-content: center;
   gap: 10px;
@@ -130,44 +183,44 @@
   width: 100%;
 }
 
-.AcompanantesCard-editDelete button {
+.AcompañantesCard-editDelete button {
   padding: 8px 15px;
   border-radius: 5px;
   font-weight: bold;
   cursor: pointer;
-  color: white;
+  color: white !important;
   border: none;
   box-shadow: 0 2px 4px rgba(0,0,0,0.3);
   transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
-.AcompanantesCard-editDelete button:first-child {
+.AcompañantesCard-editDelete button:first-child {
   background-color: #00cc00;
 }
 
-.AcompanantesCard-editDelete button:first-child:hover {
+.AcompañantesCard-editDelete button:first-child:hover {
   background-color: #009900;
   transform: translateY(-2px);
 }
 
-.AcompanantesCard-editDelete button:last-child {
+.AcompañantesCard-editDelete button:last-child {
   background-color: #ff3333;
 }
 
-.AcompanantesCard-editDelete button:last-child:hover {
+.AcompañantesCard-editDelete button:last-child:hover {
   background-color: #cc0000;
   transform: translateY(-2px);
 }
 
 /* Botones Guardar / Cancelar en edición */
-.AcompanantesCard-actions {
+.AcompañantesCard-actions {
   display: flex;
   justify-content: center;
   gap: 10px;
   margin-top: 10px;
 }
 
-.AcompanantesCard-actions button {
+.AcompañantesCard-actions button {
   padding: 8px 16px;
   border-radius: 5px;
   font-weight: bold;
@@ -178,31 +231,36 @@
   transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
-.AcompanantesCard-actions button:first-child {
+.AcompañantesCard-actions button:first-child {
   background-color: #00cc00;
 }
 
-.AcompanantesCard-actions button:first-child:hover {
+.AcompañantesCard-actions button:first-child:hover {
   background-color: #009900;
   transform: translateY(-2px);
 }
 
-.AcompanantesCard-actions button:last-child {
+.AcompañantesCard-actions button:last-child {
   background-color: #ff3333;
 }
 
-.AcompanantesCard-actions button:last-child:hover {
+.AcompañantesCard-actions button:last-child:hover {
   background-color: #cc0000;
   transform: translateY(-2px);
 }
 
 /* Inputs de imagen en edición */
-.AcompanantesCard-editing-controls input[type="file"],
-.AcompanantesCard-editing-controls input[type="text"] {
+.AcompañantesCard-editing-controls input[type="file"],
+.AcompañantesCard-editing-controls input[type="text"] {
   display: block;
   width: 90%;
   margin: 5px auto;
   padding: 5px;
   border-radius: 5px;
   border: 1px solid #ccc;
+}
+
+
+.AcompañantesCard-price {
+  color: #ffb347 !important;
 }

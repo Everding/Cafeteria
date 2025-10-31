@@ -43,7 +43,7 @@ function Login() {
         <h2>Iniciar sesión</h2>
         <input
           type="text"
-          placeholder="Correo o número de mesa"
+          placeholder="Correo"
           value={usuario}
           onChange={(e) => setUsuario(e.target.value)}
           required

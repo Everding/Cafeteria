@@ -1,62 +1,116 @@
-import React, { useState } from 'react';
-import PostresCard from './PostresCard';
-import '../../../styles/Menu/Postres.css';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import PostresCard from "./PostresCard";
+import "../../../styles/Menu/Postres.css";
 
 const Postres = () => {
-  // Productos de ejemplo
-  const [products, setProducts] = useState([
-    { id: 1, title: 'Brownie', description: 'Delicioso brownie de chocolate', image: 'https://via.placeholder.com/120', price: 200, subcategoria: 'Torta' },
-    { id: 2, title: 'Helado', description: 'Helado cremoso de vainilla', image: 'https://via.placeholder.com/120', price: 150, subcategoria: 'Postre frío' },
-    { id: 3, title: 'Galleta', description: 'Galleta de avena con chispas de chocolate', image: 'https://via.placeholder.com/120', price: 100, subcategoria: 'Galleta' },
-    { id: 4, title: 'Tiramisu', description: 'Postre italiano clásico', image: 'https://via.placeholder.com/120', price: 220, subcategoria: 'Postre frío' }
-  ]);
+  const [products, setProducts] = useState([]);
+  const [filtroSubcategoria, setFiltroSubcategoria] = useState("Todas");
 
-  const [filtroSubcategoria, setFiltroSubcategoria] = useState('Todas');
-
-  // Funciones para actualizar, agregar o eliminar productos
-  const agregarProducto = () => {
-    const newProduct = { id: Date.now(), title: 'Nuevo Producto', description: 'Descripción', image: 'https://via.placeholder.com/120', price: 0, subcategoria: 'Sin categoría' };
-    setProducts([newProduct, ...products]);
+  // 🔹 Cargar productos desde backend
+  const fetchProductos = async () => {
+    try {
+      const res = await axios.get("http://localhost:3000/api/productos");
+      setProducts(res.data);
+    } catch (error) {
+      console.error("Error al cargar productos:", error);
+    }
   };
 
-  const actualizarProducto = (id, datosActualizados) => {
-    setProducts(products.map(p => (p.id === id ? { ...p, ...datosActualizados } : p)));
+  useEffect(() => {
+    fetchProductos();
+  }, []);
+
+  // 🔹 Agregar nuevo producto
+  const agregarProducto = async () => {
+    try {
+      const nuevoProducto = {
+        nombre: "Nuevo Postre",
+        descripcion: "Descripción del producto",
+        precio_actual: 100,
+        id_categoria: 4, // Postres
+        estado: "disponible",
+        imagen_url: "https://via.placeholder.com/120",
+        subcategoria: "Torta",
+      };
+      const res = await axios.post("http://localhost:3000/api/productos", nuevoProducto);
+      setProducts([res.data, ...products]);
+    } catch (error) {
+      console.error("Error al agregar producto:", error.response?.data || error.message);
+      alert("No se pudo agregar el producto");
+    }
   };
 
-  const eliminarProducto = (id) => {
-    setProducts(products.filter(p => p.id !== id));
+  // 🔹 Actualizar producto
+  const actualizarProducto = async (id, datosActualizados) => {
+    try {
+      await axios.put(`http://localhost:3000/api/productos/${id}`, datosActualizados);
+      fetchProductos();
+    } catch (error) {
+      console.error("Error al actualizar producto:", error);
+      alert("Error al actualizar producto ❌");
+    }
   };
 
-  // Obtener subcategorías únicas para el select
-  const subcategoriasUnicas = ['Todas', ...Array.from(new Set(products.map(p => p.subcategoria)))];
+  // 🔹 Eliminar producto
+  const eliminarProducto = async (id) => {
+    try {
+      await axios.delete(`http://localhost:3000/api/productos/${id}`);
+      setProducts(products.filter((p) => p.id_producto !== id));
+    } catch (error) {
+      console.error("Error al eliminar producto:", error);
+    }
+  };
 
-  // Filtrar productos según la subcategoría seleccionada
-  const productosFiltrados = filtroSubcategoria === 'Todas'
-    ? products
-    : products.filter(p => p.subcategoria === filtroSubcategoria);
+  // 🔹 Subcategorías únicas del postres
+  const subcategoriasUnicas = [
+    "Todas",
+    ...Array.from(
+      new Set(
+        products
+          .filter((p) => p.id_categoria === 4)
+          .map((p) => p.subcategoria || "Sin subcategoría")
+      )
+    ),
+  ];
+
+  // 🔹 Filtrar productos a mostrar
+  const productosFiltrados = products
+    .filter((p) => p.id_categoria === 4)
+    .filter(
+      (p) =>
+        filtroSubcategoria === "Todas" ||
+        (p.subcategoria || "Sin subcategoría") === filtroSubcategoria
+    );
 
   return (
     <div className="PostresPage">
       <div className="PostresPage-header">
         <h2>Postres</h2>
-        <button className="PostresPage-addProduct" onClick={agregarProducto}>Agregar Producto</button>
+        <button className="PostresPage-addProduct" onClick={agregarProducto}>
+          Agregar Producto
+        </button>
       </div>
 
-      {/* Select de filtro por subcategoría */}
       <div className="PostresPage-filter">
         <label>Filtrar por subcategoría: </label>
-        <select value={filtroSubcategoria} onChange={e => setFiltroSubcategoria(e.target.value)}>
+        <select
+          value={filtroSubcategoria}
+          onChange={(e) => setFiltroSubcategoria(e.target.value)}
+        >
           {subcategoriasUnicas.map((sub, idx) => (
-            <option key={idx} value={sub}>{sub}</option>
+            <option key={idx} value={sub}>
+              {sub}
+            </option>
           ))}
         </select>
       </div>
 
       <div className="PostresPage-container">
         {productosFiltrados.length > 0 ? (
-          productosFiltrados.map(product => (
+          productosFiltrados.map((product) => (
             <PostresCard
-              key={product.id}
+              key={product.id_producto}
               product={product}
               onUpdate={actualizarProducto}
               onDelete={eliminarProducto}

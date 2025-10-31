@@ -1,55 +1,116 @@
-import React, { useState } from 'react';
-import KioscoCard from './KioscoCard';
-import '../../../styles/Menu/Kiosco.css';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import KioscoCard from "./KioscoCard";
+import "../../../styles/Menu/Kiosco.css";
 
 const Kiosco = () => {
-  const [products, setProducts] = useState([
-    { id: 1, title: 'Chocolatina', description: 'Chocolate con leche', image: 'https://via.placeholder.com/120', price: 50, subcategoria: 'Chocolates' },
-    { id: 2, title: 'Gomitas', description: 'Gomitas de frutas', image: 'https://via.placeholder.com/120', price: 40, subcategoria: 'Golosinas' }
-  ]);
+  const [products, setProducts] = useState([]);
+  const [filtroSubcategoria, setFiltroSubcategoria] = useState("Todas");
 
-  const [filtroSubcategoria, setFiltroSubcategoria] = useState('Todas');
-
-  const agregarProducto = () => {
-    const newProduct = { id: Date.now(), title: 'Nuevo Producto', description: 'Descripción', image: 'https://via.placeholder.com/120', price: 0, subcategoria: 'Sin categoría' };
-    setProducts([newProduct, ...products]);
+  // 🔹 Cargar productos del backend
+  const fetchProductos = async () => {
+    try {
+      const res = await axios.get("http://localhost:3000/api/productos");
+      setProducts(res.data);
+    } catch (error) {
+      console.error("Error al cargar productos:", error);
+    }
   };
 
-  const actualizarProducto = (id, datosActualizados) => {
-    setProducts(products.map(p => (p.id === id ? { ...p, ...datosActualizados } : p)));
+  useEffect(() => {
+    fetchProductos();
+  }, []);
+
+  // 🔹 Agregar nuevo producto
+  const agregarProducto = async () => {
+    try {
+      const nuevoProducto = {
+        nombre: "Nuevo Producto Kiosco",
+        descripcion: "Descripción del producto",
+        precio_actual: 50,
+        id_categoria: 3, // Kiosco
+        estado: "disponible",
+        imagen_url: "https://via.placeholder.com/120",
+        subcategoria: "Snacks",
+      };
+      const res = await axios.post("http://localhost:3000/api/productos", nuevoProducto);
+      setProducts([res.data, ...products]);
+    } catch (error) {
+      console.error("Error al agregar producto:", error.response?.data || error.message);
+      alert("No se pudo agregar el producto");
+    }
   };
 
-  const eliminarProducto = (id) => {
-    setProducts(products.filter(p => p.id !== id));
+  // 🔹 Actualizar producto
+  const actualizarProducto = async (id, datosActualizados) => {
+    try {
+      await axios.put(`http://localhost:3000/api/productos/${id}`, datosActualizados);
+      fetchProductos();
+    } catch (error) {
+      console.error("Error al actualizar producto:", error);
+      alert("Error al actualizar producto ❌");
+    }
   };
 
-  const subcategoriasUnicas = ['Todas', ...Array.from(new Set(products.map(p => p.subcategoria)))];
+  // 🔹 Eliminar producto
+  const eliminarProducto = async (id) => {
+    try {
+      await axios.delete(`http://localhost:3000/api/productos/${id}`);
+      setProducts(products.filter((p) => p.id_producto !== id));
+    } catch (error) {
+      console.error("Error al eliminar producto:", error);
+    }
+  };
 
-  const productosFiltrados = filtroSubcategoria === 'Todas'
-    ? products
-    : products.filter(p => p.subcategoria === filtroSubcategoria);
+  // 🔹 Subcategorías únicas del kiosco
+  const subcategoriasUnicas = [
+    "Todas",
+    ...Array.from(
+      new Set(
+        products
+          .filter((p) => p.id_categoria === 3)
+          .map((p) => p.subcategoria || "Sin subcategoría")
+      )
+    ),
+  ];
+
+  // 🔹 Filtrado de productos a mostrar
+  const productosFiltrados = products
+    .filter((p) => p.id_categoria === 3)
+    .filter(
+      (p) =>
+        filtroSubcategoria === "Todas" ||
+        (p.subcategoria || "Sin subcategoría") === filtroSubcategoria
+    );
 
   return (
     <div className="KioscoPage">
       <div className="KioscoPage-header">
         <h2>Kiosco</h2>
-        <button className="KioscoPage-addProduct" onClick={agregarProducto}>Agregar Producto</button>
+        <button className="KioscoPage-addProduct" onClick={agregarProducto}>
+          Agregar Producto
+        </button>
       </div>
 
       <div className="KioscoPage-filter">
         <label>Filtrar por subcategoría: </label>
-        <select value={filtroSubcategoria} onChange={e => setFiltroSubcategoria(e.target.value)}>
+        <select
+          value={filtroSubcategoria}
+          onChange={(e) => setFiltroSubcategoria(e.target.value)}
+        >
           {subcategoriasUnicas.map((sub, idx) => (
-            <option key={idx} value={sub}>{sub}</option>
+            <option key={idx} value={sub}>
+              {sub}
+            </option>
           ))}
         </select>
       </div>
 
       <div className="KioscoPage-container">
         {productosFiltrados.length > 0 ? (
-          productosFiltrados.map(product => (
+          productosFiltrados.map((product) => (
             <KioscoCard
-              key={product.id}
+              key={product.id_producto}
               product={product}
               onUpdate={actualizarProducto}
               onDelete={eliminarProducto}

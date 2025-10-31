@@ -1,28 +1,29 @@
 /* ===========================
    Página de Acompañantes
    =========================== */
-.AcompanantesPage {
+.AcompañantesPage {
   background: linear-gradient(135deg, #d7b89e, #442200);
   padding: 20px;
   box-sizing: border-box;
+  min-height: 100vh;
 }
 
-.AcompanantesPage-header {
+.AcompañantesPage-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
 }
 
-.AcompanantesPage h2 {
+.AcompañantesPage h2 {
   margin: 0;
   color: black;
   background-color: #ffb347;
   border-radius: 10px;
-  width: 20%;
+  padding: 10px;
 }
 
-.AcompanantesPage-addProduct {
+.AcompañantesPage-addProduct {
   padding: 10px 20px;
   border-radius: 5px;
   background-color: #ffb347;
@@ -33,20 +34,166 @@
   transition: transform 0.2s ease;
 }
 
-.AcompanantesPage-addProduct:hover {
+.AcompañantesPage-addProduct:hover {
   transform: translateY(-2px);
 }
 
-/* Grid de cards con máximo 8 por fila */
-.AcompanantesPage-container {
+/* Grid de cards */
+.AcompañantesPage-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 20px;
   justify-content: center;
 }
 
-.AcompanantesCard-wrapper {
+/* Wrapper de cada card */
+.AcompañantesCard-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+/* ===========================
+   Card de Acompañante
+   =========================== */
+.AcompañantesCard {
+  background-color: #fff3e0;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  width: 100%;
+  padding: 15px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.AcompañantesCard:hover {
+  transform: translateY(-3px);
+}
+
+.AcompañantesCard-image {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.AcompañantesCard-title,
+.AcompañantesCard-title-edit {
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: center;
+  margin: 5px 0;
+}
+
+.AcompañantesCard-description,
+.AcompañantesCard-description-edit {
+  font-size: 0.95rem;
+  text-align: center;
+  margin: 5px 0;
+  color: #333;
+}
+
+.AcompañantesCard-price {
+  font-size: 1rem;
+  font-weight: bold;
+  margin: 10px 0;
+  color: #444;
+}
+
+.AcompañantesCard-quantity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.AcompañantesCard-quantity button {
+  padding: 5px 10px;
+  border: none;
+  background-color: #ffb347;
+  color: black;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.AcompañantesCard-quantity button:hover {
+  transform: translateY(-2px);
+}
+
+.AcompañantesCard-add {
+  padding: 8px 15px;
+  background-color: #ffb347;
+  color: black;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.AcompañantesCard-add:hover {
+  transform: translateY(-2px);
+}
+
+/* Botones de editar y eliminar */
+.AcompañantesCard-editDelete {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.AcompañantesCard-editDelete button {
+  padding: 6px 12px;
+  background-color: #ffb347;
+  color: black;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.AcompañantesCard-editDelete button:hover {
+  transform: translateY(-2px);
+}
+
+/* Acciones dentro de edición */
+.AcompañantesCard-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.AcompañantesCard-actions button {
+  padding: 6px 12px;
+  background-color: #ffb347;
+  color: black;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.AcompañantesCard-actions button:hover {
+  transform: translateY(-2px);
+}
+
+/* Input de edición */
+.AcompañantesCard-title-edit,
+.AcompañantesCard-description-edit,
+.AcompañantesCard input[type="number"] {
+  width: 100%;
+  padding: 5px;
+  margin: 5px 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  text-align: center;
 }

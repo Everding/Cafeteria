@@ -8,9 +8,7 @@ const Empleados = () => {
   const [sucursales, setSucursales] = useState([]);
   const [cambiosPendientes, setCambiosPendientes] = useState([]);
 
-  // ---------- TRAER EMPLEADOS DESDE LA DB ----------
   useEffect(() => {
-    // Simulación de fetch a backend
     const fetchEmpleados = async () => {
       // Ejemplo de datos que vendrían de la DB
       const data = [

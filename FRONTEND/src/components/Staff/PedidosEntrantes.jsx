@@ -58,16 +58,16 @@ const PedidosEntrantes = () => {
       <div className="pedidos-lista">
         {comandas.map((comanda) => (
           <div key={comanda.id} className={`comanda-card ${comanda.estado.toLowerCase()}`}>
-            {/* Izquierda: Foto + Cliente */}
+           
             <div className="comanda-cliente">
               <img src={comanda.imagen} alt={comanda.cliente} className="cliente-foto" />
               <p className="cliente-nombre">{comanda.cliente}</p>
             </div>
 
-            {/* Separador vertical */}
+           
             <div className="comanda-separador"></div>
 
-            {/* Centro: Pedido */}
+        
             <div className="comanda-detalle">
               <h3>Pedido</h3>
               <ul className="comanda-productos">
@@ -79,7 +79,7 @@ const PedidosEntrantes = () => {
               </ul>
             </div>
 
-            {/* Derecha: Estado */}
+        
             <div className="comanda-estado">
               <h3>Estado:</h3>
               <p className={`estado-texto estado-${comanda.estado.toLowerCase()}`}>
@@ -87,7 +87,6 @@ const PedidosEntrantes = () => {
               </p>
             </div>
 
-            {/* Botón al extremo derecho */}
             {comanda.estado === 'Pendiente' && (
               <button
                 className="boton-entregado"

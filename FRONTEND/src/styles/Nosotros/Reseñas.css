@@ -1,0 +1,111 @@
+.reseñas-container {
+  padding: 40px;
+  font-family: 'Arial', sans-serif;
+  background-color: #fff8f0;
+}
+
+.titulo {
+  text-align: center;
+  font-size: 2rem;
+  color: #3c2f2f;
+  margin-bottom: 30px;
+}
+
+/* FORMULARIO */
+.reseña-form {
+  background-color: #ffe6cc;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 600px;
+  margin: 0 auto 40px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reseña-form textarea,
+.reseña-form select {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.reseña-form button {
+  background-color: #ffb347;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.reseña-form button:hover {
+  background-color: #ff9a00;
+}
+
+/* LISTA DE RESEÑAS */
+.reseñas-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.reseña-row {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.reseña-user-card,
+.reseña-text-card {
+  background-color: #fdf3e7;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 🔹 Ajuste: la card del usuario ahora ocupa menos espacio */
+.reseña-user-card {
+  width: 25%;
+  text-align: center;
+}
+
+.reseña-text-card {
+  width: 65%;
+}
+
+.reseña-user-card img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.reseña-user-card h4 {
+  font-size: 1.1rem;
+  margin-bottom: 5px;
+  color: #3c2f2f;
+}
+
+.reseña-text-card p {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.reseña-estrellas {
+  text-align: right;
+  margin-top: 10px;
+  font-size: 1.2rem;
+  color: #ffb347;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .reseña-user-card,
+  .reseña-text-card {
+    width: 100%;
+  }
+}

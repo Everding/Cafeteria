@@ -8,7 +8,7 @@ const AdministrarEmpleados = ({ onUpdateEmpleados }) => {
   const [empleados, setEmpleados] = useState([]);
   const [encargados, setEncargados] = useState([]);
 
-  // ---------- FUNCIONES GENERALES ----------
+
   const handleEdit = (id, tipo) => {
     const lista = tipo === "empleado" ? empleados : encargados;
     const setLista = tipo === "empleado" ? setEmpleados : setEncargados;
@@ -84,7 +84,7 @@ const AdministrarEmpleados = ({ onUpdateEmpleados }) => {
     setLista([nuevo, ...lista]);
   };
 
-  // ---------- RENDERIZAR FILA ----------
+ 
   const renderFila = (e, tipo) => (
     <div className="admin-card" key={e.idPersonal}>
       <img src={e.cambios?.imagen ?? e.imagen} alt={e.nombre} className="admin-foto" />
@@ -154,7 +154,7 @@ const AdministrarEmpleados = ({ onUpdateEmpleados }) => {
     </div>
   );
 
-  // ---------- RENDER PRINCIPAL ----------
+
   return (
     
     <div className="admin-empleados-container">

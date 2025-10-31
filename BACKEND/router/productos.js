@@ -1,27 +1,31 @@
 import express from "express";
+import multer from "multer";
+import path from "path";
 import {
   getAllProductos,
   getProductoById,
   createProducto,
-  updateProducto,
-  deleteProducto
+  updateProductoConImagen,
+  deleteProducto,
 } from "../controllers/productos.js";
 
 const router = express.Router();
 
-// Obtener todos los productos
+// Configuración de multer
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, "uploads"), // carpeta uploads/
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, Date.now() + ext);
+  },
+});
+const upload = multer({ storage });
+
+// Rutas
 router.get("/", getAllProductos);
-
-// Obtener producto por ID
 router.get("/:id_producto", getProductoById);
-
-// Crear nuevo producto
 router.post("/", createProducto);
-
-// Actualizar producto
-router.put("/:id_producto", updateProducto);
-
-// Eliminar producto
+router.put("/:id_producto", upload.single("imagen"), updateProductoConImagen);
 router.delete("/:id_producto", deleteProducto);
 
 export default router;

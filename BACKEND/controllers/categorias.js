@@ -1,5 +1,5 @@
 // controllers/categorias.js
-import db from "../config/dataBase.js"; // tu conexión MySQL (usa mysql2 o similar)
+import db from "../config/dataBase.js"; 
 
 // Obtener todas las categorías (visible para cliente y admin)
 export const getCategorias = async (req, res) => {

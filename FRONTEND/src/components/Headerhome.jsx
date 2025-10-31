@@ -29,7 +29,7 @@ const HeaderHome = () => {
   };
 
   const handleCartClick = () => {
-    navigate("/cart");
+    navigate("/Carrito");
   };
   
 
@@ -70,12 +70,12 @@ const HeaderHome = () => {
             onMouseLeave={() => handleMouseLeave("nosotros")}
             onClick={() => handleDropdownClick("nosotros")}
           >
-            <a href="#" className="headerhome-nav-link">Nosotros</a>
+            <a href="/Nosotros/NuestraHistoria" className="headerhome-nav-link">Nosotros</a>
             <div className={`headerhome-dropdown ${openDropdown.nosotros ? 'open' : ''}`}>
-              <a href="#" className="headerhome-dropdown-item">Equipo</a>
-              <a href="#" className="headerhome-dropdown-item">Nuestra historia</a>
-              <a href="#" className="headerhome-dropdown-item">Sucursales</a>
-              <a href="#" className="headerhome-dropdown-item">Reseña</a>
+              <a href="/Nosotros/Equipo" className="headerhome-dropdown-item">Equipo</a>
+              <a href="/Nosotros/NuestraHistoria" className="headerhome-dropdown-item">Nuestra historia</a>
+              <a href="/Nosotros/Sucursales" className="headerhome-dropdown-item">Sucursales</a>
+              <a href="/Nosotros/Reseña" className="headerhome-dropdown-item">Reseña</a>
             </div>
           </li>
 
@@ -99,7 +99,7 @@ const HeaderHome = () => {
             onMouseLeave={() => handleMouseLeave("catalogo")}
             onClick={() => handleDropdownClick("catalogo")}
           >
-            <a href="#" className="headerhome-nav-link">Promociones</a>
+            <a href="/Contactanos" className="headerhome-nav-link">Contactanos</a>
           </li>
 
           <li
@@ -133,7 +133,7 @@ const HeaderHome = () => {
               {isLoggedIn ? (
                 <>
                   <a href="/perfil" className='headerhome-dropdown-item'>Mi perfil</a>
-                  <a href="#" className='headerhome-dropdown-item' onClick={handleLogout}>Cerrar sesión</a>
+                  <a href="" className='headerhome-dropdown-item' onClick={handleLogout}>Cerrar sesión</a>
                 </>
               ) : (
                 <>

@@ -47,12 +47,12 @@ const Header = ({ cantidadProductos = 0 }) => { // <-- agregamos prop
             onMouseEnter={() => handleMouseEnter("nosotros")}
             onMouseLeave={handleMouseLeave}
           >
-            <a href="#" className="nav-linkGeneral">Nosotros</a>
+            <a href="/Nosotros/NuestraHistoria" className="nav-linkGeneral">Nosotros</a>
             <div className={`dropdownGeneral ${openDropdown === "nosotros" ? "open" : ""}`}>
-              <a href="#">Equipo</a>
-              <a href="#">Nuestra historia</a>
-              <a href="#">Sucursales</a>
-              <a href="#">Reseña</a>
+              <a href="/Nosotros/Equipo">Equipo</a>
+              <a href="/Nosotros/NuestraHistoria">Nuestra historia</a>
+              <a href="/Nosotros/Sucursales">Sucursales</a>
+              <a href="/Nosotros/Reseña">Reseña</a>
             </div>
           </li>
 
@@ -70,7 +70,7 @@ const Header = ({ cantidadProductos = 0 }) => { // <-- agregamos prop
           </li>
 
           <li className="nav-itemGeneral">
-            <a href="#" className="nav-linkGeneral">Promociones</a>
+            <a href="/Contactanos" className="nav-linkGeneral">Contactanos</a>
           </li>
 
           <li

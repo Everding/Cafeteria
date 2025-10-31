@@ -25,7 +25,8 @@ import sucursalesRoutes from "./router/sucursales.js";
 import turnosRoutes from "./router/turnos.js";
 import ventasRoutes from "./router/ventas.js";
 import registerRoutes from "./router/register.js";
-
+import multer from "multer";
+import path from "path";
 
 const app = express();
 app.use(cors());
@@ -56,7 +57,21 @@ app.use("/api/sucursales", sucursalesRoutes);
 app.use("/api/turnos", turnosRoutes);
 app.use("/api/ventas", ventasRoutes);
 app.use("/api", registerRoutes);
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
+
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads"); // guarda en /uploads
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, Date.now() + ext); // nombre único
+  },
+});
+
+const upload = multer({ storage });
 
 
 

@@ -23,7 +23,7 @@ const Stock = () => {
     setMateriasPrimas((prev) => prev.filter((mp) => mp.idMateriaPrima !== id));
   };
 
-  // Nueva lógica para agregar materia prima con select de categoría
+  
   const agregarMateriaPrima = () => {
     const nombre = prompt('Ingrese el nombre de la nueva materia prima:');
     if (!nombre) return;
@@ -31,7 +31,7 @@ const Stock = () => {
     const cantidad = parseInt(prompt('Ingrese la cantidad inicial:'), 10);
     if (isNaN(cantidad)) return alert('Cantidad inválida');
 
-    // Mostrar un select con categorías disponibles
+   
     const categoria = prompt(
       `Seleccione la categoría escribiendo el número:\n${categorias
         .map((cat, i) => `${i + 1}. ${cat}`)

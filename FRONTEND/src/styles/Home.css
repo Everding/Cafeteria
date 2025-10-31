@@ -14,7 +14,7 @@
   width: 70%;
 }
 
-/* 🔹 Imagen izquierda, texto derecha */
+/* Imagen izquierda, texto derecha */
 .Parrafo-imagenizquierda {
   display: flex;
   align-items: stretch; /* misma altura */
@@ -25,7 +25,7 @@
   margin-bottom: 40px;
 }
 
-/* 🔹 Imagen derecha, texto izquierda */
+/* Imagen derecha, texto izquierda */
 .Parrafo-imagenderecha {
   display: flex;
   flex-direction: row-reverse;
@@ -37,14 +37,14 @@
   margin-bottom: 40px;
 }
 
-/* 🔹 Imagen */
+/* Imagen */
 .imagen {
   width: 50%;
   object-fit: cover;
   border-radius: 10px;
 }
 
-/* 🔹 Párrafo */
+/* Párrafo */
 .parrafo {
   width: 50%;
   background-color: #f8f8f8;
@@ -56,15 +56,3 @@
   align-items: center; /* centra verticalmente el texto */
 }
 
-/* 🔹 Responsive (pantallas chicas) */
-@media (max-width: 768px) {
-  .Parrafo-imagenizquierda,
-  .Parrafo-imagenderecha {
-    flex-direction: column;
-  }
-
-  .imagen,
-  .parrafo {
-    width: 100%;
-  }
-}

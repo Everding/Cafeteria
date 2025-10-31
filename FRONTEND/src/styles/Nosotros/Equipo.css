@@ -1,0 +1,117 @@
+.equipo-container {
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(135deg, #d7b89e, #442200);
+  color: #222;
+  min-height: 100vh;
+}
+
+/* 🔸 Título principal */
+#Titulo-equipo {
+  font-size: 2rem;
+  margin-bottom: 40px;
+  color: #222;
+  text-align: center;
+  background-color: #ffb347;
+  width: 70%;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+/* 🔹 Línea con título centrado */
+.linea-titulo {
+  position: relative;
+  width: 90%;
+  text-align: center;
+  margin: 40px 0 30px;
+}
+
+.linea-titulo::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #ffb347;
+  z-index: 1;
+}
+
+.linea-titulo h3 {
+  position: relative;
+  display: inline-block;
+  background-color: #fff3e6;
+  padding: 0 20px;
+  z-index: 2;
+  font-size: 1.6rem;
+  color: #5a3e2b;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* 🔸 Contenedor de las cards (en fila) */
+.fila-equipo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 25px;
+  width: 90%;
+  max-width: 1200px;
+  margin-bottom: 40px;
+}
+
+/* 🔸 Card individual */
+.equipo-card {
+  background-color: #fff3e6;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  width: 220px;
+  text-align: center;
+  padding: 20px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.equipo-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+}
+
+/* 🔸 Imagen */
+.equipo-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+/* 🔸 Nombre */
+.equipo-card h4 {
+  font-size: 1.2rem;
+  margin: 10px 0 5px;
+  color: #5a3e2b;
+}
+
+/* 🔸 Descripción */
+.equipo-card p {
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: #333;
+}
+
+/* 🔹 Responsive */
+@media (max-width: 768px) {
+  .fila-equipo {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .equipo-card {
+    width: 85%;
+  }
+}

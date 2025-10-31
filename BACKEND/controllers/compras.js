@@ -47,7 +47,6 @@ export const getCompraById = async (req, res) => {
 
 
 // Registrar una nueva compra
-// Ejemplo body: { "id_proveedor": 1, "total": 3500.50 }
 export const createCompra = async (req, res) => {
   try {
     const { id_proveedor, total } = req.body;

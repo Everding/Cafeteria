@@ -4,9 +4,9 @@ export const loginGeneral = async (req, res) => {
   const { usuario, contraseña } = req.body; // puede ser correo o número de mesa
 
   try {
-    let rows; // ✅ Inicializada correctamente
+    let rows; //Inicializada correctamente
 
-    // 🔹 Buscar en UsuariosApp (clientes con cuenta)
+    //  Buscar en UsuariosApp (clientes con cuenta)
     [rows] = await db.query(
       "SELECT correo, usuario FROM UsuariosApp WHERE (correo = ? OR usuario = ?) AND contraseña = ?",
       [usuario, usuario, contraseña]
@@ -21,7 +21,7 @@ export const loginGeneral = async (req, res) => {
       });
     }
 
-    // 🔹 Buscar en Personal (administrador, encargado, empleado)
+    // Buscar en Personal (administrador, encargado, empleado)
     [rows] = await db.query(
       "SELECT correo, idRol FROM Personal WHERE correo = ? AND contraseña = ?",
       [usuario, contraseña]
@@ -36,7 +36,7 @@ export const loginGeneral = async (req, res) => {
       });
     }
 
-    // 🔹 Buscar en Clientes (mesas)
+    // Buscar en Clientes (mesas)
     [rows] = await db.query(
       "SELECT numeroMesa, estado FROM Clientes WHERE numeroMesa = ?",
       [usuario]
@@ -59,7 +59,7 @@ export const loginGeneral = async (req, res) => {
       }
     }
 
-    // 🔹 Ningún usuario coincide
+    // Ningún usuario coincide
     res.json({ success: false, message: "Usuario o contraseña incorrectos" });
   } catch (error) {
     console.error("Error en login:", error);

@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { Routes, Route, BrowserRouter } from 'react-router-dom';
-import { LOGIN, HOME, MENUSPREFABRICADOS, ORDENAR, BEBIDAS, ACOMPAÑANTES, POSTRES, KIOSCO, NUESTROSPRODUCTOS, PEDIDOS, EMPLEADOS, ADMINISTRAREMPLEADOS, STOCK, VENTAS, COMPRAS,
-REGISTER, MIPERFIL, CARRITO } from './routers/router';
+import { Routes, Route, BrowserRouter, useLocation } from 'react-router-dom';
+import { 
+  LOGIN, HOME, MENUSPREFABRICADOS, ORDENAR, BEBIDAS, ACOMPAÑANTES, POSTRES, 
+  KIOSCO, NUESTROSPRODUCTOS, PEDIDOS, EMPLEADOS, ADMINISTRAREMPLEADOS, STOCK, 
+  VENTAS, COMPRAS, REGISTER, MIPERFIL, CARRITO, EQUIPO, NUESTRAHISTORIA, SUCURSALES, RESEÑA, CONTACTANOS
+} from './routers/router';
 
 // Páginas
 import LoginPage from "./pages/LoginPage";
@@ -22,20 +25,24 @@ import ComprasPage from './pages/staff/ComprasPage';
 import RegisterPage from './pages/RegisterPage';
 import MiPerfilPage from './pages/MiperfilPage';
 import CarritoPage from './pages/CarritoPage';
-
-// Header
 import Header from './components/Header';
+import EquipoPage from './pages/nosotros/EquipoPage';
+import NuestraHistoriaPage from './pages/nosotros/NuestrahistoriaPage';
+import SucursalesPage from './pages/nosotros/SucursalesPage';
+import ReseñaPage from './pages/nosotros/ReseñasPage';
+import ContactanosPage from './pages/ContactanosPage';
 
-const App = () => {
-  // Estado del carrito: empieza vacío
+const AppContent = () => {
+  const location = useLocation();
   const [detalle, setDetalle] = useState([]);
-
-  // Total de productos en el carrito
   const totalItems = detalle.reduce((acc, item) => acc + item.cantidad, 0);
+  const noHeaderRoutes = [HOME];
+
   return (
-    <BrowserRouter>
-      {/* Pasamos la cantidad de productos al Header */}
-      <Header cantidadProductos={totalItems} />
+    <>
+      {!noHeaderRoutes.includes(location.pathname) && (
+        <Header cantidadProductos={totalItems} />
+      )}
 
       <Routes>
         <Route path={HOME} element={<Home />} />
@@ -55,11 +62,23 @@ const App = () => {
         <Route path={COMPRAS} element={<ComprasPage />} />
         <Route path={REGISTER} element={<RegisterPage />} />
         <Route path={MIPERFIL} element={<MiPerfilPage />} />
-        {/* Pasamos detalle y setDetalle a CarritoPage */}
         <Route path={CARRITO} element={<CarritoPage detalle={detalle} setDetalle={setDetalle} />} />
+        <Route path={EQUIPO} element={<EquipoPage />} />
+        <Route path={NUESTRAHISTORIA} element={<NuestraHistoriaPage />} />
+        <Route path={SUCURSALES} element={<SucursalesPage />} />
+        <Route path={RESEÑA} element={<ReseñaPage />} />
+        <Route path={CONTACTANOS} element={<ContactanosPage />} />
+        
+       
       </Routes>
-    </BrowserRouter>
+    </>
   );
 };
+
+const App = () => (
+  <BrowserRouter>
+    <AppContent />
+  </BrowserRouter>
+);
 
 export default App;
