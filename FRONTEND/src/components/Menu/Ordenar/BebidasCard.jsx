@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../../../styles/Menu/BebidasCard.css";
 
@@ -10,6 +10,66 @@ const BebidasCard = ({ product, onUpdate, onDelete }) => {
   const [cantidad, setCantidad] = useState(1);
   const [file, setFile] = useState(null);
 
+  // 🔹 Materias primas
+  const [materiasPrimas, setMateriasPrimas] = useState([]);
+  const [busqueda, setBusqueda] = useState("");
+  const [seleccionadas, setSeleccionadas] = useState([]); // {id_materia, cantidad_necesaria}
+
+  // --- Cargar todas las materias primas disponibles ---
+  useEffect(() => {
+    axios
+      .get("http://localhost:3000/api/materia-prima")
+      .then(res => setMateriasPrimas(res.data))
+      .catch(err => console.error("Error al obtener materias primas:", err));
+  }, []);
+
+  // --- Cargar materias primas asignadas al producto cuando se edita ---
+  useEffect(() => {
+    if (editing) {
+      axios
+        .get(`http://localhost:3000/api/materia-prima/producto/${product.id_producto}/stock`)
+        .then(res => {
+          const asignadas = res.data.map(m => ({
+            id_materia: m.id_materia,
+            cantidad_necesaria: m.cantidad_necesaria || 1
+          }));
+          setSeleccionadas(asignadas);
+        })
+        .catch(err => console.error(err));
+    }
+  }, [editing]);
+
+  // --- Toggle de selección ---
+  function toggleMateriaPrima(id_materia) {
+    setSeleccionadas(prev => {
+      if (prev.some(m => m.id_materia === id_materia)) {
+        return prev.filter(m => m.id_materia !== id_materia);
+      } else {
+        return [...prev, { id_materia, cantidad_necesaria: 1 }];
+      }
+    });
+  }
+
+  // --- Guardar materias primas en stock ---
+  const guardarMateriasPrimas = async () => {
+    if (!product.id_producto) {
+      alert("ID de producto inválido");
+      return;
+    }
+
+    try {
+      await axios.put(
+        `http://localhost:3000/api/materia-prima/producto/${product.id_producto}/stock`,
+        { materiasPrimas: seleccionadas }
+      );
+      alert("Materias primas guardadas correctamente ✅");
+    } catch (error) {
+      console.error("Error al guardar materias primas:", error);
+      alert("Error al guardar materias primas ❌");
+    }
+  };
+
+  // --- Código original de guardar producto ---
   const handleGuardar = async () => {
     try {
       let updatedProduct = {
@@ -19,7 +79,7 @@ const BebidasCard = ({ product, onUpdate, onDelete }) => {
         id_categoria: product.id_categoria,
         estado: product.estado,
         subcategoria: product.subcategoria,
-        imagen_url: product.imagen_url, // valor inicial
+        imagen_url: product.imagen_url,
       };
 
       if (file) {
@@ -37,9 +97,8 @@ const BebidasCard = ({ product, onUpdate, onDelete }) => {
           formData,
           { headers: { "Content-Type": "multipart/form-data" } }
         );
-        updatedProduct = res.data; // producto actualizado con nueva imagen
+        updatedProduct = res.data;
       } else {
-        // Si no hay archivo, solo actualizar datos normales
         const res = await axios.put(
           `http://localhost:3000/api/productos/${product.id_producto}`,
           updatedProduct
@@ -47,7 +106,6 @@ const BebidasCard = ({ product, onUpdate, onDelete }) => {
         updatedProduct = res.data;
       }
 
-      // Actualizar el producto en el estado del padre
       onUpdate(product.id_producto, updatedProduct);
       setEditing(false);
       setFile(null);
@@ -58,7 +116,8 @@ const BebidasCard = ({ product, onUpdate, onDelete }) => {
   };
 
   const handleDelete = () => {
-    if (window.confirm("¿Eliminar este producto?")) onDelete(product.id_producto);
+    if (window.confirm("¿Eliminar este producto?"))
+      onDelete(product.id_producto);
   };
 
   const agregarAlCarrito = async () => {
@@ -78,6 +137,11 @@ const BebidasCard = ({ product, onUpdate, onDelete }) => {
 
   const incrementar = () => setCantidad(cantidad + 1);
   const decrementar = () => setCantidad(cantidad > 1 ? cantidad - 1 : 1);
+
+  // Filtrado de materias primas por búsqueda
+  const materiasFiltradas = materiasPrimas.filter(mp =>
+    mp.nombre.toLowerCase().includes(busqueda.toLowerCase())
+  );
 
   return (
     <div className="BebidasCard-wrapper">
@@ -112,6 +176,33 @@ const BebidasCard = ({ product, onUpdate, onDelete }) => {
               className="BebidasCard-title-edit"
             />
 
+            {/* Materias primas */}
+            <div className="BebidasCard-materias">
+              <h4>Materias primas</h4>
+              <input
+                type="text"
+                placeholder="Buscar materia prima..."
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+                className="MateriaPrimaSearch"
+              />
+              <div className="MateriasList">
+                {materiasFiltradas.map(mp => (
+                  <label key={mp.id_materia} className="MateriaPrimaItem">
+                    <input
+                      type="checkbox"
+                      checked={seleccionadas.some(m => m.id_materia === mp.id_materia)}
+                      onChange={() => toggleMateriaPrima(mp.id_materia)}
+                    />
+                    {mp.nombre}
+                  </label>
+                ))}
+              </div>
+              <button className="SaveButton" onClick={guardarMateriasPrimas}>
+                Guardar Materias Primas
+              </button>
+            </div>
+
             <div className="BebidasCard-actions">
               <button onClick={handleGuardar}>Guardar</button>
               <button onClick={() => setEditing(false)}>Cancelar</button>
@@ -134,9 +225,7 @@ const BebidasCard = ({ product, onUpdate, onDelete }) => {
             <button className="BebidasCard-add" onClick={agregarAlCarrito}>
               Agregar al carrito
             </button>
-            <p className="BebidasCard-price">
-              <strong>Precio:</strong> ${precio}
-            </p>
+            <p className="BebidasCard-price"><strong>Precio:</strong> ${precio}</p>
           </>
         )}
       </div>

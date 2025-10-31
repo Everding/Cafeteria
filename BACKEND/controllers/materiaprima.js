@@ -7,7 +7,7 @@ export const getAllMateriasPrimas = async (req, res) => {
     const [rows] = await db.query(`
       SELECT m.id_materia, m.nombre, m.unidad_medida, m.stock_actual, m.stock_minimo,
              p.nombre AS proveedor
-      FROM materia_prima m
+      FROM materiaprima m
       LEFT JOIN proveedores p ON m.id_proveedor = p.id_proveedor
       ORDER BY m.nombre ASC
     `);
@@ -29,7 +29,7 @@ export const getMateriaPrimaById = async (req, res) => {
     const [rows] = await db.query(`
       SELECT m.id_materia, m.nombre, m.unidad_medida, m.stock_actual, m.stock_minimo,
              p.nombre AS proveedor
-      FROM materia_prima m
+      FROM materiaprima m
       LEFT JOIN proveedores p ON m.id_proveedor = p.id_proveedor
       WHERE m.id_materia = ?
     `, [id_materia]);
@@ -75,7 +75,7 @@ export const updateMateriaPrima = async (req, res) => {
     const { nombre, unidad_medida, stock_actual, stock_minimo, id_proveedor } = req.body;
 
     await db.query(`
-      UPDATE materia_prima
+      UPDATE materiaprima
       SET nombre = ?, unidad_medida = ?, stock_actual = ?, stock_minimo = ?, id_proveedor = ?
       WHERE id_materia = ?
     `, [nombre, unidad_medida, stock_actual, stock_minimo, id_proveedor, id_materia]);
@@ -93,10 +93,38 @@ export const updateMateriaPrima = async (req, res) => {
 export const deleteMateriaPrima = async (req, res) => {
   try {
     const { id_materia } = req.params;
-    await db.query("DELETE FROM materia_prima WHERE id_materia = ?", [id_materia]);
+    await db.query("DELETE FROM materiaprima WHERE id_materia = ?", [id_materia]);
     res.json({ message: "Materia prima eliminada correctamente" });
   } catch (error) {
     console.error("Error al eliminar materia prima:", error);
     res.status(500).json({ message: "Error al eliminar materia prima" });
+  }
+};
+
+
+// Actualizar el stock (relación producto ↔ materias primas)
+export const actualizarStockProducto = async (req, res) => {
+  const { id_producto } = req.params;
+  const { materiasPrimas } = req.body; // array de objetos { id_materia, cantidad_necesaria }
+
+  if (!Array.isArray(materiasPrimas))
+    return res.status(400).json({ error: "materiasPrimas debe ser un array" });
+
+  try {
+    // 1️⃣ Eliminar registros previos de este producto
+    await db.query("DELETE FROM stock WHERE id_producto = ?", [id_producto]);
+
+    // 2️⃣ Insertar los nuevos vínculos
+    for (const { id_materia, cantidad_necesaria } of materiasPrimas) {
+      await db.query(
+        "INSERT INTO stock (id_producto, id_materia, cantidad_necesaria) VALUES (?, ?, ?)",
+        [id_producto, id_materia, cantidad_necesaria || 1] // si no envían cantidad, ponemos 1
+      );
+    }
+
+    res.json({ message: "Materias primas actualizadas correctamente" });
+  } catch (error) {
+    console.error("Error al actualizar stock:", error);
+    res.status(500).json({ error: "Error al actualizar stock" });
   }
 };
