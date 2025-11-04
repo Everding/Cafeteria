@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, BrowserRouter, useLocation } from 'react-router-dom';
+import axios from 'axios';
 import { 
   LOGIN, HOME, MENUSPREFABRICADOS, ORDENAR, BEBIDAS, ACOMPAÑANTES, POSTRES, 
   KIOSCO, NUESTROSPRODUCTOS, PEDIDOS, EMPLEADOS, ADMINISTRAREMPLEADOS, STOCK, 
@@ -34,14 +35,35 @@ import ContactanosPage from './pages/ContactanosPage';
 
 const AppContent = () => {
   const location = useLocation();
-  const [detalle, setDetalle] = useState([]);
-  const totalItems = detalle.reduce((acc, item) => acc + item.cantidad, 0);
+  const [cantidadProductos, setCantidadProductos] = useState(0);
+  const idCarrito = 1; // ⚠️ Cambiar si usás un carrito por usuario
   const noHeaderRoutes = [HOME];
+
+  // 🔁 Función que obtiene la cantidad total desde el backend
+  const cargarCantidadCarrito = async () => {
+    try {
+      const res = await axios.get(`http://localhost:3000/api/detalle-carrito/count/${idCarrito}`);
+      setCantidadProductos(res.data.total || 0);
+    } catch (error) {
+      console.error("Error cargando cantidad del carrito:", error);
+    }
+  };
+
+  // 🧠 Carga inicial + actualización cuando se emite el evento global
+  useEffect(() => {
+    cargarCantidadCarrito();
+
+    // Escucha evento global para refrescar cantidad
+    const handleUpdate = () => cargarCantidadCarrito();
+    window.addEventListener("carritoActualizado", handleUpdate);
+
+    return () => window.removeEventListener("carritoActualizado", handleUpdate);
+  }, []);
 
   return (
     <>
       {!noHeaderRoutes.includes(location.pathname) && (
-        <Header cantidadProductos={totalItems} />
+        <Header cantidadProductos={cantidadProductos} />
       )}
 
       <Routes>
@@ -62,14 +84,12 @@ const AppContent = () => {
         <Route path={COMPRAS} element={<ComprasPage />} />
         <Route path={REGISTER} element={<RegisterPage />} />
         <Route path={MIPERFIL} element={<MiPerfilPage />} />
-        <Route path={CARRITO} element={<CarritoPage detalle={detalle} setDetalle={setDetalle} />} />
+        <Route path={CARRITO} element={<CarritoPage />} />
         <Route path={EQUIPO} element={<EquipoPage />} />
         <Route path={NUESTRAHISTORIA} element={<NuestraHistoriaPage />} />
         <Route path={SUCURSALES} element={<SucursalesPage />} />
         <Route path={RESEÑA} element={<ReseñaPage />} />
         <Route path={CONTACTANOS} element={<ContactanosPage />} />
-        
-       
       </Routes>
     </>
   );

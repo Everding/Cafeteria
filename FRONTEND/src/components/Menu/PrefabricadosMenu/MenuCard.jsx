@@ -1,116 +1,111 @@
-import React, { useState, useEffect } from 'react';
-import './../../../styles/Menu/MenuCard.css';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import "../../../styles/Menu/MenuCard.css";
 
+const MenuCard = ({ menu, onUpdate, triggerEdit }) => {
+  const [editing, setEditing] = useState(false);
+  const [titulo, setTitulo] = useState(menu.nombre);
+  const [descripcion, setDescripcion] = useState(menu.descripcion);
+  const [precio, setPrecio] = useState(menu.precio_total);
+  const [file, setFile] = useState(null);
 
-const MenuCard = ({ menu, onAddToCart, onEdit, categories }) => {
-  const [isEditing, setIsEditing] = useState(menu.editing || false);
-  const [editedMenu, setEditedMenu] = useState({
-    name: menu.name || '',
-    imageUrl: menu.imageUrl || '',
-    items: menu.items ? menu.items.join(', ') : '',
-    price: menu.price || '',
-    materias: menu.materias || []
-  });
-
-  const [selectedMaterias, setSelectedMaterias] = useState(menu.materiasPrimas || []);
-  const [searchMateria, setSearchMateria] = useState('');
-
+  // 🔹 Detectar cuando el padre pida editar
   useEffect(() => {
-    setIsEditing(menu.editing || false);
-  }, [menu.editing]);
+    if (triggerEdit) setEditing(true);
+  }, [triggerEdit]);
 
-  const handleSave = () => {
-    const updatedMenu = {
-      ...menu,
-      name: editedMenu.name,
-      imageUrl: editedMenu.imageUrl,
-      items: editedMenu.items.split(',').map(i => i.trim()),
-      price: editedMenu.price,
-      materias: editedMenu.materias,
-      materiasPrimas: selectedMaterias
-    };
-    onEdit(menu.id, updatedMenu);
-    setIsEditing(false);
+  const handleGuardar = async () => {
+    try {
+      let updatedMenu = {
+        nombre: titulo,
+        descripcion,
+        precio_total: precio,
+        estado: menu.estado,
+        imagen_url: menu.imagen_url,
+      };
+
+      if (file) {
+        const formData = new FormData();
+        formData.append("imagen", file);
+        formData.append("nombre", titulo);
+        formData.append("descripcion", descripcion);
+        formData.append("precio_total", precio);
+        formData.append("estado", menu.estado);
+
+        const res = await axios.put(
+          `http://localhost:3000/api/menus-prefabricados/${menu.id_menu}`,
+          formData,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        );
+        updatedMenu = res.data;
+      } else {
+        const res = await axios.put(
+          `http://localhost:3000/api/menus-prefabricados/${menu.id_menu}`,
+          updatedMenu
+        );
+        updatedMenu = res.data;
+      }
+
+      onUpdate(menu.id_menu, updatedMenu);
+      setEditing(false);
+      setFile(null);
+    } catch (error) {
+      console.error("Error al guardar menú:", error);
+      alert("No se pudo guardar el menú");
+    }
   };
 
-  const handleFileChange = (file) => {
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setEditedMenu(prev => ({ ...prev, imageUrl: reader.result }));
-    };
-    reader.readAsDataURL(file);
+  // 🔹 Acción del botón “Agregar al carrito”
+  const handleAgregarCarrito = () => {
+    console.log(`🛒 Menú agregado al carrito: ${titulo}`);
+    // 👉 Acá después puedes llamar a una función del padre o a tu contexto del carrito
   };
-
-  const toggleMateria = (materia) => {
-    setSelectedMaterias(prev =>
-      prev.includes(materia)
-        ? prev.filter(m => m !== materia)
-        : [...prev, materia]
-    );
-  };
-
-  const placeholderImg = 'https://via.placeholder.com/150x150?text=Sin+imagen';
-
-  // Filtrar materias primas según el buscador
-  const materiasFiltradas = categories.filter(c =>
-    c.nombre.toLowerCase().includes(searchMateria.toLowerCase())
-  );
 
   return (
     <div className="menu-card">
-      {isEditing ? (
+      {editing ? (
         <>
-          <input type="text" value={editedMenu.name} onChange={e => setEditedMenu({ ...editedMenu, name: e.target.value })} placeholder="Nombre del menú" />
-          <input type="text" value={editedMenu.imageUrl} onChange={e => setEditedMenu({ ...editedMenu, imageUrl: e.target.value })} placeholder="URL de la imagen" />
-          <input type="file" accept="image/*" onChange={e => handleFileChange(e.target.files[0])} />
-          <textarea value={editedMenu.items} onChange={e => setEditedMenu({ ...editedMenu, items: e.target.value })} placeholder="Items separados por coma" />
-          <input type="number" value={editedMenu.price} onChange={e => setEditedMenu({ ...editedMenu, price: e.target.value })} placeholder="Precio" />
-
-
-          {/* Buscador de materias primas */}
-          <div className="menu-materias-primas">
-            <h4>Seleccionar materias primas:</h4>
-            <input
-              type="text"
-              placeholder="Buscar materia prima..."
-              value={searchMateria}
-              onChange={e => setSearchMateria(e.target.value)}
-              className="materia-search"
-            />
-            <div className="materias-grid-scroll">
-              {materiasFiltradas.map((materia, idx) => (
-                <label key={idx} className="materia-item">
-                  <input
-                    type="checkbox"
-                    checked={selectedMaterias.includes(materia.nombre)}
-                    onChange={() => toggleMateria(materia.nombre)}
-                  />
-                  {materia.nombre}
-                </label>
-              ))}
-            </div>
-          </div>
+          <input
+            type="text"
+            value={titulo}
+            onChange={(e) => setTitulo(e.target.value)}
+          />
+          <img
+            src={menu.imagen_url ? `http://localhost:3000${menu.imagen_url}` : "https://via.placeholder.com/150"}
+            alt={titulo}
+          />
+          <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+          <textarea
+            value={descripcion}
+            onChange={(e) => setDescripcion(e.target.value)}
+          />
+          <input
+            type="number"
+            value={precio}
+            onChange={(e) => setPrecio(Number(e.target.value))}
+          />
 
           <div className="menu-actions">
-            <button onClick={handleSave}>Guardar</button>
-            <button onClick={() => setIsEditing(false)}>Cancelar</button>
+            <button onClick={handleGuardar}>Guardar</button>
+            <button onClick={() => setEditing(false)}>Cancelar</button>
           </div>
         </>
       ) : (
         <>
-          <h3>{menu.name}</h3>
-          <img src={menu.imageUrl || placeholderImg} alt={menu.name} className="menu-image" />
-          <div className="menu-details-white">
-            <p>Este menú contiene:</p>
-            <div className="menu-items-scroll">
-              <ul>
-                {menu.items.length ? menu.items.map((i, idx) => <li key={idx}>{i}</li>) : <li>No hay ítems</li>}
-              </ul>
-            </div>
+          <h3>{titulo}</h3>
+          <img
+            src={menu.imagen_url ? `http://localhost:3000${menu.imagen_url}` : "https://via.placeholder.com/150"}
+            alt={titulo}
+          />
+          <div className="menu-details menu-details-white">
+            <p>{descripcion}</p>
           </div>
-          <button onClick={() => onAddToCart(menu.id)} className="add-menu">Agregar al carrito</button>
-          {menu.price && <p className="menu-price">Precio: ${menu.price}</p>}
+          <div className="menu-price">${precio}</div>
+
+          {/* 🔹 Botón Agregar al carrito */}
+          <button className="add-to-cart" onClick={handleAgregarCarrito}>
+            Agregar al carrito
+          </button>
         </>
       )}
     </div>

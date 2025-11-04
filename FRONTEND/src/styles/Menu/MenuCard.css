@@ -49,17 +49,37 @@
 }
 
 /* Detalles */
+/* Detalles */
 .menu-details {
   flex: 1;
   width: 100%;
   text-align: left;
+  background-color: rgba(0, 0, 0, 0.3); /* leve fondo para distinguir */
+  padding: 10px;
+  border-radius: 5px;
+  overflow-y: auto; /* agrega scroll si el contenido es largo */
+  max-height: 150px; /* altura máxima visible */
+  box-sizing: border-box;
 }
 
-.menu-details ul {
-  padding: 0;
+/* Descripción dentro de los detalles */
+.menu-details p {
   margin: 5px 0;
-  list-style-type: none;
+  line-height: 1.4;
+  font-size: 1rem;
+  word-wrap: break-word; /* evita desbordes */
 }
+
+/* Texto antes de la descripción */
+.menu-details::before {
+  content: "Este menú contiene:";
+  display: block;
+  font-weight: bold;
+  color: #000000;
+  margin-bottom: 5px;
+  font-size: 1.1rem;
+}
+
 
 /* Botón agregar al carrito sobresaliendo */
 .add-to-cart {
@@ -69,7 +89,7 @@
   cursor: pointer;
   border-radius: 5px;
   width: 70%;
-  margin-top: -20px; /* sobresale de la card */
+  margin-top: 20px; /* sobresale de la card */
   position: relative;
   z-index: 1;
 }

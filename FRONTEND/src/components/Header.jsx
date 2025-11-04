@@ -6,30 +6,21 @@ import Logo from "../assets/Logo.png";
 import { useNavigate } from "react-router-dom";
 import { HOME } from "../routers/router";
 
-const Header = ({ cantidadProductos = 0 }) => { // <-- agregamos prop
-
+const Header = ({ cantidadProductos = 0 }) => {
   const [openDropdown, setOpenDropdown] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Estado de sesión
-
-  // Detecta sesión al cargar
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      setIsLoggedIn(true);
-    }
-  }, []);
-
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
 
-  const handleMouseEnter = (menu) => {
-    setOpenDropdown(menu);
-  };
+  // Detecta si el usuario tiene sesión activa
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) setIsLoggedIn(true);
+  }, []);
 
-  const handleMouseLeave = () => {
-    setTimeout(() => setOpenDropdown(null), 200);
-  };
+  const handleMouseEnter = (menu) => setOpenDropdown(menu);
+  const handleMouseLeave = () => setTimeout(() => setOpenDropdown(null), 200);
 
-  // Función para cerrar sesión
+  // Cerrar sesión
   const handleLogout = () => {
     localStorage.removeItem("token");
     setIsLoggedIn(false);
@@ -38,10 +29,15 @@ const Header = ({ cantidadProductos = 0 }) => { // <-- agregamos prop
   return (
     <header className="headerGeneral">
       <nav className="nav-containerGeneral">
-        <img src={Logo} alt="Café Logo" className="logoGeneral" onClick={() => navigate(HOME)} id='LogoGeneral'/>
+        <img
+          src={Logo}
+          alt="Café Logo"
+          className="logoGeneral"
+          onClick={() => navigate(HOME)}
+          id='LogoGeneral'
+        />
 
         <ul className="nav-linksGeneral">
-          {/* Tus links existentes */}
           <li
             className="nav-itemGeneral"
             onMouseEnter={() => handleMouseEnter("nosotros")}
@@ -89,14 +85,18 @@ const Header = ({ cantidadProductos = 0 }) => { // <-- agregamos prop
           </li>
         </ul>
 
-        {/* Icono de carrito con badge */}
+        {/* 🛒 Carrito con badge */}
         <div className="cart-containerGeneral">
-          <TiShoppingCart className="cart-iconGeneral" onClick={() => navigate("/Carrito")} />
+          <TiShoppingCart
+            className="cart-iconGeneral"
+            onClick={() => navigate("/Carrito")}
+          />
           {cantidadProductos > 0 && (
             <span className="cart-badgeGeneral">{cantidadProductos}</span>
           )}
         </div>
 
+        {/* 👤 Perfil / Sesión */}
         <div
           className="profileGeneral"
           onMouseEnter={() => handleMouseEnter("profile")}

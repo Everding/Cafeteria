@@ -1,76 +1,84 @@
-import React, { useState } from 'react';
-import MenuCard from './MenuCard';
-import './../../../styles/Menu/Menu.css';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import MenuCard from "./MenuCard";
+import "../../../styles/Menu/Menu.css";
 
 const MenuList = () => {
-  const [menus, setMenus] = useState([
-    { id: 1, name: 'Menú 1', imageUrl: '', items: ['Item A', 'Item B'], price: 100, category: 'Bebidas' },
-    { id: 2, name: 'Menú 2', imageUrl: '', items: ['Item C'], price: 150, category: 'Postres' },
-    { id: 3, name: 'Menú 3', imageUrl: '', items: ['Item D', 'Item E', 'Item F'], price: 200, category: 'Kiosco' },
-  ]);
+  const [menus, setMenus] = useState([]);
+  const [editingId, setEditingId] = useState(null); // 🔹 Nuevo estado
 
-  const [categories] = useState([
-{ id: 1, nombre: 'Leche' },
-  { id: 2, nombre: 'Café' },
-  { id: 3, nombre: 'Azúcar' },
-  { id: 4, nombre: 'Chocolate' },
-  { id: 5, nombre: 'Vainilla' },
-  { id: 6, nombre: 'Miel' },
-  { id: 7, nombre: 'Crema' },
-  { id: 8, nombre: 'Frutilla' },
-  { id: 9, nombre: 'Plátano' },
-  { id: 10, nombre: 'Caramelo' },
-  ]);
-
-  const agregarMenu = () => {
-    const newMenu = {
-      id: Date.now(),
-      name: 'Nuevo Menú',
-      imageUrl: '',
-      items: ['Item 1', 'Item 2'],
-      price: 0,
-      category: ''
-    };
-    setMenus([newMenu, ...menus]);
+  // 🔹 Cargar menús desde backend
+  const fetchMenus = async () => {
+    try {
+      const res = await axios.get("http://localhost:3000/api/menus-prefabricados");
+      setMenus(res.data);
+    } catch (error) {
+      console.error("Error al cargar menús:", error);
+    }
   };
 
-  const handleEdit = (id, updatedMenu) => {
-    setMenus(menus.map(menu => menu.id === id ? { ...updatedMenu, editing: false } : menu));
+  useEffect(() => {
+    fetchMenus();
+  }, []);
+
+  // 🔹 Agregar nuevo menú
+  const agregarMenu = async () => {
+    try {
+      const nuevoMenu = {
+        nombre: "Nuevo Menú",
+        descripcion: "",
+        precio_total: 0,
+        estado: "activo",
+        imagen_url: "/uploads/placeholder.png",
+      };
+      const res = await axios.post("http://localhost:3000/api/menus-prefabricados", nuevoMenu);
+      setMenus([res.data, ...menus]);
+    } catch (error) {
+      console.error("Error al crear menú:", error);
+    }
   };
 
-  const handleAddToCart = (id) => console.log(`Menú ${id} agregado al carrito`);
+  // 🔹 Actualizar menú
+  const actualizarMenu = (id, menuActualizado) => {
+    setMenus(menus.map((m) => (m.id_menu === id ? menuActualizado : m)));
+    setEditingId(null); // 🔹 Salir del modo edición
+  };
 
-  const handleDelete = (id) => setMenus(menus.filter(menu => menu.id !== id));
-
-  const handleCancel = (id) => setMenus(menus.map(menu => menu.id === id ? { ...menu, editing: false } : menu));
+  // 🔹 Eliminar menú
+  const eliminarMenu = async (id) => {
+    if (!window.confirm("¿Eliminar este menú?")) return;
+    try {
+      await axios.delete(`http://localhost:3000/api/menus-prefabricados/${id}`);
+      setMenus(menus.filter((m) => m.id_menu !== id));
+    } catch (error) {
+      console.error("Error al eliminar menú:", error);
+    }
+  };
 
   return (
-    <div className='menu-list'>
-      <div className='menu-list-header' style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px' }}>
-        <h1>Menús</h1>
-        <button onClick={agregarMenu} className='add-menuPage'>Agregar Menú</button>
+    <div className="menu-list">
+      <div className="menu-list-header">
+        <h1>Menús Prefabricados</h1>
+        <button className="add-menuPage" onClick={agregarMenu}>Agregar Menú</button>
       </div>
-
       <div className="menu-container">
-        {menus.map(menu => (
-          <div key={menu.id} className="menu-wrapper">
-            <MenuCard
-              menu={menu}
-              onAddToCart={handleAddToCart}
-              onEdit={handleEdit}
-              onCancel={handleCancel}
-              categories={categories}
-            />
-            {!menu.editing && (
+        {menus.length ? (
+          menus.map((menu) => (
+            <div key={menu.id_menu} className="menu-wrapper">
+              <MenuCard
+                menu={menu}
+                onUpdate={actualizarMenu}
+                triggerEdit={editingId === menu.id_menu} // 🔹 Nuevo prop
+              />
               <div className="menu-buttons">
-                <button onClick={() => setMenus(menus.map(m => m.id === menu.id ? { ...m, editing: true } : m))}>
-                  Editar
-                </button>
-                <button onClick={() => handleDelete(menu.id)}>Eliminar</button>
+                <button onClick={() => setEditingId(menu.id_menu)}>Editar</button>
+                <button onClick={() => eliminarMenu(menu.id_menu)}>Eliminar</button>
               </div>
-            )}
-          </div>
-        ))}
+            </div>
+          ))
+        ) : (
+          <p>No hay menús cargados.</p>
+        )}
       </div>
     </div>
   );

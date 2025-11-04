@@ -2,7 +2,7 @@
 .pedidos-container {
   text-align: center;
   padding: 40px 20px;
-  background: linear-gradient(135deg, #d7b89e, #f3e5ab);
+  background: linear-gradient(135deg, #d7b89e, #fff6e5);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
