@@ -11,7 +11,7 @@ export const getAllStock = async (req, res) => {
              m.nombre AS materia
       FROM stock s
       LEFT JOIN productos p ON s.id_producto = p.id_producto
-      LEFT JOIN materia_prima m ON s.id_materia = m.id_materia
+      LEFT JOIN materiaprima m ON s.id_materia = m.id_materia
       ORDER BY p.nombre ASC
     `);
 
@@ -34,7 +34,7 @@ export const getStockById = async (req, res) => {
              m.nombre AS materia
       FROM stock s
       LEFT JOIN productos p ON s.id_producto = p.id_producto
-      LEFT JOIN materia_prima m ON s.id_materia = m.id_materia
+      LEFT JOIN materiaprima m ON s.id_materia = m.id_materia
       WHERE s.id_stock = ?
     `, [id_stock]);
 

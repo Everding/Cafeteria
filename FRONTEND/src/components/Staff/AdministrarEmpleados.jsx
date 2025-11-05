@@ -1,190 +1,250 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import "../../styles/Staff/AdministrarEmpleados.css";
 
-const AdministrarEmpleados = ({ onUpdateEmpleados }) => {
-  const navigate = useNavigate();
+const API_URL = "http://localhost:3000/api/personal";
 
+const AdministrarEmpleado = () => {
   const [empleados, setEmpleados] = useState([]);
-  const [encargados, setEncargados] = useState([]);
+  const [formData, setFormData] = useState({
+    nombre: "",
+    apellido: "",
+    dni: "",
+    correo: "",
+    contrasena: "",
+    idRol: "",
+    imagen: null,
+  });
+  const [editingId, setEditingId] = useState(null);
 
+  // ==========================
+  // Cargar empleados al montar
+  // ==========================
+  useEffect(() => {
+    obtenerEmpleados();
+  }, []);
 
-  const handleEdit = (id, tipo) => {
-    const lista = tipo === "empleado" ? empleados : encargados;
-    const setLista = tipo === "empleado" ? setEmpleados : setEncargados;
-    setLista(
-      lista.map((e) => (e.idPersonal === id ? { ...e, editando: true, cambios: {} } : e))
-    );
-  };
-
-  const handleChange = (id, tipo, campo, valor) => {
-    const lista = tipo === "empleado" ? empleados : encargados;
-    const setLista = tipo === "empleado" ? setEmpleados : setEncargados;
-    setLista(
-      lista.map((e) =>
-        e.idPersonal === id ? { ...e, cambios: { ...e.cambios, [campo]: valor } } : e
-      )
-    );
-  };
-
-  const handleSave = (id, tipo) => {
-    const lista = tipo === "empleado" ? empleados : encargados;
-    const setLista = tipo === "empleado" ? setEmpleados : setEncargados;
-
-    setLista(
-      lista.map((e) =>
-        e.idPersonal === id
-          ? { ...e, ...e.cambios, editando: false, cambios: {} }
-          : e
-      )
-    );
-
-    if (onUpdateEmpleados) onUpdateEmpleados([...empleados, ...encargados]);
-  };
-
-  const handleCancel = (id, tipo) => {
-    const lista = tipo === "empleado" ? empleados : encargados;
-    const setLista = tipo === "empleado" ? setEmpleados : setEncargados;
-    setLista(
-      lista.map((e) =>
-        e.idPersonal === id ? { ...e, editando: false, cambios: {} } : e
-      )
-    );
-  };
-
-  const handleDelete = (id, tipo) => {
-    const confirmacion = window.confirm(
-      "¿Estás seguro de que deseas eliminar este empleado?"
-    );
-    if (!confirmacion) return;
-    if (tipo === "empleado") {
-      setEmpleados(empleados.filter((e) => e.idPersonal !== id));
-    } else {
-      setEncargados(encargados.filter((e) => e.idPersonal !== id));
+  const obtenerEmpleados = async () => {
+    try {
+      const res = await axios.get(API_URL);
+      setEmpleados(res.data);
+    } catch (err) {
+      console.error("Error al obtener empleados:", err);
     }
   };
 
-  const agregarEmpleado = (tipo) => {
-    const lista = tipo === "empleado" ? empleados : encargados;
-    const setLista = tipo === "empleado" ? setEmpleados : setEncargados;
-
-    const nuevo = {
-      idPersonal: Date.now(),
-      nombre: "",
-      apellido: "",
-      dni: "",
-      correo: "",
-      contraseña: "",
-      idRol: tipo === "empleado" ? 2 : 3,
-      imagen: "https://i.pravatar.cc/100",
-      editando: true,
-      cambios: {},
-    };
-
-    setLista([nuevo, ...lista]);
+  // ==========================
+  // Manejar inputs
+  // ==========================
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: files ? files[0] : value,
+    }));
   };
 
- 
-  const renderFila = (e, tipo) => (
-    <div className="admin-card" key={e.idPersonal}>
-      <img src={e.cambios?.imagen ?? e.imagen} alt={e.nombre} className="admin-foto" />
-      <div className="admin-info">
-        {e.editando ? (
-          <>
-            <input
-              type="text"
-              placeholder="Nombre"
-              value={e.cambios.nombre ?? e.nombre}
-              onChange={(ev) => handleChange(e.idPersonal, tipo, "nombre", ev.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Apellido"
-              value={e.cambios.apellido ?? e.apellido}
-              onChange={(ev) => handleChange(e.idPersonal, tipo, "apellido", ev.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="DNI"
-              value={e.cambios.dni ?? e.dni}
-              onChange={(ev) => handleChange(e.idPersonal, tipo, "dni", ev.target.value)}
-            />
-            <input
-              type="email"
-              placeholder="Correo"
-              value={e.cambios.correo ?? e.correo}
-              onChange={(ev) => handleChange(e.idPersonal, tipo, "correo", ev.target.value)}
-            />
-            <input
-              type="password"
-              placeholder="Contraseña"
-              value={e.cambios.contraseña ?? e.contraseña}
-              onChange={(ev) => handleChange(e.idPersonal, tipo, "contraseña", ev.target.value)}
-            />
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(ev) => {
-                const file = ev.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = () => handleChange(e.idPersonal, tipo, "imagen", reader.result);
-                reader.readAsDataURL(file);
-              }}
-            />
-          </>
-        ) : (
-          <>
-            <h4>{e.nombre} {e.apellido}</h4>
-            <p><strong>DNI:</strong> {e.dni}</p>
-            <p><strong>Correo:</strong> {e.correo}</p>
-          </>
-        )}
-      </div>
-      <div className="admin-buttons">
-        {!e.editando && <button onClick={() => handleEdit(e.idPersonal, tipo)} className="btn-editar">Editar</button>}
-        {e.editando && (
-          <>
-            <button onClick={() => handleSave(e.idPersonal, tipo)} className="btn-guardar">Guardar</button>
-            <button onClick={() => handleCancel(e.idPersonal, tipo)} className="btn-cancelar">Cancelar</button>
-          </>
-        )}
-        <button onClick={() => handleDelete(e.idPersonal, tipo)} className="btn-eliminar">Eliminar</button>
-      </div>
-    </div>
-  );
+  // ==========================
+  // Crear o actualizar empleado
+  // ==========================
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
+    try {
+      const data = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        // Evita enviar contraseña vacía en actualizaciones
+        if (editingId && key === "contrasena" && value === "") return;
+        if (value !== null && value !== "") data.append(key, value);
+      });
 
+      if (editingId) {
+        await axios.put(`${API_URL}/${editingId}`, data, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        alert("Empleado actualizado correctamente");
+      } else {
+        await axios.post(API_URL, data, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        alert("Empleado agregado correctamente");
+      }
+
+      // Reset form
+      setFormData({
+        nombre: "",
+        apellido: "",
+        dni: "",
+        correo: "",
+        contraseña: "",
+        idRol: "",
+        imagen: null,
+      });
+      setEditingId(null);
+      obtenerEmpleados();
+    } catch (err) {
+      console.error("Error al guardar empleado:", err);
+      alert("Error al guardar empleado");
+    }
+  };
+
+  // ==========================
+  // Editar empleado
+  // ==========================
+  const handleEdit = (empleado) => {
+    setEditingId(empleado.idPersonal);
+    setFormData({
+      nombre: empleado.nombre,
+      apellido: empleado.apellido,
+      dni: empleado.dni,
+      correo: empleado.correo,
+      contraseña: "",
+      idRol: empleado.idRol,
+      imagen: null,
+    });
+  };
+
+  // ==========================
+  // Eliminar empleado
+  // ==========================
+  const handleDelete = async (id) => {
+    if (!window.confirm("¿Seguro que deseas eliminar este empleado?")) return;
+    try {
+      await axios.delete(`${API_URL}/${id}`);
+      obtenerEmpleados();
+      alert("Empleado eliminado correctamente");
+    } catch (err) {
+      console.error("Error al eliminar empleado:", err);
+    }
+  };
+
+  // ==========================
+  // Filtrar por rol
+  // ==========================
+  const encargados = empleados.filter((e) => e.idRol === 1);
+  const empleadosComunes = empleados.filter((e) => e.idRol === 2);
+
+  // ==========================
+  // Render
+  // ==========================
   return (
-    
-    <div className="admin-empleados-container">
-      <h2>Administración de Personal</h2>
+    <div className="empleados-page">
+      <h1>Administrar Personal</h1>
 
-          <div style={{ marginTop: "30px" }}>
-        <button className="btn-volver" onClick={() => navigate("/Empleados")}>
-          Volver a la Gestión
-        </button>
+      <form className="empleados-form" onSubmit={handleSubmit}>
+        <input
+          type="text"
+          name="nombre"
+          placeholder="Nombre"
+          value={formData.nombre}
+          onChange={handleChange}
+          required
+        />
+        <input
+          type="text"
+          name="apellido"
+          placeholder="Apellido"
+          value={formData.apellido}
+          onChange={handleChange}
+          required
+        />
+        <input
+          type="text"
+          name="dni"
+          placeholder="DNI"
+          value={formData.dni}
+          onChange={handleChange}
+        />
+        <input
+          type="email"
+          name="correo"
+          placeholder="Correo"
+          value={formData.correo}
+          onChange={handleChange}
+          required
+        />
+        <input
+          type="password"
+          name="contrasena"
+          placeholder="Contraseña"
+          value={formData.contrasena}
+          onChange={handleChange}
+          required={!editingId}
+        />
+        <input
+          type="number"
+          name="idRol"
+          placeholder="ID Rol (1 = Encargado, 2 = Empleado)"
+          value={formData.idRol}
+          onChange={handleChange}
+          required
+        />
+        <input type="file" name="imagen" accept="image/*" onChange={handleChange} />
+
+        <button type="submit">{editingId ? "Actualizar" : "Agregar"}</button>
+      </form>
+
+      {/* ========================== */}
+      {/* Sección: Encargados */}
+      {/* ========================== */}
+      <h2>Encargados</h2>
+      <div className="empleados-list">
+        {encargados.length > 0 ? (
+          encargados.map((emp) => (
+            <div key={emp.idPersonal} className="empleado-card encargado-card">
+              <img
+                src={emp.imagen_url || "https://i.pravatar.cc/150?img=3"}
+                alt={emp.nombre}
+                className="empleado-img"
+              />
+              <h3>
+                {emp.nombre} {emp.apellido}
+              </h3>
+              <p>{emp.correo}</p>
+              <p>DNI: {emp.dni}</p>
+              <p>Rol: Encargado</p>
+              <div className="empleado-buttons">
+                <button onClick={() => handleEdit(emp)}>Editar</button>
+                <button onClick={() => handleDelete(emp.idPersonal)}>Eliminar</button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p>No hay encargados registrados.</p>
+        )}
       </div>
 
-      <div className="admin-columns">
-        <div className="admin-column">
-          <h3>Encargados</h3>
-          <button className="btn-agregar" onClick={() => agregarEmpleado("encargado")}>
-            Agregar Encargado
-          </button>
-          {encargados.map((e) => renderFila(e, "encargado"))}
-        </div>
-
-        <div className="admin-column">
-          <h3>Empleados</h3>
-          <button className="btn-agregar" onClick={() => agregarEmpleado("empleado")}>
-            Agregar Empleado
-          </button>
-          {empleados.map((e) => renderFila(e, "empleado"))}
-        </div>
+      {/* ========================== */}
+      {/* Sección: Empleados */}
+      {/* ========================== */}
+      <h2>Empleados</h2>
+      <div className="empleados-list">
+        {empleadosComunes.length > 0 ? (
+          empleadosComunes.map((emp) => (
+            <div key={emp.idPersonal} className="empleado-card empleado-card">
+              <img
+                src={emp.imagen_url || "https://i.pravatar.cc/150?img=3"}
+                alt={emp.nombre}
+                className="empleado-img"
+              />
+              <h3>
+                {emp.nombre} {emp.apellido}
+              </h3>
+              <p>{emp.correo}</p>
+              <p>DNI: {emp.dni}</p>
+              <p>Rol: Empleado</p>
+              <div className="empleado-buttons">
+                <button onClick={() => handleEdit(emp)}>Editar</button>
+                <button onClick={() => handleDelete(emp.idPersonal)}>Eliminar</button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p>No hay empleados registrados.</p>
+        )}
       </div>
     </div>
   );
 };
 
-export default AdministrarEmpleados;
+export default AdministrarEmpleado;

@@ -5,6 +5,7 @@
   background: #f9f9f9;
   border-radius: 15px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  min-height: 100vh;
 }
 
 .compras-container h2 {
@@ -131,3 +132,132 @@
   color: #3e2723;
   font-weight: 500;
 }
+
+.compras-container {
+  max-width: 1000px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.compras-form label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.compras-form input,
+.compras-form select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.compra-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.compra-item select,
+.compra-item input {
+  flex: 1;
+}
+
+.btn-eliminar-item {
+  background-color: #ff4d4f;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn-eliminar-item:hover {
+  background-color: #ff7875;
+}
+
+.btn-agregar-item,
+.btn-registrar-compra {
+  margin-top: 15px;
+  padding: 8px 16px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-agregar-item {
+  background-color: #40a9ff;
+  color: #fff;
+  margin-right: 10px;
+}
+
+.btn-agregar-item:hover {
+  background-color: #69c0ff;
+}
+
+.btn-registrar-compra {
+  background-color: #52c41a;
+  color: #fff;
+}
+
+.btn-registrar-compra:hover {
+  background-color: #73d13d;
+}
+
+.compras-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.compras-table th,
+.compras-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+
+.compras-table th {
+  background-color: #f0f0f0;
+}
+
+.paginacionCompras {
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.paginacionCompras button {
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.paginacionCompras button:hover {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+
+.paginacionCompras button.activo {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+
+.paginacionCompras button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+

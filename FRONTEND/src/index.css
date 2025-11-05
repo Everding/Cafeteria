@@ -7,10 +7,16 @@ html, body, #root {
   font-family: 'Arial', sans-serif;
 }
 
+/* Convertimos body en un flex vertical */
 body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* asegura que ocupe toda la ventana */
   box-sizing: border-box;
-  /* quitar background-color o poner el mismo degradado si quieres */
   margin: 0;
 }
 
-
+/* Contenedor principal de tu contenido */
+.main-content {
+  flex: 1; /* ocupa todo el espacio disponible y empuja el footer hacia abajo */
+}

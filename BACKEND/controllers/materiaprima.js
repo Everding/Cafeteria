@@ -128,3 +128,25 @@ export const actualizarStockProducto = async (req, res) => {
     res.status(500).json({ error: "Error al actualizar stock" });
   }
 };
+
+// Actualizar solo stock_actual de una materia prima
+export const actualizarStockMateria = async (req, res) => {
+  const { id_materia } = req.params;
+  const { cantidad } = req.body;
+
+  if (cantidad == null) return res.status(400).json({ message: "Falta la cantidad" });
+
+  try {
+    await db.query(
+      "UPDATE materiaprima SET stock_actual = stock_actual + ? WHERE id_materia = ?",
+      [cantidad, id_materia]
+    );
+    res.json({ message: "Stock actualizado correctamente" });
+  } catch (error) {
+    console.error("Error al actualizar stock:", error);
+    res.status(500).json({ message: "Error al actualizar stock" });
+  }
+};
+
+
+

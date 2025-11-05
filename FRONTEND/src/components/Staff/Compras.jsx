@@ -1,117 +1,217 @@
-import React, { useState } from 'react';
-import '../../styles/Staff/Compras.css';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import "../../styles/Staff/Compras.css";
 
 const Compras = () => {
-  const [compras, setCompras] = useState([
-    { id: 1, fecha: '2025-10-25', proveedor: 'Café del Norte', compra: '50 kg de café', total: 25000 },
-    { id: 2, fecha: '2025-10-26', proveedor: 'Lácteos La Vaquita', compra: '100 L de leche', total: 18000 },
-    { id: 3, fecha: '2025-10-27', proveedor: 'Dulce Aroma', compra: '20 kg de azúcar', total: 6000 },
-  ]);
+  const [proveedores, setProveedores] = useState([]);
+  const [materiasPrimas, setMateriasPrimas] = useState([]);
+  const [compras, setCompras] = useState([]);
 
   const [nuevaCompra, setNuevaCompra] = useState({
-    fecha: '',
-    proveedor: '',
-    compra: '',
-    total: '',
+    fecha: "",
+    proveedorId: "",
+    proveedorNuevo: "",
+    total: "",
+    items: [],
   });
 
-  const [editando, setEditando] = useState(null);
+  const [itemSeleccionado, setItemSeleccionado] = useState({ id_materia: "", cantidad: "" });
+
   const [paginaActual, setPaginaActual] = useState(1);
   const comprasPorPagina = 10;
 
-  const totalPaginas = Math.ceil(compras.length / comprasPorPagina);
-  const inicio = (paginaActual - 1) * comprasPorPagina;
-  const comprasPaginadas = compras.slice(inicio, inicio + comprasPorPagina);
+  const API_COMPRAS = "http://localhost:3000/api/compras";
+  const API_PROVEEDORES = "http://localhost:3000/api/proveedores";
+  const API_MATERIAS = "http://localhost:3000/api/materia-prima";
 
-  const handleChange = (e) => {
+  useEffect(() => {
+    cargarProveedores();
+    cargarMateriasPrimas();
+    cargarCompras();
+  }, []);
+
+  const cargarProveedores = async () => {
+    try {
+      const res = await axios.get(API_PROVEEDORES);
+      setProveedores(res.data);
+    } catch (error) {
+      console.error("Error cargando proveedores:", error);
+    }
+  };
+
+  const cargarMateriasPrimas = async () => {
+    try {
+      const res = await axios.get(API_MATERIAS);
+      setMateriasPrimas(res.data);
+    } catch (error) {
+      console.error("Error cargando materias primas:", error);
+    }
+  };
+
+  const cargarCompras = async () => {
+    try {
+      const res = await axios.get(API_COMPRAS);
+      setCompras(res.data);
+    } catch (error) {
+      console.error("Error cargando compras:", error);
+    }
+  };
+
+  const handleChangeCompra = (e) => {
+    setNuevaCompra({ ...nuevaCompra, [e.target.name]: e.target.value });
+  };
+
+  const handleChangeItem = (e) => {
+    setItemSeleccionado({ ...itemSeleccionado, [e.target.name]: e.target.value });
+  };
+
+  const agregarItem = () => {
+    if (!itemSeleccionado.id_materia || !itemSeleccionado.cantidad) return alert("Completa materia prima y cantidad");
+    if (nuevaCompra.items.some(i => i.id_materia === parseInt(itemSeleccionado.id_materia))) {
+      return alert("Esta materia prima ya está en la lista");
+    }
     setNuevaCompra({
       ...nuevaCompra,
-      [e.target.name]: e.target.value,
+      items: [...nuevaCompra.items, { ...itemSeleccionado, id_materia: parseInt(itemSeleccionado.id_materia), cantidad: parseFloat(itemSeleccionado.cantidad) }]
+    });
+    setItemSeleccionado({ id_materia: "", cantidad: "" });
+  };
+
+  const eliminarItem = (id_materia) => {
+    setNuevaCompra({
+      ...nuevaCompra,
+      items: nuevaCompra.items.filter(i => i.id_materia !== id_materia)
     });
   };
 
-  const agregarCompra = () => {
-    if (!nuevaCompra.fecha || !nuevaCompra.proveedor || !nuevaCompra.compra || !nuevaCompra.total)
-      return alert('Por favor complete todos los campos');
+  const registrarCompra = async () => {
+    // Verificar que todos los campos estén completos
+    if (!nuevaCompra.fecha || (!nuevaCompra.proveedorId && !nuevaCompra.proveedorNuevo) || !nuevaCompra.total || nuevaCompra.items.length === 0)
+      return alert("Completa todos los campos obligatorios y agrega al menos un item");
 
-    if (editando !== null) {
-      // Guardar cambios
-      setCompras((prev) =>
-        prev.map((c) =>
-          c.id === editando ? { ...c, ...nuevaCompra, total: parseFloat(nuevaCompra.total) } : c
-        )
-      );
-      setEditando(null);
-    } else {
-      // Crear nueva compra
-      const nuevoId = Math.max(...compras.map((c) => c.id)) + 1;
-      setCompras([...compras, { id: nuevoId, ...nuevaCompra, total: parseFloat(nuevaCompra.total) }]);
+    try {
+      let id_proveedor;
+
+      // Verificar si es proveedor nuevo o existente
+      if (nuevaCompra.proveedorId) {
+        id_proveedor = nuevaCompra.proveedorId;
+      } else if (nuevaCompra.proveedorNuevo) {
+        const resProv = await axios.post(API_PROVEEDORES, { nombre: nuevaCompra.proveedorNuevo });
+        id_proveedor = resProv.data.id_proveedor;
+        await cargarProveedores(); // Volver a cargar los proveedores después de agregar uno nuevo
+      }
+
+      // Registrar la compra en el backend
+      const compraData = {
+        id_proveedor,
+        fecha: nuevaCompra.fecha,
+        total: parseFloat(nuevaCompra.total),
+        materiasPrimas: nuevaCompra.items,
+      };
+      await axios.post(API_COMPRAS, compraData);
+
+      // Actualizar el stock de las materias primas
+      for (const item of nuevaCompra.items) {
+        // Buscar la materia prima por su id
+        const materia = materiasPrimas.find((m) => m.id_materia === item.id_materia);
+
+        // Si no se encuentra, seguimos al siguiente item
+        if (!materia) continue;
+
+        // Realizar la actualización del stock
+        await axios.put(`${API_MATERIAS}/${item.id_materia}/stock`, {
+          cantidad: parseFloat(item.cantidad),
+        });
+      }
+
+      // Confirmación de éxito
+      alert("Compra registrada y stock actualizado correctamente");
+
+      // Limpiar el formulario
+      setNuevaCompra({ fecha: "", proveedorId: "", proveedorNuevo: "", total: "", items: [] });
+      setPaginaActual(1);
+
+      // Recargar las compras y las materias primas
+      cargarCompras();
+      cargarMateriasPrimas();
+    } catch (error) {
+      console.error("Error registrando compra:", error);
+      alert("No se pudo registrar la compra");
     }
-
-    setNuevaCompra({ fecha: '', proveedor: '', compra: '', total: '' });
   };
 
-  const editarCompra = (id) => {
-    const compra = compras.find((c) => c.id === id);
-    setNuevaCompra(compra);
-    setEditando(id);
-  };
-
-  const cancelarEdicion = () => {
-    setEditando(null);
-    setNuevaCompra({ fecha: '', proveedor: '', compra: '', total: '' });
-  };
-
-  const eliminarCompra = (id) => {
-    const confirmacion = window.confirm('¿Estás seguro de eliminar este registro?');
-    if (!confirmacion) return;
-    setCompras((prev) => prev.filter((c) => c.id !== id));
-  };
+  // ===============================
+  // Paginación
+  // ===============================
+  const totalPaginas = Math.ceil(compras.length / comprasPorPagina);
+  const inicio = (paginaActual - 1) * comprasPorPagina;
+  const comprasPaginadas = compras.slice(inicio, inicio + comprasPorPagina);
 
   return (
     <div className="compras-container">
       <h2>Registro de Compras a Proveedores</h2>
 
       <div className="compras-form">
-        <input
-          type="date"
-          name="fecha"
-          value={nuevaCompra.fecha}
-          onChange={handleChange}
-          placeholder="Fecha"
-        />
+        <input type="date" name="fecha" value={nuevaCompra.fecha} onChange={handleChangeCompra} />
+
+        <select
+          name="proveedorId"
+          value={nuevaCompra.proveedorId}
+          onChange={handleChangeCompra}
+        >
+          <option value="">-- Seleccione proveedor existente --</option>
+          {proveedores.map((p) => (
+            <option key={p.id_proveedor} value={p.id_proveedor}>{p.nombre}</option>
+          ))}
+        </select>
+
         <input
           type="text"
-          name="proveedor"
-          value={nuevaCompra.proveedor}
-          onChange={handleChange}
-          placeholder="Proveedor"
+          name="proveedorNuevo"
+          placeholder="O ingrese un nuevo proveedor"
+          value={nuevaCompra.proveedorNuevo}
+          onChange={handleChangeCompra}
         />
-        <input
-          type="text"
-          name="compra"
-          value={nuevaCompra.compra}
-          onChange={handleChange}
-          placeholder="Compra realizada"
-        />
+
         <input
           type="number"
           name="total"
-          value={nuevaCompra.total}
-          onChange={handleChange}
           placeholder="Total ($)"
+          value={nuevaCompra.total}
+          onChange={handleChangeCompra}
         />
 
-        <div className="compras-buttons">
-          <button onClick={agregarCompra}>
-            {editando ? 'Guardar Cambios' : 'Agregar Compra'}
-          </button>
-          {editando && (
-            <button className="btn-cancelar" onClick={cancelarEdicion}>
-              Cancelar
-            </button>
-          )}
+        <div className="items-compra">
+          <h4>Agregar items a la compra</h4>
+          <select name="id_materia" value={itemSeleccionado.id_materia} onChange={handleChangeItem}>
+            <option value="">-- Seleccione materia prima --</option>
+            {materiasPrimas.map((mp) => (
+              <option key={mp.id_materia} value={mp.id_materia}>{mp.nombre}</option>
+            ))}
+          </select>
+          <input
+            type="number"
+            name="cantidad"
+            min="0"
+            placeholder="Cantidad"
+            value={itemSeleccionado.cantidad}
+            onChange={handleChangeItem}
+          />
+          <button type="button" onClick={agregarItem}>Agregar Item</button>
         </div>
+
+        <ul className="items-list">
+          {nuevaCompra.items.map(i => {
+            const mp = materiasPrimas.find(m => m.id_materia === i.id_materia);
+            return (
+              <li key={i.id_materia}>
+                {mp?.nombre} - {i.cantidad} <button type="button" onClick={() => eliminarItem(i.id_materia)}>Eliminar</button>
+              </li>
+            );
+          })}
+        </ul>
+
+        <button onClick={registrarCompra}>Registrar Compra</button>
       </div>
 
       <table className="compras-table">
@@ -120,46 +220,27 @@ const Compras = () => {
             <th>ID</th>
             <th>Fecha</th>
             <th>Proveedor</th>
-            <th>Compra</th>
             <th>Total ($)</th>
-            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
           {comprasPaginadas.map((c) => (
-            <tr key={c.id}>
-              <td>{c.id}</td>
-              <td>{c.fecha}</td>
+            <tr key={c.id_compra}>
+              <td>{c.id_compra}</td>
+              <td>{c.fecha_compra}</td>
               <td>{c.proveedor}</td>
-              <td>{c.compra}</td>
               <td>{c.total.toLocaleString()}</td>
-              <td>
-                <button className="btn-editar" onClick={() => editarCompra(c.id)}>
-                  Editar
-                </button>
-                <button className="btn-eliminar" onClick={() => eliminarCompra(c.id)}>
-                  Eliminar
-                </button>
-              </td>
             </tr>
           ))}
         </tbody>
       </table>
 
-      <div className="pagination">
-        <button
-          onClick={() => setPaginaActual((p) => Math.max(p - 1, 1))}
-          disabled={paginaActual === 1}
-        >
+      <div className="paginacionCompras">
+        <button onClick={() => setPaginaActual((p) => Math.max(p - 1, 1))} disabled={paginaActual === 1}>
           ◀ Anterior
         </button>
-        <span>
-          Página {paginaActual} de {totalPaginas}
-        </span>
-        <button
-          onClick={() => setPaginaActual((p) => Math.min(p + 1, totalPaginas))}
-          disabled={paginaActual === totalPaginas}
-        >
+        <span> Página {paginaActual} de {totalPaginas} </span>
+        <button onClick={() => setPaginaActual((p) => Math.min(p + 1, totalPaginas))} disabled={paginaActual === totalPaginas}>
           Siguiente ▶
         </button>
       </div>

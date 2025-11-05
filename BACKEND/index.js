@@ -59,6 +59,7 @@ app.use("/api/ventas", ventasRoutes);
 app.use("/api", registerRoutes);
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 app.use("/uploads", express.static(path.join("BACKEND", "uploads")));
+app.use("/uploads/personal", express.static(path.join(process.cwd(), "uploads/personal")));
 
 
 
