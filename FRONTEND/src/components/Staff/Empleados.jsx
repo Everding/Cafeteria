@@ -1,235 +1,408 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import '../../styles/Staff/Empleados.css';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import "../../styles/Staff/Empleados.css";
+
+const API_URL = "http://localhost:3000/api/asignacion-semanal";
 
 const Empleados = () => {
-  const navigate = useNavigate();
-
+  const [asignaciones, setAsignaciones] = useState([]);
   const [sucursales, setSucursales] = useState([]);
-  const [cambiosPendientes, setCambiosPendientes] = useState([]);
+  const [turnos, setTurnos] = useState([]);
+  const [editando, setEditando] = useState(null);
+  const [formData, setFormData] = useState({});
+  const [empleadosSinAsignar, setEmpleadosSinAsignar] = useState([]);
+  const [asignando, setAsignando] = useState(null);
 
+  // ===============================
+  // CARGAR DATOS
+  // ===============================
   useEffect(() => {
-    const fetchEmpleados = async () => {
-      // Ejemplo de datos que vendrían de la DB
-      const data = [
-        {
-          idPersonal: 1,
-          nombre: 'Ana',
-          rol: 'Encargado',
-          sucursalId: 1,
-          horarioId: 1,
-        },
-        {
-          idPersonal: 2,
-          nombre: 'Carlos',
-          rol: 'Encargado',
-          sucursalId: 1,
-          horarioId: 1,
-        },
-        {
-          idPersonal: 3,
-          nombre: 'Marta',
-          rol: 'Empleado',
-          sucursalId: 1,
-          horarioId: 1,
-        },
-        {
-          idPersonal: 4,
-          nombre: 'Lucía',
-          rol: 'Encargado',
-          sucursalId: 1,
-          horarioId: 2,
-        },
-        {
-          idPersonal: 5,
-          nombre: 'Pedro',
-          rol: 'Empleado',
-          sucursalId: 1,
-          horarioId: 2,
-        },
-      ];
-
-      // Estructura de sucursales y horarios
-      const sucursalesDB = [
-        { id: 1, nombre: 'Sucursal 1', horarios: [
-          { id: 1, rango: '07:00 AM - 14:00 PM', empleados: [] },
-          { id: 2, rango: '16:00 PM - 23:00 PM', empleados: [] },
-        ]},
-        { id: 2, nombre: 'Sucursal 2', horarios: [
-          { id: 3, rango: '07:00 AM - 14:00 PM', empleados: [] },
-          { id: 4, rango: '16:00 PM - 23:00 PM', empleados: [] },
-        ]},
-      ];
-
-      // Asignar empleados a sus sucursales y horarios
-      data.forEach(emp => {
-        const suc = sucursalesDB.find(s => s.id === emp.sucursalId);
-        if (!suc) return;
-        const hor = suc.horarios.find(h => h.id === emp.horarioId);
-        if (!hor) return;
-        hor.empleados.push({ nombre: emp.nombre, cargo: emp.rol });
-      });
-
-      setSucursales(sucursalesDB);
-    };
-
-    fetchEmpleados();
+    obtenerAsignaciones();
+    obtenerSucursales();
+    obtenerTurnos();
+    obtenerEmpleadosSinAsignar();
   }, []);
 
-  // ---------- FUNCIONES PARA MOVER EMPLEADOS ----------
-  const moverEmpleado = (empleado, sucursalIdActual, horarioIdActual, destino) => {
-    const cambio = {
-      empleado: empleado.nombre,
-      deSucursal: sucursalIdActual,
-      deHorario: horarioIdActual,
-      aSucursal: destino.sucursalId,
-      aHorario: destino.horarioId,
-    };
-    setCambiosPendientes([...cambiosPendientes, cambio]);
-
-    const nuevasSucursales = sucursales.map((sucursal) => {
-      if (sucursal.id === sucursalIdActual) {
-        sucursal.horarios = sucursal.horarios.map((horario) => {
-          if (horario.id === horarioIdActual) {
-            horario.empleados = horario.empleados.filter(e => e.nombre !== empleado.nombre);
-          }
-          return horario;
-        });
-      }
-
-      if (sucursal.id === destino.sucursalId) {
-        sucursal.horarios = sucursal.horarios.map((horario) => {
-          if (horario.id === destino.horarioId) {
-            horario.empleados.push(empleado);
-          }
-          return horario;
-        });
-      }
-
-      return sucursal;
-    });
-
-    setSucursales(nuevasSucursales);
-  };
-
-  const handleGuardarCambios = () => {
-    if (cambiosPendientes.length === 0) return;
-
-    let mensaje = "Se aplicarán los siguientes cambios:\n\n";
-    cambiosPendientes.forEach((c, i) => {
-      mensaje += `${i + 1}. ${c.empleado}: de Sucursal ${c.deSucursal}, Horario ${c.deHorario} → Sucursal ${c.aSucursal}, Horario ${c.aHorario}\n`;
-    });
-
-    if (window.confirm(mensaje)) {
-      setCambiosPendientes([]);
-      // Aquí se podría hacer un fetch POST/PUT al backend para guardar los cambios
+  const obtenerAsignaciones = async () => {
+    try {
+      const { data } = await axios.get(API_URL);
+      setAsignaciones(data);
+    } catch (error) {
+      console.error("Error al obtener asignaciones:", error);
     }
   };
 
-  const handleCancelarCambios = () => {
-    if (cambiosPendientes.length === 0) return;
-
-    let restaurarSucursales = JSON.parse(JSON.stringify(sucursales));
-
-    cambiosPendientes.slice().reverse().forEach((c) => {
-      const destSucursal = restaurarSucursales.find(s => s.id === c.aSucursal);
-      const destHorario = destSucursal.horarios.find(h => h.id === c.aHorario);
-      const empleadoObj = destHorario.empleados.find(e => e.nombre === c.empleado);
-      destHorario.empleados = destHorario.empleados.filter(e => e.nombre !== c.empleado);
-
-      const origSucursal = restaurarSucursales.find(s => s.id === c.deSucursal);
-      const origHorario = origSucursal.horarios.find(h => h.id === c.deHorario);
-      origHorario.empleados.push(empleadoObj);
-    });
-
-    setSucursales(restaurarSucursales);
-    setCambiosPendientes([]);
+  const obtenerSucursales = async () => {
+    try {
+      const { data } = await axios.get("http://localhost:3000/api/sucursales");
+      setSucursales(data);
+    } catch (error) {
+      console.error("Error al obtener sucursales:", error);
+    }
   };
 
+
+  const guardarNuevaAsignacion = async (idPersonal) => {
+  try {
+    if (!formData.idSucursal || !formData.idTurno) {
+      alert("⚠️ Debes seleccionar sucursal y turno");
+      return;
+    }
+
+    // Calculamos automáticamente las fechas (semana actual)
+    const hoy = new Date();
+    const diaSemana = hoy.getDay(); // 0 = domingo
+    const lunes = new Date(hoy);
+    lunes.setDate(hoy.getDate() - diaSemana + 1);
+    const domingo = new Date(lunes);
+    domingo.setDate(lunes.getDate() + 6);
+
+    const fechaInicioSemana = lunes.toISOString().split("T")[0];
+    const fechaFinSemana = domingo.toISOString().split("T")[0];
+
+    await axios.post(`${API_URL}`, {
+      idPersonal,
+      idSucursal: formData.idSucursal,
+      idTurno: formData.idTurno,
+      fechaInicioSemana,
+      fechaFinSemana,
+    });
+
+    alert("✅ Empleado asignado correctamente");
+    setAsignando(null);
+    setFormData({});
+    obtenerAsignaciones();
+    obtenerEmpleadosSinAsignar();
+  } catch (error) {
+    console.error("Error al crear asignación:", error);
+    alert("❌ Error al asignar empleado");
+  }
+};
+
+
+  const obtenerTurnos = async () => {
+    try {
+      const { data } = await axios.get("http://localhost:3000/api/turnos");
+      setTurnos(data);
+    } catch (error) {
+      console.error("Error al obtener turnos:", error);
+    }
+  };
+
+  const obtenerEmpleadosSinAsignar = async () => {
+    try {
+      const { data } = await axios.get(`${API_URL}/sin-asignar`);
+      setEmpleadosSinAsignar(data);
+    } catch (error) {
+      console.error("Error al obtener empleados sin asignar:", error);
+    }
+  };
+
+  // ===============================
+  // EDITAR ASIGNACIÓN
+  // ===============================
+  const iniciarEdicion = (asignacion) => {
+    setEditando(asignacion.idAsignacion);
+    setFormData({
+      idSucursal: asignacion.idSucursal,
+      idTurno: asignacion.idTurno,
+    });
+  };
+
+  const cancelarEdicion = () => {
+    setEditando(null);
+    setFormData({});
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const guardarCambios = async (idAsignacion) => {
+    try {
+      const asignacion = asignaciones.find(
+        (a) => a.idAsignacion === idAsignacion
+      );
+
+      await axios.put(`${API_URL}/${idAsignacion}`, {
+        idPersonal: asignacion.idPersonal,
+        idSucursal: formData.idSucursal,
+        idTurno: formData.idTurno,
+        fechaInicioSemana: asignacion.fechaInicioSemana,
+        fechaFinSemana: asignacion.fechaFinSemana,
+      });
+
+      alert("✅ Asignación actualizada correctamente");
+      setEditando(null);
+      obtenerAsignaciones();
+    } catch (error) {
+      console.error("Error al actualizar asignación:", error);
+      alert("❌ Error al actualizar la asignación");
+    }
+  };
+
+  // ===============================
+  // AGRUPAR POR SUCURSAL
+  // ===============================
+ const empleadosPorSucursal = sucursales.map((sucursal) => {
+  const empleados = asignaciones.filter(
+    (a) => a.idSucursal === sucursal.idSucursal
+  );
+
+  // Separar por turno
+  const mañana = empleados.filter((e) => e.idTurno === 1);
+  const tarde = empleados.filter((e) => e.idTurno === 2);
+
+  return {
+    ...sucursal,
+    mañana,
+    tarde,
+  };
+});
+
   return (
-    <div className="empleados-layout">
-      <aside className="empleados-aside">
-        <h3>Opciones</h3>
-        <button
-          className="ver-todos-btn"
-          onClick={() => navigate('/AdministrarEmpleados')}
-        >
-          Ver a todos los empleados
-        </button>
-      </aside>
+  <div className="asignacion-wrapper">
+    <aside className="sidebar">
+      <h3>Panel</h3>
+      <button
+        className="btn-admin"
+        onClick={() => (window.location.href = "/AdministrarEmpleados")}
+      >
+        Administrar empleados
+      </button>
+    </aside>
+    <div className="asignacion-container">
+      <h2>Asignación Semanal de Empleados</h2>
 
-      <main className="empleados-container">
-        <h2 className="empleados-titulo">Gestión de Empleados</h2>
-
-        {cambiosPendientes.length > 0 && (
-          <div className="botones-cambios">
-            <button onClick={handleGuardarCambios} className="btn-guardar">
-              Guardar Cambios
-            </button>
-            <button onClick={handleCancelarCambios} className="btn-cancelar">
-              Cancelar
-            </button>
-          </div>
-        )}
-
-        <div className="sucursales-grid">
-          {sucursales.map((sucursal) => (
-            <div key={sucursal.id} className="sucursal-card">
-              <h3 className="sucursal-nombre">{sucursal.nombre}</h3>
-
-              {sucursal.horarios.map((horario) => (
-                <div key={horario.id} className="horario-card">
-                  <h4 className="horario-rango">{horario.rango}</h4>
-
-                  <div className="empleados-lista">
-                    {horario.empleados.length > 0 ? (
-                      horario.empleados.map((empleado, i) => (
-                        <div key={i} className="empleado-item">
-                          <div className="empleado-info">
-                            <span className="empleado-nombre">{empleado.nombre}</span>
-                            <span className="empleado-cargo">({empleado.cargo})</span>
-                          </div>
-
-                          <select
-                            className="mover-select"
-                            onChange={(e) => {
-                              const [sucursalId, horarioId] = e.target.value
-                                .split('-')
-                                .map(Number);
-                              moverEmpleado(empleado, sucursal.id, horario.id, {
-                                sucursalId,
-                                horarioId,
-                              });
-                              e.target.value = '';
-                            }}
-                          >
-                            <option value="">Mover a...</option>
-                            {sucursales.map((dest) =>
-                              dest.horarios.map((h) => (
-                                <option
-                                  key={`${dest.id}-${h.id}`}
-                                  value={`${dest.id}-${h.id}`}
-                                  disabled={dest.id === sucursal.id && h.id === horario.id}
-                                >
-                                  {dest.nombre} - {h.rango}
-                                </option>
-                              ))
-                            )}
-                          </select>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="sin-empleados">Sin empleados asignados</p>
-                    )}
-                  </div>
+      {/* ========================= */}
+      {/* Empleados sin asignar */}
+      {/* ========================= */}
+      {empleadosSinAsignar.length > 0 && (
+        <div className="sucursal-card sin-asignar">
+          <h3>Empleados sin asignar</h3>
+          <div className="empleados-grid">
+            {empleadosSinAsignar.map((emp) => (
+              <div key={emp.idPersonal} className="empleado-card">
+                <img
+                  src={emp.imagen_url}
+                  alt={emp.nombre}
+                  className="empleado-foto"
+                />
+                <div className="empleado-info">
+                  <h4>
+                    {emp.nombre} {emp.apellido}
+                  </h4>
+                  <p>
+                    <strong>DNI:</strong> {emp.dni}
+                  </p>
+                  <p>
+                    <strong>Rol:</strong>{" "}
+                    {emp.idRol === 1 ? "Encargado" : emp.idRol === 2 ? "Empleado" : "Desconocido"}
+                  </p>
                 </div>
-              ))}
-            </div>
-          ))}
+                <div className="accionesEmpleadosCard">
+                  <button
+                    className="btn-editarEmpleadosCard"
+                    onClick={() => setAsignando(emp.idPersonal)}
+                  >
+                    Asignar
+                  </button>
+                  {asignando === emp.idPersonal && (
+                    <div className="form-asignar">
+                      <label>
+                        <strong>Sucursal:</strong>
+                        <select
+                          name="idSucursal"
+                          value={formData.idSucursal || ""}
+                          onChange={handleChange}
+                        >
+                          <option value="">Seleccionar</option>
+                          {sucursales.map((s) => (
+                            <option key={s.idSucursal} value={s.idSucursal}>
+                              {s.nombreSucursal}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+
+                      <label>
+                        <strong>Turno:</strong>
+                        <select
+                          name="idTurno"
+                          value={formData.idTurno || ""}
+                          onChange={handleChange}
+                        >
+                          <option value="">Seleccionar</option>
+                          {turnos.map((t) => (
+                            <option key={t.idTurno} value={t.idTurno}>
+                              {t.nombreTurno} ({t.horaEntrada} - {t.horaSalida})
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+
+                      <button
+                        className="btn-guardarEmpleadosCard"
+                        onClick={() => guardarNuevaAsignacion(emp.idPersonal)}
+                      >
+                        Guardar Asignación
+                      </button>
+
+                      <button className="btn-cancelarEmpleadosCard" onClick={() => setAsignando(null)}>
+                        Cancelar
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      </main>
+      )}
+
+      {/* ========================= */}
+      {/* Empleados por sucursal */}
+      {/* ========================= */}
+<div className="sucursales-grid">
+  {empleadosPorSucursal.map((sucursal) => (
+    <div key={sucursal.idSucursal} className="sucursal-card">
+      <h3>{sucursal.nombreSucursal}</h3>
+      <p className="direccion">{sucursal.direccion}</p>
+
+      {/* MAÑANA */}
+      <div className="turno-section">
+        <h4 className="turno-titulo">Mañana (07:00 - 14:00)</h4>
+        {sucursal.mañana.length > 0 ? (
+          <div className="empleados-grid">
+            {sucursal.mañana.map((emp) => (
+              <EmpleadoCard
+                key={emp.idAsignacion}
+                emp={emp}
+                editando={editando}
+                formData={formData}
+                handleChange={handleChange}
+                iniciarEdicion={iniciarEdicion}
+                guardarCambios={guardarCambios}
+                cancelarEdicion={cancelarEdicion}
+                turnos={turnos}
+                sucursales={sucursales}
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="sin-empleados">Sin empleados asignados</p>
+        )}
+      </div>
+
+      {/* TARDE */}
+      <div className="turno-section">
+        <h4 className="turno-titulo">Tarde (16:00 - 23:00)</h4>
+        {sucursal.tarde.length > 0 ? (
+          <div className="empleados-grid">
+            {sucursal.tarde.map((emp) => (
+              <EmpleadoCard
+                key={emp.idAsignacion}
+                emp={emp}
+                editando={editando}
+                formData={formData}
+                handleChange={handleChange}
+                iniciarEdicion={iniciarEdicion}
+                guardarCambios={guardarCambios}
+                cancelarEdicion={cancelarEdicion}
+                turnos={turnos}
+                sucursales={sucursales}
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="sin-empleados">Sin empleados asignados</p>
+        )}
+      </div>
+    </div>
+  ))}
+</div>
+    </div>
     </div>
   );
 };
+
+const EmpleadoCard = ({
+  emp,
+  editando,
+  formData,
+  handleChange,
+  iniciarEdicion,
+  guardarCambios,
+  cancelarEdicion,
+  turnos,
+  sucursales,
+}) => (
+  <div className="empleado-card">
+    <img
+      src={emp.imagen_url || "/default-avatar.png"}
+      alt={emp.personal}
+      className="empleado-foto"
+      onError={(e) => {
+        e.target.src = "/default-avatar.png";
+      }}
+    />
+    <div className="empleado-info">
+      <h4>{emp.personal}</h4>
+      <p>
+        <strong>DNI:</strong> {emp.dni}
+      </p>
+      <p>
+        <strong>Turno:</strong>{" "}
+        {editando === emp.idAsignacion ? (
+          <select name="idTurno" value={formData.idTurno} onChange={handleChange}>
+            {turnos.map((t) => (
+              <option key={t.idTurno} value={t.idTurno}>
+                {t.nombreTurno} ({t.horaEntrada} - {t.horaSalida})
+              </option>
+            ))}
+          </select>
+        ) : (
+          `${emp.turno} (${emp.horaEntrada} - ${emp.horaSalida})`
+        )}
+      </p>
+      <p>
+        <strong>Rol:</strong>{" "}
+        {emp.idRol === 1 ? "Encargado" : emp.idRol === 2 ? "Empleado" : "Desconocido"}
+      </p>
+
+      {editando === emp.idAsignacion && (
+        <div>
+          <label>
+            <strong>Sucursal:</strong>{" "}
+            <select name="idSucursal" value={formData.idSucursal} onChange={handleChange}>
+              {sucursales.map((s) => (
+                <option key={s.idSucursal} value={s.idSucursal}>
+                  {s.nombreSucursal}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      )}
+    </div>
+
+    <div className="accionesEmpleadosCard">
+      {editando === emp.idAsignacion ? (
+        <>
+          <button className="btn-guardarEmpleadosCard" onClick={() => guardarCambios(emp.idAsignacion)}>
+            Guardar
+          </button>
+          <button className="btn-cancelarEmpleadosCard" onClick={cancelarEdicion}>
+            Cancelar
+          </button>
+        </>
+      ) : (
+        <button className="btn-editarEmpleadosCard" onClick={() => iniciarEdicion(emp)}>
+          Editar
+        </button>
+      )}
+    </div>
+  </div>
+);
 
 export default Empleados;

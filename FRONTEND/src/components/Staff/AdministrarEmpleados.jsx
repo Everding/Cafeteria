@@ -128,6 +128,17 @@ const AdministrarEmpleado = () => {
   // Render
   // ==========================
   return (
+    <div className="asignacion-wrapper">
+    <aside className="sidebar">
+      <h3>Panel</h3>
+      <button
+        className="btn-admin"
+        onClick={() => (window.location.href = "/Empleados")}
+      >
+        Horario de Empleados
+      </button>
+    </aside>
+
     <div className="empleados-page">
       <h1>Administrar Personal</h1>
 
@@ -243,6 +254,7 @@ const AdministrarEmpleado = () => {
           <p>No hay empleados registrados.</p>
         )}
       </div>
+    </div>
     </div>
   );
 };

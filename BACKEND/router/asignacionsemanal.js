@@ -4,10 +4,13 @@ import {
   getAsignacionById,
   createAsignacion,
   updateAsignacion,
-  deleteAsignacion
+  deleteAsignacion,
+  getEmpleadosSinAsignar
 } from "../controllers/asignacionsemanal.js";
 
 const router = express.Router();
+
+router.get("/sin-asignar", getEmpleadosSinAsignar);
 
 // Obtener todas las asignaciones
 router.get("/", getAllAsignaciones);
@@ -23,5 +26,7 @@ router.put("/:idAsignacion", updateAsignacion);
 
 // Eliminar asignación semanal
 router.delete("/:idAsignacion", deleteAsignacion);
+
+
 
 export default router;
