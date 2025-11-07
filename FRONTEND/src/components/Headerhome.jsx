@@ -4,6 +4,7 @@ import { RiAccountCircleFill } from "react-icons/ri";
 import { TiShoppingCart } from "react-icons/ti";
 import Logo from "../assets/Logo.png";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.jsx";
 
 const HeaderHome = () => {
   const [openDropdown, setOpenDropdown] = useState({
@@ -13,45 +14,54 @@ const HeaderHome = () => {
     staff: false,
     profile: false,
   });
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Estado de sesión
+
   const navigate = useNavigate();
+  const { user, tipo, idRol, token, logout } = useAuth();
 
-  const handleMouseEnter = (menu) => {
-    setOpenDropdown({ ...openDropdown, [menu]: true });
+  const isLoggedIn = !!token;
+  const fotoPerfil = user?.imagen_url || null;
+
+  // 🖱 Manejo dropdowns
+  const handleMouseEnter = (menu) => setOpenDropdown({ ...openDropdown, [menu]: true });
+  const handleMouseLeave = (menu) => setTimeout(() => setOpenDropdown({ ...openDropdown, [menu]: false }), 200);
+  const handleDropdownClick = (menu) => setOpenDropdown({ ...openDropdown, [menu]: !openDropdown[menu] });
+
+  const handleCartClick = () => navigate("/Carrito");
+
+  const handleLogout = () => {
+    logout();
+    navigate("/Login");
   };
 
-  const handleMouseLeave = (menu) => {
-    setTimeout(() => setOpenDropdown({ ...openDropdown, [menu]: false }), 200);
+  const renderStaffLinks = () => {
+    if (!idRol || tipo !== "personal") return null;
+
+    switch (idRol) {
+      case 1:
+        return (
+          <>
+            <a href="/Pedidos" className="headerhome-dropdown-item">Pedidos entrantes</a>
+            <a href="/Stock" className="headerhome-dropdown-item">Stock</a>
+            <a href="/Empleados" className="headerhome-dropdown-item">Empleados</a>
+            <a href="/Ventas" className="headerhome-dropdown-item">Ventas</a>
+            <a href="/Compras" className="headerhome-dropdown-item">Compras</a>
+          </>
+        );
+      case 2:
+        return (
+          <>
+            <a href="/Pedidos" className="headerhome-dropdown-item">Pedidos entrantes</a>
+            <a href="/Stock" className="headerhome-dropdown-item">Stock</a>
+            <a href="/Ventas" className="headerhome-dropdown-item">Ventas</a>
+            <a href="/Compras" className="headerhome-dropdown-item">Compras</a>
+          </>
+        );
+      case 3:
+        return <a href="/Pedidos" className="headerhome-dropdown-item">Pedidos entrantes</a>;
+      default:
+        return null;
+    }
   };
-
-  const handleDropdownClick = (menu) => {
-    setOpenDropdown({ ...openDropdown, [menu]: !openDropdown[menu] });
-  };
-
-  const handleCartClick = () => {
-    navigate("/Carrito");
-  };
-  
-
-
-  // Detecta sesión al cargar
-    useEffect(() => {
-      const token = localStorage.getItem("token");
-      if (token) {
-        setIsLoggedIn(true);
-      }
-    }, []);
-  
-  
-
-  
-    // Función para cerrar sesión
-    const handleLogout = () => {
-      localStorage.removeItem("token");
-      setIsLoggedIn(false);
-    };
-  
-
 
   return (
     <header className="headerhome-header">
@@ -102,21 +112,20 @@ const HeaderHome = () => {
             <a href="/Contactanos" className="headerhome-nav-link">Contactanos</a>
           </li>
 
-          <li
-            className="headerhome-nav-item"
-            onMouseEnter={() => handleMouseEnter("staff")}
-            onMouseLeave={() => handleMouseLeave("staff")}
-            onClick={() => handleDropdownClick("staff")}
-          >
-            <a href="/Pedidos" className="headerhome-nav-link">Staff</a>
-            <div className={`headerhome-dropdown ${openDropdown.staff ? 'open' : ''}`}>
-              <a href="/Pedidos" className="headerhome-dropdown-item">Pedidos entrantes</a>
-              <a href="/Stock" className="headerhome-dropdown-item">Stock</a>
-              <a href="/Empleados" className="headerhome-dropdown-item">Empleados</a>
-              <a href="/Ventas" className="headerhome-dropdown-item">Ventas</a>
-              <a href="/Compras" className="headerhome-dropdown-item">Compras</a>
-            </div>
-          </li>
+          {/* Staff dinámico */}
+          {isLoggedIn && tipo === "personal" && (
+            <li
+              className="headerhome-nav-item"
+              onMouseEnter={() => handleMouseEnter("staff")}
+              onMouseLeave={() => handleMouseLeave("staff")}
+              onClick={() => handleDropdownClick("staff")}
+            >
+              <a href="/Pedidos" className="headerhome-nav-link">Staff</a>
+              <div className={`headerhome-dropdown ${openDropdown.staff ? 'open' : ''}`}>
+                {renderStaffLinks()}
+              </div>
+            </li>
+          )}
         </ul>
 
         <div className="headerhome-nav-icons">
@@ -128,12 +137,17 @@ const HeaderHome = () => {
             onMouseLeave={() => handleMouseLeave("profile")}
             onClick={() => handleDropdownClick("profile")}
           >
-            <RiAccountCircleFill className="headerhome-profile-icon" />
+            {fotoPerfil ? (
+              <img src={fotoPerfil} alt="Perfil" className="headerhome-profile-icon" />
+            ) : (
+              <RiAccountCircleFill className="headerhome-profile-icon" />
+            )}
+
             <div className={`headerhome-profile-dropdown ${openDropdown.profile ? 'open' : ''}`}>
               {isLoggedIn ? (
                 <>
                   <a href="/perfil" className='headerhome-dropdown-item'>Mi perfil</a>
-                  <a href="" className='headerhome-dropdown-item' onClick={handleLogout}>Cerrar sesión</a>
+                  <a href="#" className='headerhome-dropdown-item' onClick={handleLogout}>Cerrar sesión</a>
                 </>
               ) : (
                 <>

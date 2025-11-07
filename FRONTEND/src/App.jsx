@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { AuthProvider } from "./context/AuthContext.jsx";
 import { Routes, Route, BrowserRouter, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { 
@@ -32,14 +33,14 @@ import NuestraHistoriaPage from './pages/nosotros/NuestrahistoriaPage';
 import SucursalesPage from './pages/nosotros/SucursalesPage';
 import ReseñaPage from './pages/nosotros/ReseñasPage';
 import ContactanosPage from './pages/ContactanosPage';
-
+import RutaProtegida from "./components/RutasProtegidas.jsx";
+import RutaPublica from "./components/RutasPublicas.jsx";
 const AppContent = () => {
   const location = useLocation();
   const [cantidadProductos, setCantidadProductos] = useState(0);
-  const idCarrito = 1; // ⚠️ Cambiar si usás un carrito por usuario
+  const idCarrito = 1;
   const noHeaderRoutes = [HOME];
 
-  // 🔁 Función que obtiene la cantidad total desde el backend
   const cargarCantidadCarrito = async () => {
     try {
       const res = await axios.get(`http://localhost:3000/api/detalle-carrito/count/${idCarrito}`);
@@ -49,14 +50,10 @@ const AppContent = () => {
     }
   };
 
-  // 🧠 Carga inicial + actualización cuando se emite el evento global
   useEffect(() => {
     cargarCantidadCarrito();
-
-    // Escucha evento global para refrescar cantidad
     const handleUpdate = () => cargarCantidadCarrito();
     window.addEventListener("carritoActualizado", handleUpdate);
-
     return () => window.removeEventListener("carritoActualizado", handleUpdate);
   }, []);
 
@@ -66,39 +63,47 @@ const AppContent = () => {
         <Header cantidadProductos={cantidadProductos} />
       )}
 
-      <Routes>
+      <Routes> 
+
+        {/* Rutas públicas */}
+
         <Route path={HOME} element={<Home />} />
         <Route path={LOGIN} element={<LoginPage />} />
-        <Route path={MENUSPREFABRICADOS} element={<PrehechosPage />} />
+        <Route path={MENUSPREFABRICADOS} element={ <PrehechosPage />} />
+        <Route path={REGISTER} element={<RutaPublica><RegisterPage /></RutaPublica>} />
         <Route path={ORDENAR} element={<OrdenarPage />} />
         <Route path={BEBIDAS} element={<BebidasPage />} />
         <Route path={ACOMPAÑANTES} element={<AcompañantesPage />} />
         <Route path={POSTRES} element={<PostresPage />} />
         <Route path={KIOSCO} element={<KioscoPage />} />
         <Route path={NUESTROSPRODUCTOS} element={<NuestrosProductosPage />} />
-        <Route path={PEDIDOS} element={<PedidosentrantesPage />} />
-        <Route path={EMPLEADOS} element={<EmpleadosPage />} />
-        <Route path={ADMINISTRAREMPLEADOS} element={<AdministrarEmpleadosPage />} />
-        <Route path={STOCK} element={<StockPage />} />
-        <Route path={VENTAS} element={<VentasPage />} />
-        <Route path={COMPRAS} element={<ComprasPage />} />
-        <Route path={REGISTER} element={<RegisterPage />} />
-        <Route path={MIPERFIL} element={<MiPerfilPage />} />
-        <Route path={CARRITO} element={<CarritoPage />} />
         <Route path={EQUIPO} element={<EquipoPage />} />
         <Route path={NUESTRAHISTORIA} element={<NuestraHistoriaPage />} />
         <Route path={SUCURSALES} element={<SucursalesPage />} />
         <Route path={RESEÑA} element={<ReseñaPage />} />
         <Route path={CONTACTANOS} element={<ContactanosPage />} />
+
+        {/* Rutas privadas (requieren autenticación) */}
+        <Route path={PEDIDOS} element={<RutaProtegida  tiposPermitidos={["personal"]} rolesPermitidos={[3, 1, 2]}><PedidosentrantesPage /></RutaProtegida>} />
+        <Route path={EMPLEADOS} element={<RutaProtegida tiposPermitidos={["personal"]} rolesPermitidos={[1, 2]}><EmpleadosPage /></RutaProtegida>} />
+        <Route path={ADMINISTRAREMPLEADOS} element={<RutaProtegida tiposPermitidos={["personal"]} rolesPermitidos={[1]}><AdministrarEmpleadosPage /></RutaProtegida>} />
+        <Route path={STOCK} element={<RutaProtegida tiposPermitidos={["personal"]} rolesPermitidos={[1, 2]}><StockPage /></RutaProtegida>} />
+        <Route path={VENTAS} element={<RutaProtegida tiposPermitidos={["personal"]} rolesPermitidos={[1, 2]}><VentasPage /></RutaProtegida>} />
+        <Route path={COMPRAS} element={<RutaProtegida tiposPermitidos={["personal"]} rolesPermitidos={[1, 2]}><ComprasPage /></RutaProtegida>} />
+        <Route path={MIPERFIL} element={<RutaProtegida  tiposPermitidos={["personal", "usuariosapp"]} ><MiPerfilPage /></RutaProtegida>} />
+        <Route path={CARRITO} element={<RutaProtegida><CarritoPage /></RutaProtegida>} />
+
       </Routes>
     </>
   );
 };
 
 const App = () => (
-  <BrowserRouter>
-    <AppContent />
-  </BrowserRouter>
+  <AuthProvider>    {/* Proveedor de sesión envuelve TODO */}
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
+  </AuthProvider>
 );
 
 export default App;

@@ -25,6 +25,7 @@ import sucursalesRoutes from "./router/sucursales.js";
 import turnosRoutes from "./router/turnos.js";
 import ventasRoutes from "./router/ventas.js";
 import registerRoutes from "./router/register.js";
+import authRouter from "./router/auth.js";
 import multer from "multer";
 import path from "path";
 
@@ -60,6 +61,7 @@ app.use("/api", registerRoutes);
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 app.use("/uploads", express.static(path.join("BACKEND", "uploads")));
 app.use("/uploads/personal", express.static(path.join(process.cwd(), "uploads/personal")));
+app.use("/api/auth", authRouter);
 
 
 

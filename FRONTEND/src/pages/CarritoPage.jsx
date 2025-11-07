@@ -5,8 +5,7 @@ import Footer from "../components/Footer";
 const CarritoPage = () => {
   return (
     <div>
-      {/* 👇 Pasás el ID del carrito (por ahora fijo para pruebas) */}
-      <Carrito idCarrito={1} />
+      <Carrito  />
       <Footer />
     </div>
   );

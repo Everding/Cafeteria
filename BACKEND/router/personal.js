@@ -1,4 +1,5 @@
 import express from "express";
+import { verificarToken, soloPersonal } from "../middlewares/auth.js";
 import {
   getPersonal,
   createPersonal,
@@ -10,16 +11,16 @@ import {
 const router = express.Router();
 
 // GET todos
-router.get("/", getPersonal);
+router.get("/", getPersonal, verificarToken, soloPersonal);
 
 // POST nuevo
-router.post("/", upload.single("imagen"), createPersonal);
+router.post("/", upload.single("imagen"), createPersonal, verificarToken, soloPersonal);
 
 // PUT actualizar por ID
-router.put("/:idPersonal", upload.single("imagen"), updatePersonal);
+router.put("/:idPersonal", upload.single("imagen"), updatePersonal, verificarToken, soloPersonal);
 
 
 // DELETE eliminar por ID
-router.delete("/:id", deletePersonal);
+router.delete("/:id", deletePersonal, verificarToken, soloPersonal);
 
 export default router;

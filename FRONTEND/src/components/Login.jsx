@@ -3,37 +3,42 @@ import axios from "axios";
 import "../styles/Login.css";
 import { useNavigate } from "react-router-dom";
 import { HOME } from "../routers/router";
+import { useAuth } from "../context/AuthContext.jsx";
 
 function Login() {
-  const [usuario, setUsuario] = useState("");
+  const [correo, setCorreo] = useState("");
   const [contraseña, setContraseña] = useState("");
   const navigate = useNavigate();
+  const { login } = useAuth();
+
   const handleSend = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post("http://localhost:3000/api/login", {
-        usuario,
-        contraseña, // puede ser vacío para mesas
-      });
-
+      const response = await axios.post("http://localhost:3000/api/login", { correo, contraseña });
       const data = response.data;
 
+      console.log("Login response:", data);
+
       if (data.success) {
-        // Guardar datos en localStorage
-        localStorage.setItem("usuarioLogueado", data.usuario);
-        localStorage.setItem("tipoUsuario", data.tipo);
-        if (data.tipo === "personal") localStorage.setItem("rol", data.rol);
+        // 🔹 Guardar el objeto usuario completo
+        const usuarioObj = {
+          id: data.usuario.idPersonal || data.usuario.idUsuarioApp || data.usuario.numeroMesa,
+          correo: data.usuario.correo,
+          idRol: data.usuario.idRol || null,
+          imagen_url: data.usuario.imagen_url || null,
+          // cualquier otro campo que quieras usar en Header
+        };
 
-        alert(`Inicio de sesión exitoso como ${data.tipo}`);
+        login(usuarioObj, data.tipo, data.token, usuarioObj.idRol);
+
         navigate(HOME);
-
-     } else {
+      } else {
         alert(data.message || "Usuario o contraseña incorrectos");
       }
     } catch (error) {
-      console.error("Error al iniciar sesión", error);
-      alert("Error al iniciar sesión");
+      console.error("Error al iniciar sesión:", error);
+      alert("Error al iniciar sesión. Revisa tu conexión o servidor.");
     }
   };
 
@@ -43,12 +48,11 @@ function Login() {
         <h2>Iniciar sesión</h2>
         <input
           type="text"
-          placeholder="Correo"
-          value={usuario}
-          onChange={(e) => setUsuario(e.target.value)}
+          placeholder="Correo o número de mesa"
+          value={correo}
+          onChange={(e) => setCorreo(e.target.value)}
           required
         />
-        {/* Solo mostrar input de contraseña para usuariosApp y personal */}
         <input
           type="password"
           placeholder="Contraseña (solo si aplica)"

@@ -1,29 +1,56 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import '../styles/Header.css';
 import { RiAccountCircleFill } from "react-icons/ri";
 import { TiShoppingCart } from "react-icons/ti";
 import Logo from "../assets/Logo.png";
 import { useNavigate } from "react-router-dom";
 import { HOME } from "../routers/router";
+import { useAuth } from "../context/AuthContext.jsx";
 
 const Header = ({ cantidadProductos = 0 }) => {
   const [openDropdown, setOpenDropdown] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
+  const { tipo, idRol, token, logout, user } = useAuth();
 
-  // Detecta si el usuario tiene sesión activa
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) setIsLoggedIn(true);
-  }, []);
+  const isLoggedIn = !!token;
+  const fotoPerfil = user?.imagen_url || null;
 
   const handleMouseEnter = (menu) => setOpenDropdown(menu);
-  const handleMouseLeave = () => setTimeout(() => setOpenDropdown(null), 200);
+  const handleMouseLeave = () => setOpenDropdown(null);
 
-  // Cerrar sesión
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    setIsLoggedIn(false);
+    logout();
+    navigate("/Login");
+  };
+
+  const renderStaffLinks = () => {
+    if (!idRol) return null;
+
+    switch (idRol) {
+      case 1:
+        return (
+          <>
+            <a href="/Pedidos">Pedidos entrantes</a>
+            <a href="/Stock">Stock</a>
+            <a href="/Empleados">Empleados</a>
+            <a href="/Ventas">Ventas</a>
+            <a href="/Compras">Compras</a>
+          </>
+        );
+      case 2:
+        return (
+          <>
+            <a href="/Pedidos">Pedidos entrantes</a>
+            <a href="/Stock">Stock</a>
+            <a href="/Ventas">Ventas</a>
+            <a href="/Compras">Compras</a>
+          </>
+        );
+      case 3:
+        return <a href="/Pedidos">Pedidos entrantes</a>;
+      default:
+        return null;
+    }
   };
 
   return (
@@ -34,7 +61,6 @@ const Header = ({ cantidadProductos = 0 }) => {
           alt="Café Logo"
           className="logoGeneral"
           onClick={() => navigate(HOME)}
-          id='LogoGeneral'
         />
 
         <ul className="nav-linksGeneral">
@@ -69,23 +95,20 @@ const Header = ({ cantidadProductos = 0 }) => {
             <a href="/Contactanos" className="nav-linkGeneral">Contactanos</a>
           </li>
 
-          <li
-            className="nav-itemGeneral"
-            onMouseEnter={() => handleMouseEnter("staff")}
-            onMouseLeave={handleMouseLeave}
-          >
-            <a href="/Pedidos" className="nav-linkGeneral">Staff</a>
-            <div className={`dropdownGeneral ${openDropdown === "staff" ? "open" : ""}`}>
-              <a href="/Pedidos">Pedidos entrantes</a>
-              <a href="/Stock">Stock</a>
-              <a href="/Empleados">Empleados</a>
-              <a href="/Ventas">Ventas</a>
-              <a href="/Compras">Compras</a>
-            </div>
-          </li>
+          {isLoggedIn && tipo === "personal" && (
+            <li
+              className="nav-itemGeneral"
+              onMouseEnter={() => handleMouseEnter("staff")}
+              onMouseLeave={handleMouseLeave}
+            >
+              <a href="/Pedidos" className="nav-linkGeneral">Staff</a>
+              <div className={`dropdownGeneral ${openDropdown === "staff" ? "open" : ""}`}>
+                {renderStaffLinks()}
+              </div>
+            </li>
+          )}
         </ul>
 
-        {/* 🛒 Carrito con badge */}
         <div className="cart-containerGeneral">
           <TiShoppingCart
             className="cart-iconGeneral"
@@ -96,13 +119,21 @@ const Header = ({ cantidadProductos = 0 }) => {
           )}
         </div>
 
-        {/* 👤 Perfil / Sesión */}
         <div
           className="profileGeneral"
           onMouseEnter={() => handleMouseEnter("profile")}
           onMouseLeave={handleMouseLeave}
         >
-          <RiAccountCircleFill className="profile-iconGeneral" />
+          {fotoPerfil ? (
+            <img
+              src={fotoPerfil}
+              alt="Foto de perfil"
+              className="profile-imageGeneral"
+            />
+          ) : (
+            <RiAccountCircleFill className="profile-iconGeneral" />
+          )}
+
           <div className={`dropdownGeneral ${openDropdown === "profile" ? "open" : ''}`}>
             {isLoggedIn ? (
               <>
