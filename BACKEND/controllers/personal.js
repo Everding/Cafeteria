@@ -86,16 +86,18 @@ export const updatePersonal = async (req, res) => {
     const contrasenaFinal =
       contrasena && contrasena.trim() !== ""
         ? contrasena
-        : empleadoActual[0].contrasena;
+        : empleadoActual[0].contraseña;
 
     // Manejo de imagen nueva (si se sube)
     let imagen_url = empleadoActual[0].imagen_url;
     if (req.file) {
       // Borrar imagen anterior si existía
-      if (imagen_url && fs.existsSync(path.resolve(imagen_url.replace("http://localhost:3000/", "")))) {
-        fs.unlinkSync(path.resolve(imagen_url.replace("http://localhost:3000/", "")));
-      }
-      imagen_url = `http://localhost:3000/uploads/personal/${req.file.filename}`;
+      const rutaLocal = path.resolve(
+        imagen_url.replace(`${req.protocol}://${req.get("host")}/`, "")
+      );
+      if (fs.existsSync(rutaLocal)) fs.unlinkSync(rutaLocal);
+
+      imagen_url = `${req.protocol}://${req.get("host")}/uploads/personal/${req.file.filename}`;
     }
 
     // Actualizar datos
@@ -103,7 +105,7 @@ export const updatePersonal = async (req, res) => {
       `UPDATE Personal 
        SET nombre=?, apellido=?, dni=?, correo=?, contraseña=?, idRol=?, imagen_url=?
        WHERE idPersonal=?`,
-      [nombre, apellido, dni, correo, contraseñaFinal, idRol, imagen_url, idPersonal]
+      [nombre, apellido, dni, correo, contrasenaFinal, idRol, imagen_url, idPersonal]
     );
 
     res.json({ message: "Empleado actualizado correctamente" });

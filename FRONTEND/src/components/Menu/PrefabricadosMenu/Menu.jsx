@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import MenuCard from "./MenuCard";
 import "../../../styles/Menu/Menu.css";
+import { useAuth } from "../../../context/AuthContext.jsx"; // 🔹 Importar contexto de autenticación
 
 const MenuList = () => {
   const [menus, setMenus] = useState([]);
   const [editingId, setEditingId] = useState(null); // 🔹 Nuevo estado
+  const { user } = useAuth(); // 🔹 Obtener usuario logueado
 
   // 🔹 Cargar menús desde backend
   const fetchMenus = async () => {
@@ -55,11 +57,20 @@ const MenuList = () => {
     }
   };
 
+  // 🔹 Condición para mostrar botones
+  const mostrarBotones =
+    user &&
+    user.tipo !== "clientes" &&
+    user.tipo !== "usuariosapp" &&
+    (user.idRol === 1);
+
   return (
     <div className="menu-list">
       <div className="menu-list-header">
         <h1>Menús Prefabricados</h1>
-        <button className="add-menuPage" onClick={agregarMenu}>Agregar Menú</button>
+        {mostrarBotones && (
+          <button className="add-menuPage" onClick={agregarMenu}>Agregar Menú</button>
+        )}
       </div>
       <div className="menu-container">
         {menus.length ? (
@@ -70,10 +81,12 @@ const MenuList = () => {
                 onUpdate={actualizarMenu}
                 triggerEdit={editingId === menu.id_menu} // 🔹 Nuevo prop
               />
-              <div className="menu-buttons">
-                <button onClick={() => setEditingId(menu.id_menu)}>Editar</button>
-                <button onClick={() => eliminarMenu(menu.id_menu)}>Eliminar</button>
-              </div>
+              {mostrarBotones && (
+                <div className="menu-buttons">
+                  <button onClick={() => setEditingId(menu.id_menu)}>Editar</button>
+                  <button onClick={() => eliminarMenu(menu.id_menu)}>Eliminar</button>
+                </div>
+              )}
             </div>
           ))
         ) : (

@@ -146,7 +146,7 @@ const HeaderHome = () => {
             <div className={`headerhome-profile-dropdown ${openDropdown.profile ? 'open' : ''}`}>
               {isLoggedIn ? (
                 <>
-                  <a href="/perfil" className='headerhome-dropdown-item'>Mi perfil</a>
+                  <a href="/MiPerfil" className='headerhome-dropdown-item'>Mi perfil</a>
                   <a href="#" className='headerhome-dropdown-item' onClick={handleLogout}>Cerrar sesión</a>
                 </>
               ) : (

@@ -18,7 +18,6 @@ export const loginGeneral = async (req, res) => {
 
     if (rows.length > 0) {
       const user = rows[0];
-
       const validPassword =
         (await bcrypt.compare(contraseña, user.contraseña)) ||
         contraseña === user.contraseña;
@@ -26,8 +25,12 @@ export const loginGeneral = async (req, res) => {
       if (!validPassword)
         return res.status(401).json({ message: "Contraseña incorrecta" });
 
+      // 🔹 Incluimos idUsuarioApp en el payload del token
       const token = jwt.sign(
-        { id: user.idUsuarioApp, tipo: "usuariosapp" },
+        {
+          idUsuarioApp: user.idUsuarioApp,
+          tipo: "usuariosapp",
+        },
         SECRET_KEY,
         { expiresIn: "2h" }
       );
@@ -38,7 +41,7 @@ export const loginGeneral = async (req, res) => {
         usuario: {
           idUsuarioApp: user.idUsuarioApp,
           correo: user.correo,
-          imagen_url: null, // no tienen foto
+          imagen_url: null,
         },
         token,
       });
@@ -52,7 +55,6 @@ export const loginGeneral = async (req, res) => {
 
     if (rows.length > 0) {
       const user = rows[0];
-
       const validPassword =
         (await bcrypt.compare(contraseña, user.contraseña)) ||
         contraseña === user.contraseña;
@@ -61,7 +63,11 @@ export const loginGeneral = async (req, res) => {
         return res.status(401).json({ message: "Contraseña incorrecta" });
 
       const token = jwt.sign(
-        { id: user.idPersonal, tipo: "personal", idRol: user.idRol },
+        {
+          idPersonal: user.idPersonal,
+          tipo: "personal",
+          idRol: user.idRol,
+        },
         SECRET_KEY,
         { expiresIn: "2h" }
       );
@@ -81,7 +87,7 @@ export const loginGeneral = async (req, res) => {
 
     // ===== 3. Clientes (Mesas) =====
     [rows] = await db.query(
-      "SELECT numeroMesa, estado FROM clientes WHERE numeroMesa = ?",
+      "SELECT idCliente, numeroMesa, estado FROM Clientes WHERE numeroMesa = ?",
       [correo]
     );
 
@@ -89,13 +95,16 @@ export const loginGeneral = async (req, res) => {
       const mesa = rows[0];
 
       if (mesa.estado === "Disponible" || mesa.estado === "Reservada") {
-        await db.query(
-          "UPDATE Clientes SET estado = 'Ocupada' WHERE numeroMesa = ?",
-          [correo]
-        );
+        await db.query("UPDATE Clientes SET estado = 'Ocupada' WHERE numeroMesa = ?", [
+          correo,
+        ]);
 
         const token = jwt.sign(
-          { numeroMesa: mesa.numeroMesa, tipo: "clientes" },
+          {
+            idCliente: mesa.idCliente, // 🔹 incluimos el idCliente real
+            numeroMesa: mesa.numeroMesa,
+            tipo: "clientes",
+          },
           SECRET_KEY,
           { expiresIn: "4h" }
         );
@@ -104,6 +113,7 @@ export const loginGeneral = async (req, res) => {
           success: true,
           tipo: "clientes",
           usuario: {
+            idCliente: mesa.idCliente,
             numeroMesa: mesa.numeroMesa,
             imagen_url: null,
           },

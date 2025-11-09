@@ -1,31 +1,70 @@
-import React, { useState } from 'react';
-import '../styles/Header.css';
+import React, { useState, useEffect } from "react";
 import { RiAccountCircleFill } from "react-icons/ri";
 import { TiShoppingCart } from "react-icons/ti";
-import Logo from "../assets/Logo.png";
 import { useNavigate } from "react-router-dom";
-import { HOME } from "../routers/router";
+import Logo from "../assets/Logo.png";
 import { useAuth } from "../context/AuthContext.jsx";
+import "../styles/Header.css";
+import axios from "axios";
 
-const Header = ({ cantidadProductos = 0 }) => {
-  const [openDropdown, setOpenDropdown] = useState(null);
+const Header = () => {
   const navigate = useNavigate();
-  const { tipo, idRol, token, logout, user } = useAuth();
+  const { user, token, logout, loading } = useAuth();
+  const [openDropdown, setOpenDropdown] = useState(null);
+  const [badgeCantidad, setBadgeCantidad] = useState(0);
 
-  const isLoggedIn = !!token;
   const fotoPerfil = user?.imagen_url || null;
+
+  // 🔹 Actualizar badge
+  const actualizarBadge = async () => {
+    if (!token) {
+      setBadgeCantidad(0);
+      return;
+    }
+
+    try {
+      const { data: carrito } = await axios.get(
+        "http://localhost:3000/api/carrito/activo",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (!carrito?.id_carrito) {
+        setBadgeCantidad(0);
+        return;
+      }
+
+      const { data } = await axios.get(
+        `http://localhost:3000/api/detalle-carrito/count/${carrito.id_carrito}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setBadgeCantidad(Number(data.total) || 0);
+    } catch (err) {
+      console.error("Error actualizando badge:", err);
+      setBadgeCantidad(0);
+    }
+  };
+
+  useEffect(() => {
+    if (!loading) {
+      actualizarBadge();
+      window.addEventListener("carritoActualizado", actualizarBadge);
+    }
+    return () => window.removeEventListener("carritoActualizado", actualizarBadge);
+  }, [token, loading]);
 
   const handleMouseEnter = (menu) => setOpenDropdown(menu);
   const handleMouseLeave = () => setOpenDropdown(null);
 
   const handleLogout = () => {
     logout();
+    setBadgeCantidad(0);
     navigate("/Login");
   };
 
   const renderStaffLinks = () => {
+    const idRol = user?.idRol;
     if (!idRol) return null;
-
     switch (idRol) {
       case 1:
         return (
@@ -60,7 +99,7 @@ const Header = ({ cantidadProductos = 0 }) => {
           src={Logo}
           alt="Café Logo"
           className="logoGeneral"
-          onClick={() => navigate(HOME)}
+          onClick={() => navigate("/")}
         />
 
         <ul className="nav-linksGeneral">
@@ -95,7 +134,7 @@ const Header = ({ cantidadProductos = 0 }) => {
             <a href="/Contactanos" className="nav-linkGeneral">Contactanos</a>
           </li>
 
-          {isLoggedIn && tipo === "personal" && (
+          {[1, 2, 3].includes(user?.idRol) && (
             <li
               className="nav-itemGeneral"
               onMouseEnter={() => handleMouseEnter("staff")}
@@ -109,14 +148,9 @@ const Header = ({ cantidadProductos = 0 }) => {
           )}
         </ul>
 
-        <div className="cart-containerGeneral">
-          <TiShoppingCart
-            className="cart-iconGeneral"
-            onClick={() => navigate("/Carrito")}
-          />
-          {cantidadProductos > 0 && (
-            <span className="cart-badgeGeneral">{cantidadProductos}</span>
-          )}
+        <div className="cart-containerGeneral" onClick={() => navigate("/Carrito")}>
+          <TiShoppingCart className="cart-iconGeneral" />
+          {badgeCantidad > 0 && <span className="cart-badgeGeneral">{badgeCantidad}</span>}
         </div>
 
         <div
@@ -125,19 +159,14 @@ const Header = ({ cantidadProductos = 0 }) => {
           onMouseLeave={handleMouseLeave}
         >
           {fotoPerfil ? (
-            <img
-              src={fotoPerfil}
-              alt="Foto de perfil"
-              className="profile-imageGeneral"
-            />
+            <img src={fotoPerfil} alt="Foto de perfil" className="profile-imageGeneral" />
           ) : (
             <RiAccountCircleFill className="profile-iconGeneral" />
           )}
-
-          <div className={`dropdownGeneral ${openDropdown === "profile" ? "open" : ''}`}>
-            {isLoggedIn ? (
+          <div className={`dropdownGeneral ${openDropdown === "profile" ? "open" : ""}`}>
+            {user ? (
               <>
-                <a href="/perfil">Mi perfil</a>
+                <a href="/MiPerfil">Mi perfil</a>
                 <a href="#" onClick={handleLogout}>Cerrar sesión</a>
               </>
             ) : (
