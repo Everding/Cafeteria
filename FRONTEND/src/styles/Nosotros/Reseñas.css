@@ -1,111 +1,169 @@
+/* Reseñas.css - Estilo Twitter/X */
 .reseñas-container {
-  padding: 40px;
-  font-family: 'Arial', sans-serif;
-  background-color: #fff8f0;
+  max-width: 700px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-.titulo {
+.reseñas-container h2 {
   text-align: center;
-  font-size: 2rem;
-  color: #3c2f2f;
-  margin-bottom: 30px;
+  font-size: 1.8rem;
+  color: #0f1419;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
 }
 
-/* FORMULARIO */
+/* Formulario (opcional, lo mantenemos simple pero elegante) */
 .reseña-form {
-  background-color: #ffe6cc;
-  padding: 20px;
-  border-radius: 10px;
-  max-width: 600px;
-  margin: 0 auto 40px auto;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  background: #f7f9fa;
+  padding: 1.5rem;
+  border-radius: 16px;
+  border: 1px solid #e1e8ed;
+  margin-bottom: 2rem;
 }
 
-.reseña-form textarea,
+.reseña-form textarea {
+  width: 100%;
+  min-height: 90px;
+  padding: 0.75rem;
+  border: 1px solid #cfd9de;
+  border-radius: 12px;
+  font-size: 1rem;
+  resize: vertical;
+  margin-bottom: 1rem;
+  background: white;
+}
+
+.reseña-form textarea:focus {
+  outline: none;
+  border-color: #1da1f2;
+  box-shadow: 0 0 0 3px rgba(29, 161, 242, 0.1);
+}
+
+.reseña-form label {
+  font-weight: 600;
+  color: #0f1419;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
 .reseña-form select {
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+  padding: 0.5rem;
+  border: 1px solid #cfd9de;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white;
 }
 
 .reseña-form button {
-  background-color: #ffb347;
+  margin-top: 1rem;
+  background: #1da1f2;
+  color: white;
   border: none;
-  padding: 10px;
-  border-radius: 6px;
-  font-weight: bold;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 1rem;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: background 0.2s;
 }
 
 .reseña-form button:hover {
-  background-color: #ff9a00;
+  background: #1a91da;
 }
 
-/* LISTA DE RESEÑAS */
-.reseñas-grid {
+/* Lista de reseñas - Estilo X */
+.reseñas-list {
   display: flex;
   flex-direction: column;
-  gap: 25px;
+  gap: 1.5rem;
 }
 
-.reseña-row {
+.reseña-item {
+  background: white;
+  border: 1px solid #e1e8ed;
+  border-radius: 16px;
+  padding: 1rem;
+  position: relative;
+  transition: box-shadow 0.2s;
+}
+
+.reseña-item:hover {
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Foto + Info del usuario */
+.reseña-header {
   display: flex;
-  justify-content: center;
-  gap: 20px;
-  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
 }
 
-.reseña-user-card,
-.reseña-text-card {
-  background-color: #fdf3e7;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-/* 🔹 Ajuste: la card del usuario ahora ocupa menos espacio */
-.reseña-user-card {
-  width: 25%;
-  text-align: center;
-}
-
-.reseña-text-card {
-  width: 65%;
-}
-
-.reseña-user-card img {
-  width: 80px;
-  height: 80px;
+.reseña-item img {
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   object-fit: cover;
-  margin-bottom: 10px;
+  flex-shrink: 0;
 }
 
-.reseña-user-card h4 {
-  font-size: 1.1rem;
-  margin-bottom: 5px;
-  color: #3c2f2f;
+.user-info {
+  flex: 1;
 }
 
-.reseña-text-card p {
+.user-info strong {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #0f1419;
+  display: block;
+}
+
+.user-info .fecha {
+  font-size: 0.9rem;
+  color: #536471;
+  margin-top: 0.1rem;
+}
+
+/* Logo de X en la esquina */
+.twitter-logo {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 20px;
+  height: 20px;
+  opacity: 0.7;
+}
+
+/* Estrellas */
+.stars {
+  display: flex;
+  gap: 2px;
+  margin: 0.5rem 0;
+}
+
+.stars .star {
+  font-size: 1.4rem;
+  color: #ffd700;
+}
+
+/* Comentario */
+.reseña-content p {
+  color: #0f1419;
   font-size: 1rem;
   line-height: 1.5;
+  margin: 0;
+  word-wrap: break-word;
 }
 
-.reseña-estrellas {
-  text-align: right;
-  margin-top: 10px;
-  font-size: 1.2rem;
-  color: #ffb347;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .reseña-user-card,
-  .reseña-text-card {
-    width: 100%;
-  }
+/* Sin reseñas */
+.reseñas-list > p {
+  text-align: center;
+  color: #536471;
+  font-style: italic;
+  padding: 2rem;
+  background: #f7f9fa;
+  border-radius: 16px;
+  border: 1px dashed #cfd9de;
 }

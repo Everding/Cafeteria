@@ -1,112 +1,148 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useAuth } from "../../context/AuthContext.jsx";
+import { useNavigate } from "react-router-dom";
 import "../../styles/Nosotros/Reseñas.css";
 
 const Reseñas = () => {
-  // Simulación del usuario logeado 
-  const usuarioEjemplo = {
-    nombre: "Las pulgas",
-    foto: "https://media.discordapp.net/attachments/1370209159169179719/1433571202068123648/AP1GczMW7MWGXtI7iCto9Lgp6f9mVoSeWh6wtgWzXScRamw5W04tMH7vV-wSCQw1221-h919-s-no-gm.png?ex=69052cb9&is=6903db39&hm=8dcfee9f84db72991f4d1547dfd5a5aa24420874e207324bae269a9d2f3f72ff&=&format=webp&quality=lossless&width=909&height=684",
+  const { user, token } = useAuth();
+  const navigate = useNavigate();
+
+  const [reseñas, setReseñas] = useState([]);
+  const [comentario, setComentario] = useState("");
+  const [calificacion, setCalificacion] = useState(5);
+  const [cargando, setCargando] = useState(true);
+
+  const cargarReseñas = async () => {
+    try {
+      const res = await axios.get("http://localhost:3000/api/resenas");
+      setReseñas(res.data);
+    } catch (error) {
+      console.error("Error al obtener reseñas:", error);
+    } finally {
+      setCargando(false);
+    }
   };
 
-  const [reseñas, setReseñas] = useState([
-    {
-      id: 1,
-      usuario: "María López",
-      foto: "https://randomuser.me/api/portraits/women/68.jpg",
-      texto: "Excelente atención y productos frescos. El café tiene un sabor increíble.",
-      calificacion: 5,
-    },
-    {
-      id: 2,
-      usuario: "Juan Pérez",
-      foto: "https://randomuser.me/api/portraits/men/32.jpg",
-      texto: "Muy buena calidad, aunque el lugar estaba un poco lleno. Volveré sin dudas.",
-      calificacion: 4,
-    },
-  ]);
+  useEffect(() => {
+    cargarReseñas();
+  }, []);
 
-  const [nuevaReseña, setNuevaReseña] = useState({
-    texto: "",
-    calificacion: 0,
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setNuevaReseña({ ...nuevaReseña, [name]: value });
-  };
-
-  const handleAgregarReseña = (e) => {
-    e.preventDefault();
-    if (!nuevaReseña.texto || !nuevaReseña.calificacion) {
-      alert("Por favor completa todos los campos.");
+  const handleAgregarReseña = async () => {
+    if (!user || !user.idUsuarioApp) {
+      navigate("/Login");
       return;
     }
 
-    const nueva = {
-      id: reseñas.length + 1,
-      usuario: usuarioEjemplo.nombre,
-      foto: usuarioEjemplo.foto,
-      texto: nuevaReseña.texto,
-      calificacion: Number(nuevaReseña.calificacion),
-    };
+    if (!comentario || !calificacion) {
+      alert("Debes ingresar un comentario y una calificación");
+      return;
+    }
 
-    setReseñas([...reseñas, nueva]);
-    setNuevaReseña({ texto: "", calificacion: 0 });
+    try {
+      const res = await axios.post(
+        "http://localhost:3000/api/resenas",
+        {
+          id_usuario_app: user.idUsuarioApp,
+          comentario,
+          calificacion,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setReseñas((prev) => [
+        {
+          idResena: res.data.idResena,
+          comentario,
+          calificacion,
+          usuario_app: user.usuario,
+          foto: user.imagen_url,
+          fecha_resena: new Date().toISOString(), // fecha actual
+        },
+        ...prev,
+      ]);
+
+      setComentario("");
+      setCalificacion(5);
+    } catch (error) {
+      console.error("Error al enviar reseña:", error);
+      alert("No se pudo enviar la reseña");
+    }
   };
 
-  const renderEstrellas = (num) => "⭐".repeat(num) + "☆".repeat(5 - num);
+  const formatearFecha = (fechaStr) => {
+    const fecha = new Date(fechaStr);
+    return fecha.toLocaleDateString() + " " + fecha.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  if (cargando) return <p>Cargando reseñas...</p>;
 
   return (
     <div className="reseñas-container">
-      <h2 className="titulo">Reseñas de nuestros clientes</h2>
+      <h2>Reseñas</h2>
 
-
-      <form className="reseña-form" onSubmit={handleAgregarReseña}>
-        <h3>Hacer una reseña</h3>
+      <div className="reseña-form">
         <textarea
-          name="texto"
-          placeholder="Escribe tu reseña..."
-          value={nuevaReseña.texto}
-          onChange={handleChange}
+          value={comentario}
+          onChange={(e) => setComentario(e.target.value)}
+          placeholder="Escribe tu reseña"
         />
-        <select
-          name="calificacion"
-          value={nuevaReseña.calificacion}
-          onChange={handleChange}
+        <label>
+          Calificación:
+          <select
+            value={calificacion}
+            onChange={(e) => setCalificacion(Number(e.target.value))}
+          >
+            {[1, 2, 3, 4, 5].map((num) => (
+              <option key={num} value={num}>
+                {num}
+              </option>
+            ))}
+          </select>
+        </label>
+        <button onClick={handleAgregarReseña}>Agregar reseña</button>
+      </div>
+
+      <div className="reseñas-list">
+        {reseñas.length === 0 ? (
+          <p>No hay reseñas aún</p>
+        ) : (
+          reseñas.map((r) => (
+          <div key={r.idResena} className="reseña-item">
+    <img
+      src={r.foto || "https://via.placeholder.com/48"}
+      alt={r.usuario_app}
+      onError={(e) => { e.target.src = "https://via.placeholder.com/48"; }}
+    />
+    
+    <div className="reseña-header">
+      <div className="user-info">
+        <strong>{r.usuario_app}</strong>
+        <span className="fecha">{r.fecha_resena && formatearFecha(r.fecha_resena)}</span>
+      </div>
+    </div>
+
+    <div className="stars">
+      {[...Array(5)].map((_, i) => (
+        <span
+          key={i}
+          className="star"
+          style={{ color: i < r.calificacion ? "#ffd700" : "#e1e8ed" }}
         >
-          <option value="0">Calificación</option>
-          <option value="1">1 estrella</option>
-          <option value="2">2 estrellas</option>
-          <option value="3">3 estrellas</option>
-          <option value="4">4 estrellas</option>
-          <option value="5">5 estrellas</option>
-        </select>
-        <button type="submit">Agregar reseña</button>
-      </form>
-
-
-      <div className="reseñas-grid">
-        {reseñas.map((reseña) => (
-          <div className="reseña-row" key={reseña.id}>
-
-            <div className="reseña-user-card">
-              <img
-                src={
-                  reseña.foto ||
-                  "https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                }
-                alt={reseña.usuario}
-              />
-              <h4>{reseña.usuario}</h4>
-            </div>
-
-  
-            <div className="reseña-text-card">
-              <p>{reseña.texto}</p>
-              <div className="reseña-estrellas">{renderEstrellas(reseña.calificacion)}</div>
-            </div>
-          </div>
-        ))}
+          ★
+        </span>
+      ))}
+    </div>
+    <div className="reseña-content">
+      <p>{r.comentario}</p>
+    </div>
+  </div>
+          ))
+        )}
       </div>
     </div>
   );

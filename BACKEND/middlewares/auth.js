@@ -9,10 +9,10 @@ export const verificarToken = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, SECRET_KEY);
 
-    // Normalizamos el user para que todos los controllers funcionen
     req.user = {
-      id: decoded.idUsuarioApp || decoded.idCliente,
-      tipo: decoded.tipo
+      id: decoded.idPersonal || decoded.idUsuarioApp || decoded.idCliente,
+      tipo: decoded.tipo, // "personal" o "usuariosapp"
+      rolID: decoded.rolID || null,
     };
 
     next();

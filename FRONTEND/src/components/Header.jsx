@@ -13,7 +13,7 @@ const Header = () => {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [badgeCantidad, setBadgeCantidad] = useState(0);
 
-  const fotoPerfil = user?.imagen_url || null;
+  const fotoPerfil = user?.imagen_url;
 
   // 🔹 Actualizar badge
   const actualizarBadge = async () => {
