@@ -1,55 +1,50 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import '../../styles/Staff/PedidosEntrantes.css';
 
 const PedidosEntrantes = () => {
   const [comandas, setComandas] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const datosSimulados = [
-      {
-        id: 1,
-        cliente: 'Nombre de hombre 1',
-        imagen: 'https://plus.unsplash.com/premium_photo-1689539137236-b68e436248de?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8cGVyc29uYXxlbnwwfHwwfHx8MA%3D%3D&fm=jpg&q=60&w=3000',
-        productos: [
-          { nombre: 'Café Latte', cantidad: 2 },
-          { nombre: 'Medialunas', cantidad: 3 },
-        ],
-        estado: 'Pendiente',
-      },
-      {
-        id: 2,
-        cliente: 'Nombre de mujer 1',
-        imagen: 'https://www.dzoom.org.es/wp-content/uploads/2020/02/portada-foto-perfil-redes-sociales-consejos.jpg',
-        productos: [
-          { nombre: 'Tostado de Jamón y Queso', cantidad: 1 },
-          { nombre: 'Jugo de Naranja', cantidad: 1 },
-        ],
-        estado: 'Entregado',
-      },
-      {
-        id: 3,
-        cliente: 'Nombre de hombre 2',
-        imagen: 'https://plus.unsplash.com/premium_photo-1689568126014-06fea9d5d341?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cGVyZmlsfGVufDB8fDB8fHww&fm=jpg&q=60&w=3000',
-        productos: [
-          { nombre: 'Capuccino', cantidad: 1 },
-          { nombre: 'Brownie', cantidad: 2 },
-        ],
-        estado: 'Cancelado',
-      },
-    ];
+    const obtenerPedidos = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/api/pedidos');
+        setComandas(response.data);
+      } catch (error) {
+        console.error('Error al obtener pedidos:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    setComandas(datosSimulados);
+    obtenerPedidos();
   }, []);
 
-  const cambiarEstado = (id) => {
-    setComandas((prev) =>
-      prev.map((comanda) =>
-        comanda.id === id && comanda.estado === 'Pendiente'
-          ? { ...comanda, estado: 'Entregado' }
-          : comanda
-      )
-    );
+  // Cambiar estado local y enviar a backend
+  const cambiarEstado = async (idPedido) => {
+    try {
+      const pedido = comandas.find(c => c.idPedido === idPedido);
+      if (!pedido || pedido.estado !== 'Pendiente') return;
+
+      // Actualizar backend
+      await axios.put(`http://localhost:3000/api/pedidos/${idPedido}`, {
+        total: 0, // puede ser cualquier valor, solo necesitamos enviar el estado
+        estado: 'Entregado'
+      });
+
+      // Actualizar estado local
+      setComandas(prev =>
+        prev.map(c =>
+          c.idPedido === idPedido ? { ...c, estado: 'Entregado' } : c
+        )
+      );
+    } catch (error) {
+      console.error('Error al actualizar pedido:', error);
+    }
   };
+
+  if (loading) return <p>Cargando pedidos...</p>;
 
   return (
     <div className="pedidos-container">
@@ -57,29 +52,35 @@ const PedidosEntrantes = () => {
 
       <div className="pedidos-lista">
         {comandas.map((comanda) => (
-          <div key={comanda.id} className={`comanda-card ${comanda.estado.toLowerCase()}`}>
+          <div key={comanda.idPedido} className={`comanda-card ${comanda.estado.toLowerCase()}`}>
            
             <div className="comanda-cliente">
-              <img src={comanda.imagen} alt={comanda.cliente} className="cliente-foto" />
-              <p className="cliente-nombre">{comanda.cliente}</p>
+              <img
+                src={comanda.foto || "https://via.placeholder.com/48"}
+                alt={comanda.usuario}
+                onError={(e) => { e.target.src = "https://via.placeholder.com/48"; }}
+                className="cliente-foto"
+              />
+              <p className="cliente-nombre">{comanda.usuario}</p>
             </div>
 
-           
             <div className="comanda-separador"></div>
 
-        
             <div className="comanda-detalle">
               <h3>Pedido</h3>
               <ul className="comanda-productos">
-                {comanda.productos.map((p, index) => (
-                  <li key={index}>
-                    {p.cantidad}x {p.nombre}
-                  </li>
-                ))}
+                {comanda.productos.length > 0 ? (
+                  comanda.productos.map((p, index) => (
+                    <li key={index}>
+                      {p.cantidad}x {p.nombre}
+                    </li>
+                  ))
+                ) : (
+                  <li>No hay productos</li>
+                )}
               </ul>
             </div>
 
-        
             <div className="comanda-estado">
               <h3>Estado:</h3>
               <p className={`estado-texto estado-${comanda.estado.toLowerCase()}`}>
@@ -90,7 +91,7 @@ const PedidosEntrantes = () => {
             {comanda.estado === 'Pendiente' && (
               <button
                 className="boton-entregado"
-                onClick={() => cambiarEstado(comanda.id)}
+                onClick={() => cambiarEstado(comanda.idPedido)}
               >
                 Marcar como Entregado
               </button>

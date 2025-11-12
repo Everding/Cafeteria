@@ -1,44 +1,37 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import '../../styles/Staff/Ventas.css';
 
 const Ventas = () => {
-
-  const [ventas] = useState([
-    { idVenta: 1, idPedido: 101, id_metodo_pago: 1, fecha_venta: '2025-10-28', total: 1800 },
-    { idVenta: 2, idPedido: 102, id_metodo_pago: 2, fecha_venta: '2025-10-28', total: 2200 },
-    { idVenta: 3, idPedido: 103, id_metodo_pago: 3, fecha_venta: '2025-10-27', total: 900 },
-  ]);
-
- 
-  const pedidos = {
-    101: { usuario: 'Juan Pérez', productos: 'Café con leche, Medialuna' },
-    102: { usuario: 'Mesa 3', productos: 'Capuchino, Brownie' },
-    103: { usuario: 'Lucía Torres', productos: 'Té verde' },
-  };
-
-
-  const metodosPago = {
-    1: 'Efectivo',
-    2: 'Tarjeta',
-    3: 'MercadoPago',
-  };
-
+  const [ventas, setVentas] = useState([]);
   const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date().toISOString().split('T')[0]);
   const [paginaActual, setPaginaActual] = useState(1);
   const ventasPorPagina = 10;
 
+  // 🔹 Cargar ventas desde backend
+  const cargarVentas = async () => {
+    try {
+      const { data } = await axios.get('http://localhost:3000/api/ventas'); // tu endpoint getAllVentas
+      setVentas(data);
+    } catch (error) {
+      console.error('Error al cargar ventas:', error);
+    }
+  };
 
-  const ventasFiltradas = ventas.filter(v => v.fecha_venta === fechaSeleccionada);
+  useEffect(() => {
+    cargarVentas();
+  }, []);
 
+  // 🔹 Filtrar por fecha
+  const ventasFiltradas = ventas.filter(v => v.fecha_venta?.split('T')[0] === fechaSeleccionada);
 
+  // 🔹 Paginación
   const totalPaginas = Math.ceil(ventasFiltradas.length / ventasPorPagina);
   const inicio = (paginaActual - 1) * ventasPorPagina;
   const ventasPaginadas = ventasFiltradas.slice(inicio, inicio + ventasPorPagina);
 
-  const totalDelDia = ventasFiltradas.reduce((acc, v) => acc + v.total, 0);
-
-
-  const filasVacias = Array(Math.max(0, ventasPorPagina - ventasPaginadas.length)).fill(null);
+  // 🔹 Total del día
+  const totalDelDia = ventasFiltradas.reduce((acc, v) => acc + Number(v.total), 0);
 
   return (
     <div className="ventas-container">
@@ -57,11 +50,10 @@ const Ventas = () => {
       <table className="ventas-table">
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Fecha</th>
-            <th>Usuario / Mesa</th>
+            <th>ID Venta</th>
+            <th>ID Pedido</th>
+            <th>Cliente / Usuario</th>
             <th>Método de Pago</th>
-            <th>Productos</th>
             <th>Total ($)</th>
           </tr>
         </thead>
@@ -70,31 +62,26 @@ const Ventas = () => {
             ventasPaginadas.map(v => (
               <tr key={v.idVenta}>
                 <td>{v.idVenta}</td>
-                <td>{v.fecha_venta}</td>
-                <td>{pedidos[v.idPedido]?.usuario || 'N/A'}</td>
-                <td>{metodosPago[v.id_metodo_pago] || 'N/A'}</td>
-                <td>{pedidos[v.idPedido]?.productos || ''}</td>
-                <td>{v.total.toLocaleString()}</td>
+                <td>{v.idPedido}</td>
+                <td>{v.usuario_app || v.cliente || 'N/A'}</td>
+                <td>{v.metodo_pago || 'N/A'}</td>
+                <td>{Number(v.total).toLocaleString()}</td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="6" style={{ textAlign: 'center' }}>No hay ventas registradas en esta fecha</td>
-            </tr>
-          )}
-
-  
-          {filasVacias.map((_, i) => (
-            <tr key={`vacia-${i}`}><td colSpan="6" style={{ height: '40px', background: '#fff' }}></td></tr>
-          ))}
-
-          {ventasFiltradas.length > 0 && (
-            <tr className="total-fila">
-              <td colSpan="5" style={{ textAlign: 'right', fontWeight: 'bold' }}>Total del Día:</td>
-              <td style={{ fontWeight: 'bold' }}>${totalDelDia.toLocaleString()}</td>
+              <td colSpan="5" style={{ textAlign: 'center' }}>No hay ventas registradas en esta fecha</td>
             </tr>
           )}
         </tbody>
+        {ventasFiltradas.length > 0 && (
+          <tfoot>
+            <tr className="total-fila">
+              <td colSpan="4" style={{ textAlign: 'right', fontWeight: 'bold' }}>Total del Día:</td>
+              <td style={{ fontWeight: 'bold' }}>${totalDelDia.toLocaleString()}</td>
+            </tr>
+          </tfoot>
+        )}
       </table>
 
       <div className="pagination">

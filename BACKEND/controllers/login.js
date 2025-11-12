@@ -2,7 +2,7 @@ import db from "../config/dataBase.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
-const SECRET_KEY = "mi_secreto_jwt"; // ⚠️ usa variable de entorno en producción
+const SECRET_KEY = "mi_secreto_jwt"; 
 
 export const loginGeneral = async (req, res) => {
   const { correo, contraseña } = req.body;

@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import "../styles/Login.css";
 import { useNavigate } from "react-router-dom";
-import { HOME } from "../routers/router";
+import { HOME, MIPERFIL } from "../routers/router";
 import { useAuth } from "../context/AuthContext.jsx";
 
 function Login() {
@@ -21,7 +21,7 @@ function Login() {
       console.log("Login response:", data);
 
       if (data.success) {
-        // 🔹 Guardar el objeto usuario completo
+        //  Guardar el objeto usuario completo
         const usuarioObj = {
           id: data.usuario.idPersonal || data.usuario.idUsuarioApp || data.usuario.numeroMesa,
           correo: data.usuario.correo,
@@ -32,7 +32,7 @@ function Login() {
 
         login(usuarioObj, data.tipo, data.token, usuarioObj.idRol);
 
-        navigate(HOME);
+        navigate(MIPERFIL);
       } else {
         alert(data.message || "Usuario o contraseña incorrectos");
       }

@@ -12,8 +12,8 @@ export const getAllVentas = async (req, res) => {
       FROM ventas v
       LEFT JOIN pedidos p ON v.idPedido = p.idPedido
       LEFT JOIN clientes c ON p.id_cliente = c.idCliente
-      LEFT JOIN usuariosApp u ON p.id_usuario_app = u.id_usuario
-      LEFT JOIN metodos_pago m ON v.id_metodo_pago = m.id_metodo_pago
+      LEFT JOIN usuariosApp u ON p.id_usuario_app = u.idUsuarioApp
+      LEFT JOIN metodospago m ON v.id_metodo_pago = m.id_metodo_pago
       ORDER BY v.fecha_venta DESC
     `);
     res.json(rows);
@@ -22,7 +22,6 @@ export const getAllVentas = async (req, res) => {
     res.status(500).json({ message: "Error al obtener ventas" });
   }
 };
-
 
 // Obtener venta por ID
 

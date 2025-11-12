@@ -103,9 +103,8 @@ export const updateCarrito = async (req, res) => {
     const { id_sucursal, activo } = req.body;
 
     await db.query(
-      `UPDATE carrito
-       SET id_sucursal = ?, activo = ?
-       WHERE id_carrito = ?`,
+      `DELETE FROM detallecarrito
+WHERE id_carrito = ?`,
       [id_sucursal || null, activo, id_carrito]
     );
 
