@@ -1,207 +1,219 @@
+/* ===== CARD ===== */
 .PostresCard {
-  background-color: #222;
-  padding: 20px;
-  border-radius: 15px;
+  background: #fff;
+  border-radius: 14px;
+  border: 4px solid #222;
+  padding: 25px;
   width: 100%;
-  max-width: 400px;
-  min-height: 500px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: #ffb347;
-  box-sizing: border-box;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.4);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: 0.25s ease;
 }
 
 .PostresCard:hover {
-  transform: translateY(-5px);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.18);
 }
 
-/* Imagen circular */
-.PostresCard img {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 4px solid #ff9900;
-  margin-bottom: 10px;
-}
-
-/* Título */
+/* ===== TITULO ===== */
 .PostresCard-title {
-  margin: 5px 0;
+  font-size: 26px;
+  font-weight: 700;
+  color: #ffb347;
+  margin-bottom: 12px;
   text-align: center;
-  font-size: 1.1rem;
-  font-weight: bold;
 }
 
-/* Descripción */
-.PostresCard-description,
-.PostresCard-description-edit {
-  width: 90%;
-  background-color: #fff;
-  color: #222;
-  border-radius: 8px;
-  padding: 8px;
-  text-align: center;
-  min-height: 50px;
-  margin-bottom: 10px;
-  font-size: 0.95rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-
-  overflow: hidden;
-  text-overflow: ellipsis;
-  word-wrap: break-word;
-  display: -webkit-box;
-  -webkit-line-clamp: 4; /* Máximo 4 líneas visibles */
-  -webkit-box-orient: vertical;
-  line-clamp: 4;
-  cursor: help;
-}
-
-/* Inputs de edición */
-.PostresCard-description-edit,
+/* Input edición título */
 .PostresCard-title-edit {
-  display: block;
-  width: 90%;
-  margin: 5px auto;
-  padding: 5px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 18px;
+  margin-bottom: 12px;
 }
 
-/* Controles de cantidad */
+/* ===== IMAGEN ===== */
+.PostresCard-image {
+  width: 220px;
+  height: 220px;
+  border-radius: 14px;
+  object-fit: cover;
+  margin-bottom: 15px;
+}
+
+/* ===== DESCRIPCIÓN ===== */
+.PostresCard-description {
+  font-size: 16px;
+  color: #444;
+  text-align: center;
+  margin-bottom: 14px;
+  min-height: 60px;
+}
+
+.PostresCard-description-edit {
+  width: 100%;
+  min-height: 70px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+/* ===== PRECIO ===== */
+.PostresCard-price {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 10px 0;
+}
+
+/* ===== CANTIDAD ===== */
 .PostresCard-quantity {
   display: flex;
-  gap: 10px;
   align-items: center;
+  gap: 12px;
   margin-bottom: 10px;
 }
 
 .PostresCard-quantity button {
-  padding: 5px 10px;
+  background: #ffb347;
   border: none;
-  border-radius: 5px;
-  background-color: #ffb347;
+  padding: 6px 12px;
+  font-size: 18px;
+  color: #222;
+  border-radius: 8px;
   cursor: pointer;
-  font-weight: bold;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  transition: transform 0.2s ease, background-color 0.2s ease;
+  transition: 0.2s;
 }
 
 .PostresCard-quantity button:hover {
-  transform: translateY(-2px);
-  background-color: #ffaa00;
+  background: #ffa733;
 }
 
-.PostresCard-quantity-value {
-  font-weight: bold;
+.PostresCard-quantity span {
+  font-size: 18px;
+  font-weight: 600;
 }
 
-/* Botón Agregar al carrito */
+/* ===== BOTÓN AGREGAR ===== */
 .PostresCard-add {
-  background-color: #ff9999;
+  width: 100%;
+  padding: 12px;
+  background: #ffb347;
   border: none;
-  border-radius: 5px;
-  padding: 8px 15px;
+  border-radius: 10px;
+  margin-top: 10px;
+  font-weight: 700;
   cursor: pointer;
-  margin-bottom: 5px;
-  font-weight: bold;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  transition: transform 0.2s ease, background-color 0.2s ease;
+  font-size: 16px;
+  transition: 0.25s ease;
 }
 
 .PostresCard-add:hover {
-  transform: translateY(-2px);
-  background-color: #ff6666;
+  background: #ff9933;
 }
 
-/* Botones Guardar / Cancelar en edición */
-.PostresCard-actions {
+/* ===== MATERIAS PRIMAS (modo edición) ===== */
+.PostresCard-materias {
+  width: 100%;
+  margin-top: 15px;
+  padding: 15px;
+  background: #fafafa;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+.PostresCard-materias h4 {
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: #222;
+}
+
+.MateriaPrimaSearch {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  margin-bottom: 12px;
+}
+
+.MateriasList {
+  max-height: 180px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.MateriaPrimaItem {
   display: flex;
-  justify-content: center;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 15px;
+}
+
+.MateriaPrimaItem input[type="number"] {
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+/* ===== BOTÓN GUARDAR MATERIAS ===== */
+.SaveButton {
+  margin-top: 12px;
+  width: 100%;
+  padding: 10px;
+  font-weight: 700;
+  background: #ffb347;
+  color: #222;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.SaveButton:hover {
+  background: #ff9933;
+}
+
+/* ===== ACCIONES (guardar/cancelar) ===== */
+.PostresCard-actions {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
   gap: 10px;
-  margin-top: 10px;
+  margin-top: 18px;
 }
 
 .PostresCard-actions button {
-  padding: 8px 16px;
-  border-radius: 5px;
-  font-weight: bold;
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  font-weight: 600;
   cursor: pointer;
-  color: white;
   border: none;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-  transition: transform 0.2s ease, background-color 0.2s ease;
+  transition: 0.25s;
 }
 
+/* Guardar */
 .PostresCard-actions button:first-child {
-  background-color: #00cc00;
+  background: #ffb347;
+  color: #222;
 }
 
 .PostresCard-actions button:first-child:hover {
-  background-color: #009900;
-  transform: translateY(-2px);
+  background: #ffa733;
 }
 
+/* Cancelar */
 .PostresCard-actions button:last-child {
-  background-color: #ff3333;
+  background: #ddd;
+  color: #333;
 }
 
 .PostresCard-actions button:last-child:hover {
-  background-color: #cc0000;
-  transform: translateY(-2px);
-}
-
-/* Inputs de imagen en edición */
-.PostresCard-editing-controls input[type="file"],
-.PostresCard-editing-controls input[type="text"] {
-  display: block;
-  width: 90%;
-  margin: 5px auto;
-  padding: 5px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-}
-
-.PostresCard-materias {
-  margin-top: 10px;
-}
-
-.materia-search {
-  width: 100%;
-  padding: 5px;
-  margin-bottom: 5px;
-}
-
-.materias-grid-scroll {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 columnas */
-  gap: 5px;
-  max-height: 120px; /* scroll si hay muchas */
-  overflow-y: auto;
-  border: 1px solid #ccc;
-  padding: 5px;
-}
-
-.materia-item {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 14px;
-}
-
-
-
-.PostresCard-description-scroll {
-  max-height: 80px; /* altura máxima de la descripción */
-  overflow-y: auto; /* agrega scroll si excede la altura */
-  padding-right: 5px; /* para que no tape el scroll */
-  margin-bottom: 10px;
-}
-
-.PostresCard-description-scroll p {
-  margin: 0;
-  word-wrap: break-word; /* rompe palabras largas */
+  background: #ccc;
 }

@@ -14,20 +14,101 @@ const BebidasCard = ({ product, onUpdate, triggerEdit }) => {
 
   const { token } = useAuth();
 
+  // --- Materias primas ---
+  const [materiasPrimas, setMateriasPrimas] = useState([]); // todas las materias disponibles
+  const [busqueda, setBusqueda] = useState("");
+  const [seleccionadas, setSeleccionadas] = useState([]); // { id_materia, cantidad_necesaria }
+
+  // cargar todas las materias primas una vez
+  useEffect(() => {
+    const fetchMaterias = async () => {
+      try {
+        const res = await axios.get("http://localhost:3000/api/materia-prima");
+        setMateriasPrimas(res.data || []);
+      } catch (err) {
+        console.error("Error al obtener materias primas:", err);
+      }
+    };
+    fetchMaterias();
+  }, []);
+
+  // abrir modo edición si triggerEdit viene true
   useEffect(() => {
     if (triggerEdit) setEditing(true);
   }, [triggerEdit]);
 
+  // cuando se entra a editar, cargar materias asignadas al producto
+  useEffect(() => {
+    const fetchAsignadas = async () => {
+      if (!editing) return;
+      try {
+        const res = await axios.get(
+          `http://localhost:3000/api/materia-prima/producto/${product.id_producto}/stock`
+        );
+        // Respuesta esperada: lista de materias asignadas con id_materia y cantidad_necesaria
+        const asignadas = (res.data || []).map((m) => ({
+          id_materia: m.id_materia,
+          cantidad_necesaria: m.cantidad_necesaria != null ? m.cantidad_necesaria : 1,
+        }));
+        setSeleccionadas(asignadas);
+      } catch (err) {
+        console.error("Error al cargar materias asignadas:", err);
+        setSeleccionadas([]); // fallback
+      }
+    };
+
+    fetchAsignadas();
+  }, [editing, product.id_producto]);
+
+  // toggle de selección
+  function toggleMateriaPrima(id_materia) {
+    setSeleccionadas((prev) => {
+      if (prev.some((m) => m.id_materia === id_materia)) {
+        return prev.filter((m) => m.id_materia !== id_materia);
+      } else {
+        return [...prev, { id_materia, cantidad_necesaria: 1 }];
+      }
+    });
+  }
+
+  // cambiar cantidad necesaria para una materia seleccionada
+  function setCantidadNecesaria(id_materia, nuevaCantidad) {
+    setSeleccionadas((prev) =>
+      prev.map((m) =>
+        m.id_materia === id_materia ? { ...m, cantidad_necesaria: nuevaCantidad } : m
+      )
+    );
+  }
+
+  // guardar materias primas asignadas al producto
+  const guardarMateriasPrimas = async () => {
+    if (!product.id_producto) {
+      alert("ID de producto inválido");
+      return;
+    }
+    try {
+      await axios.put(
+        `http://localhost:3000/api/materia-prima/producto/${product.id_producto}/stock`,
+        { materiasPrimas: seleccionadas },
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+      );
+      alert("Materias primas guardadas correctamente ✅");
+    } catch (error) {
+      console.error("Error al guardar materias primas:", error.response || error);
+      alert("Error al guardar materias primas ❌");
+    }
+  };
+
   const handleGuardar = async () => {
     try {
-      let updatedProduct = { 
+      let updatedProduct = {
         nombre: titulo,
         descripcion,
         precio_actual: precio,
         estado: product.estado,
         subcategoria: product.subcategoria,
         imagen_url: product.imagen_url,
-        id_categoria: product.id_categoria 
+        id_categoria: product.id_categoria,
       };
 
       if (file) {
@@ -40,10 +121,17 @@ const BebidasCard = ({ product, onUpdate, triggerEdit }) => {
         formData.append("subcategoria", product.subcategoria);
         formData.append("id_categoria", product.id_categoria);
 
-        const res = await axios.put(`http://localhost:3000/api/productos/${product.id_producto}`, formData, { headers: { "Content-Type": "multipart/form-data" } });
+        const res = await axios.put(
+          `http://localhost:3000/api/productos/${product.id_producto}`,
+          formData,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        );
         updatedProduct = res.data;
       } else {
-        const res = await axios.put(`http://localhost:3000/api/productos/${product.id_producto}`, updatedProduct);
+        const res = await axios.put(
+          `http://localhost:3000/api/productos/${product.id_producto}`,
+          updatedProduct
+        );
         updatedProduct = res.data;
       }
 
@@ -61,7 +149,9 @@ const BebidasCard = ({ product, onUpdate, triggerEdit }) => {
 
     try {
       setLoading(true);
-      const { data: carrito } = await axios.get("http://localhost:3000/api/carrito/activo", { headers: { Authorization: `Bearer ${token}` } });
+      const { data: carrito } = await axios.get("http://localhost:3000/api/carrito/activo", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (!carrito?.id_carrito) throw new Error("No se pudo obtener carrito activo");
 
       await axios.post(
@@ -83,33 +173,125 @@ const BebidasCard = ({ product, onUpdate, triggerEdit }) => {
   const incrementar = () => setCantidad(cantidad + 1);
   const decrementar = () => setCantidad(cantidad > 1 ? cantidad - 1 : 1);
 
+  // Filtrado de materias por búsqueda (asegura que se muestren todas al no buscar)
+  const materiasFiltradas = materiasPrimas.filter((mp) =>
+    mp.nombre.toLowerCase().includes(busqueda.toLowerCase())
+  );
+
+  // helper para saber si una materia está seleccionada
+  const isSeleccionada = (id_materia) => seleccionadas.some((m) => m.id_materia === id_materia);
+  const getCantidadSeleccionada = (id_materia) => {
+    const found = seleccionadas.find((m) => m.id_materia === id_materia);
+    return found ? found.cantidad_necesaria : 1;
+  };
+
   return (
     <div className="BebidasCard">
       {editing ? (
         <>
-          <input className="BebidasCard-title-edit" type="text" value={titulo} onChange={(e) => setTitulo(e.target.value)} />
-          <img className="BebidasCard-image" src={product.imagen_url ? `http://localhost:3000${product.imagen_url}` : "https://via.placeholder.com/120"} alt={titulo} />
+          <input
+            className="BebidasCard-title-edit"
+            type="text"
+            value={titulo}
+            onChange={(e) => setTitulo(e.target.value)}
+          />
+          <img
+            className="BebidasCard-image"
+            src={product.imagen_url ? `http://localhost:3000${product.imagen_url}` : "https://via.placeholder.com/120"}
+            alt={titulo}
+          />
           <input type="file" onChange={(e) => setFile(e.target.files[0])} />
-          <textarea className="BebidasCard-description-edit" value={descripcion} onChange={(e) => setDescripcion(e.target.value)} />
-          <input className="BebidasCard-title-edit" type="number" value={precio} onChange={(e) => setPrecio(Number(e.target.value))} />
+          <textarea
+            className="BebidasCard-description-edit"
+            value={descripcion}
+            onChange={(e) => setDescripcion(e.target.value)}
+          />
+          <input
+            className="BebidasCard-title-edit"
+            type="number"
+            value={precio}
+            onChange={(e) => setPrecio(Number(e.target.value))}
+          />
+
+          {/* --- Materias primas (se muestran todas, con búsqueda) --- */}
+          <div className="BebidasCard-materias">
+            <h4>Materias primas</h4>
+            <input
+              type="text"
+              placeholder="Buscar materia prima..."
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              className="MateriaPrimaSearch"
+            />
+            <div className="MateriasList">
+              {materiasFiltradas.map((mp) => (
+                <label key={mp.id_materia} className="MateriaPrimaItem">
+                  <input
+                    type="checkbox"
+                    checked={isSeleccionada(mp.id_materia)}
+                    onChange={() => toggleMateriaPrima(mp.id_materia)}
+                  />
+                  <span style={{ marginLeft: 8 }}>{mp.nombre}</span>
+
+                  {/* Si está seleccionada, permitir editar cantidad necesaria */}
+                  {isSeleccionada(mp.id_materia) && (
+                    <input
+                      type="number"
+                      min="1"
+                      value={getCantidadSeleccionada(mp.id_materia)}
+                      onChange={(e) =>
+                        setCantidadNecesaria(mp.id_materia, Number(e.target.value || 1))
+                      }
+                      style={{ marginLeft: 12, width: 70 }}
+                    />
+                  )}
+                </label>
+              ))}
+              {materiasFiltradas.length === 0 && <p>No hay materias que coincidan.</p>}
+            </div>
+
+            <div style={{ marginTop: 8 }}>
+              <button className="SaveButton" onClick={guardarMateriasPrimas}>
+                Guardar Materias Primas
+              </button>
+            </div>
+          </div>
 
           <div className="BebidasCard-actions">
             <button onClick={handleGuardar}>Guardar</button>
-            <button onClick={() => setEditing(false)}>Cancelar</button>
+            <button
+              onClick={() => {
+                setEditing(false);
+              }}
+            >
+              Cancelar
+            </button>
           </div>
         </>
       ) : (
         <>
           <h3 className="BebidasCard-title">{titulo}</h3>
-          <img className="BebidasCard-image" src={product.imagen_url ? `http://localhost:3000${product.imagen_url}` : "https://via.placeholder.com/120"} alt={titulo} />
+          <img
+            className="BebidasCard-image"
+            src={product.imagen_url ? `http://localhost:3000${product.imagen_url}` : "https://via.placeholder.com/120"}
+            alt={titulo}
+          />
           <p className="BebidasCard-description">{descripcion}</p>
           <div className="BebidasCard-quantity">
             <button onClick={decrementar}>-</button>
             <span>{cantidad}</span>
             <button onClick={incrementar}>+</button>
           </div>
-          <p className="BebidasCard-price"><strong>Precio:</strong> ${precio}</p>
-          <button className="BebidasCard-add" onClick={agregarAlCarrito} disabled={loading}>{loading ? "Agregando..." : "Agregar al carrito"}</button>
+          <p className="BebidasCard-price">
+            <strong>Precio:</strong> ${precio}
+          </p>
+          <button
+            className="BebidasCard-add"
+            onClick={agregarAlCarrito}
+            disabled={loading}
+          >
+            {loading ? "Agregando..." : "Agregar al carrito"}
+          </button>
         </>
       )}
     </div>

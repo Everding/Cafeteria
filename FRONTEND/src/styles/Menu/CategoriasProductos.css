@@ -1,23 +1,57 @@
+/* Fondo general con el mismo estilo que venimos usando */
 .container {
+  margin-top: 120px;
   text-align: center;
-  padding: 20px;
-  font-size: 1.3rem;
-  background: linear-gradient(135deg, #d7b89e, #442200);
 }
 
 .header {
-  background-color: #ffb347;
-  color: #222;
-  padding: 10px;
-  font-size: 50px;
-  border-radius: 8px;
+  font-size: 38px;
+  font-weight: 800;
+  margin-bottom: 40px;
+  color: #5a3e2b;
+  text-align: center;
+  letter-spacing: 2px;
 }
 
 .category-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 60px; /* separación entre tarjetas */
-  margin: 10px auto 0; /* centrado horizontal */
-  max-width: 60%; /* ajustar según el tamaño de las cards */
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  gap: 50px; /* espacio bien visible entre cards */
   justify-items: center;
+  padding: 20px 50px; /* un poco más de aire a los costados */
+}
+
+
+/* Tarjeta de cada categoría (envoltorio del card) */
+.category-grid .categoria-card {
+  background: rgba(255, 255, 255, 0.75); /* glass suave */
+  backdrop-filter: blur(6px);
+  border-radius: 18px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.category-grid .categoria-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* Imagen */
+.category-grid .categoria-card img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  border-radius: 12px;
+  margin-bottom: 15px;
+}
+
+/* Nombre categoría */
+.category-grid .categoria-card h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #4e342e;
 }

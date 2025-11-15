@@ -1,199 +1,111 @@
-/* ===========================
-   Página de Acompañantes
-   =========================== */
+/* ====== CONTENEDOR PRINCIPAL ====== */
 .AcompañantesPage {
-  background: linear-gradient(135deg, #d7b89e, #442200);
-  padding: 20px;
-  box-sizing: border-box;
+  padding: 40px 5%;
   min-height: 100vh;
+  background: #f4f4f4;
 }
 
+/* ====== HEADER ====== */
 .AcompañantesPage-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 35px;
 }
 
-.AcompañantesPage h2 {
-  margin: 0;
-  color: black;
-  background-color: #ffb347;
-  border-radius: 10px;
-  padding: 10px;
+.AcompañantesPage-header h2 {
+  font-size: 42px;
+  font-weight: 700;
+  color: #000;
+  letter-spacing: 1px;
 }
 
+/* ====== BOTÓN AGREGAR ====== */
 .AcompañantesPage-addProduct {
-  padding: 10px 20px;
-  border-radius: 5px;
-  background-color: #ffb347;
-  color: black;
-  font-weight: bold;
+  background: #ffb347;
+  color: #222;
   border: none;
+  padding: 12px 22px;
+  font-weight: 600;
+  font-size: 16px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: 0.25s ease;
 }
 
 .AcompañantesPage-addProduct:hover {
+  background: #ff9933;
   transform: translateY(-2px);
 }
 
-/* Grid de cards */
-.AcompañantesPage-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
-  justify-content: center;
+/* ====== FILTRO ====== */
+.AcompañantesPage-filter {
+  margin-bottom: 25px;
+  font-size: 18px;
+  color: #222;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-/* Wrapper de cada card */
+.AcompañantesPage-filter select {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  background: white;
+}
+
+/* ====== GRID DE CARDS ====== */
+.AcompañantesPage-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 55px; /* Más aire entre cards */
+  justify-items: center; /* Centra las cards en cada columna */
+  padding-top: 15px;
+}
+
+/* ====== WRAPPER DE LA CARD (imagen + nombre + botones) ====== */
 .AcompañantesCard-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 18px;
 }
 
-/* ===========================
-   Card de Acompañante
-   =========================== */
-.AcompañantesCard {
-  background-color: #fff3e0;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  width: 100%;
-  padding: 15px;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transition: transform 0.2s ease;
-}
-
-.AcompañantesCard:hover {
-  transform: translateY(-3px);
-}
-
-.AcompañantesCard-image {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 10px;
-  margin-bottom: 10px;
-}
-
-.AcompañantesCard-title,
-.AcompañantesCard-title-edit {
-  font-size: 1.2rem;
-  font-weight: bold;
-  text-align: center;
-  margin: 5px 0;
-}
-
-.AcompañantesCard-description,
-.AcompañantesCard-description-edit {
-  font-size: 0.95rem;
-  text-align: center;
-  margin: 5px 0;
-  color: #333;
-}
-
-.AcompañantesCard-price {
-  font-size: 1rem;
-  font-weight: bold;
-  margin: 10px 0;
-  color: #444;
-}
-
-.AcompañantesCard-quantity {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 10px 0;
-}
-
-.AcompañantesCard-quantity button {
-  padding: 5px 10px;
-  border: none;
-  background-color: #ffb347;
-  color: black;
-  font-weight: bold;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.AcompañantesCard-quantity button:hover {
-  transform: translateY(-2px);
-}
-
-.AcompañantesCard-add {
-  padding: 8px 15px;
-  background-color: #ffb347;
-  color: black;
-  font-weight: bold;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.AcompañantesCard-add:hover {
-  transform: translateY(-2px);
-}
-
-/* Botones de editar y eliminar */
+/* ====== BOTONERA (editar / eliminar) ====== */
 .AcompañantesCard-editDelete {
   display: flex;
-  gap: 10px;
+  gap: 16px;
   margin-top: 10px;
 }
 
 .AcompañantesCard-editDelete button {
-  padding: 6px 12px;
-  background-color: #ffb347;
-  color: black;
-  font-weight: bold;
+  padding: 10px 18px;
+  border-radius: 10px;
   border: none;
-  border-radius: 5px;
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: 0.25s ease;
 }
 
-.AcompañantesCard-editDelete button:hover {
-  transform: translateY(-2px);
+/* Botón Editar */
+.AcompañantesCard-editDelete button:first-child {
+  background: #ffb347;
+  color: #222;
 }
 
-/* Acciones dentro de edición */
-.AcompañantesCard-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
+.AcompañantesCard-editDelete button:first-child:hover {
+  background: #ffa733;
 }
 
-.AcompañantesCard-actions button {
-  padding: 6px 12px;
-  background-color: #ffb347;
-  color: black;
-  font-weight: bold;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: transform 0.2s ease;
+/* Botón Eliminar */
+.AcompañantesCard-editDelete button:last-child {
+  background: #e44;
+  color: white;
 }
 
-.AcompañantesCard-actions button:hover {
-  transform: translateY(-2px);
-}
-
-/* Input de edición */
-.AcompañantesCard-title-edit,
-.AcompañantesCard-description-edit,
-.AcompañantesCard input[type="number"] {
-  width: 100%;
-  padding: 5px;
-  margin: 5px 0;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  box-sizing: border-box;
-  text-align: center;
+.AcompañantesCard-editDelete button:last-child:hover {
+  background: #c33;
 }

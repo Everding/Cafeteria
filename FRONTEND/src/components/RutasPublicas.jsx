@@ -7,12 +7,12 @@ const RutaPublica = ({ children }) => {
 
   if (loading) return <p>Cargando...</p>;
 
-  // 🔒 Si ya hay sesión iniciada, redirige al inicio (o donde quieras)
+  //  Si ya hay sesión iniciada, redirige al inicio (o donde quieras)
   if (user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/MiPerfil" replace />;
   }
 
-  // ✅ Si no hay sesión, permite acceder
+  //  Si no hay sesión, permite acceder
   return children;
 };
 

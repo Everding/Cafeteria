@@ -1,91 +1,111 @@
-/* ===========================
-   Página de Kiosco
-   =========================== */
+/* ====== CONTENEDOR PRINCIPAL ====== */
 .KioscoPage {
-  background: linear-gradient(135deg, #d7b89e, #442200);
-  padding: 20px;
-  box-sizing: border-box;
+  padding: 40px 5%;
+  min-height: 100vh;
+  background: #f4f4f4;
 }
 
+/* ====== HEADER ====== */
 .KioscoPage-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 35px;
 }
 
-.KioscoPage h2 {
-  margin: 0;
-  color: black;
-  background-color: #ffb347;
-  border-radius: 10px;
-  padding: 10px;
+.KioscoPage-header h2 {
+  font-size: 42px;
+  font-weight: 700;
+  color: #000;
+  letter-spacing: 1px;
 }
 
+/* ====== BOTÓN AGREGAR ====== */
 .KioscoPage-addProduct {
-  padding: 10px 20px;
-  border-radius: 5px;
-  background-color: #ffb347;
-  color: black;
-  font-weight: bold;
+  background: #ffb347;
+  color: #222;
   border: none;
+  padding: 12px 22px;
+  font-weight: 600;
+  font-size: 16px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: 0.25s ease;
 }
 
 .KioscoPage-addProduct:hover {
+  background: #ff9933;
   transform: translateY(-2px);
 }
 
-/* Grid de cards */
-.KioscoPage-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Máximo 8 cards por fila adaptables */
-  gap: 20px;
-  justify-content: center;
+/* ====== FILTRO ====== */
+.KioscoPage-filter {
+  margin-bottom: 25px;
+  font-size: 18px;
+  color: #222;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-/* Wrapper de cada card con botones externos */
+.KioscoPage-filter select {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  background: white;
+}
+
+/* ====== GRID DE CARDS ====== */
+.KioscoPage-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 55px;
+  justify-items: center;
+  padding-top: 15px;
+}
+
+/* ====== WRAPPER DE LA CARD ====== */
 .KioscoCard-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 18px;
 }
 
-/* Botones Editar / Eliminar fuera de la card */
+/* ====== BOTONERA (editar / eliminar) ====== */
 .KioscoCard-editDelete {
   display: flex;
-  justify-content: center;
-  gap: 10px;
+  gap: 16px;
   margin-top: 10px;
-  width: 100%;
 }
 
 .KioscoCard-editDelete button {
-  padding: 8px 15px;
-  border-radius: 5px;
-  font-weight: bold;
-  cursor: pointer;
-  color: white;
+  padding: 10px 18px;
+  border-radius: 10px;
   border: none;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-  transition: transform 0.2s ease, background-color 0.2s ease;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.25s ease;
 }
 
+/* Botón Editar */
 .KioscoCard-editDelete button:first-child {
-  background-color: #00cc00;
+  background: #ffb347;
+  color: #222;
 }
 
 .KioscoCard-editDelete button:first-child:hover {
-  background-color: #009900;
-  transform: translateY(-2px);
+  background: #ffa733;
 }
 
+/* Botón Eliminar */
 .KioscoCard-editDelete button:last-child {
-  background-color: #ff3333;
+  background: #e44;
+  color: white;
 }
 
 .KioscoCard-editDelete button:last-child:hover {
-  background-color: #cc0000;
-  transform: translateY(-2px);
+  background: #c33;
 }

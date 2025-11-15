@@ -22,7 +22,7 @@ export const verificarToken = (req, res, next) => {
 };
 
 
-// Filtros opcionales por tipo de usuario
+// Filtros por tipo de usuario
 export const soloPersonal = (req, res, next) => {
   if (req.user.tipo !== "personal")
     return res.status(403).json({ message: "Acceso solo para personal" });

@@ -7,6 +7,7 @@ import {
   deleteMateriaPrima,
   actualizarStockProducto,
   actualizarStockMateria,
+  obtenerStockProducto
 } from "../controllers/materiaprima.js";
 
 const router = express.Router();
@@ -29,5 +30,7 @@ router.delete("/:id_materia", deleteMateriaPrima);
 router.put("/producto/:id_producto/stock", actualizarStockProducto);
 
 router.put('/:id_materia/stock', actualizarStockMateria);
+
+router.get("/producto/:id_producto/stock", obtenerStockProducto);
 
 export default router;

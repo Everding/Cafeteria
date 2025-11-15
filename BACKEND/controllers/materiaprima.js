@@ -149,4 +149,23 @@ export const actualizarStockMateria = async (req, res) => {
 };
 
 
+export const obtenerStockProducto = async (req, res) => {
+  const { id_producto } = req.params;
+
+  try {
+    const [rows] = await db.query(`
+      SELECT s.id_materia, m.nombre, s.cantidad_necesaria
+      FROM stock s
+      INNER JOIN materiaprima m ON s.id_materia = m.id_materia
+      WHERE s.id_producto = ?
+    `, [id_producto]);
+
+    res.json(rows);
+  } catch (error) {
+    console.error("Error al obtener stock del producto:", error);
+    res.status(500).json({ error: "Error al obtener stock del producto" });
+  }
+};
+
+
 

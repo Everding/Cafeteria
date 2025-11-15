@@ -1,263 +1,185 @@
+/* Contenedor principal */
 .compras-container {
-  padding: 30px;
-  max-width: 1100px;
-  margin: auto;
-  background: #f9f9f9;
-  border-radius: 15px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  background: #e9ecef;
   min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .compras-container h2 {
-  text-align: center;
-  margin-bottom: 25px;
-  color: #3e2723;
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
 }
 
+/* ------------------------------------- */
+/* FORMULARIO DE REGISTRO DE COMPRA */
+/* ------------------------------------- */
 .compras-form {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 14px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+  margin-bottom: 2rem;
+
   display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-}
-
-.compras-form input {
-  padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  width: 200px;
-}
-
-.compras-buttons {
-  display: flex;
-  gap: 8px;
-}
-
-.compras-form button {
-  background-color: #795548;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 10px 18px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.compras-form button:hover {
-  background-color: #5d4037;
-}
-
-.btn-cancelar {
-  background-color: #9e9e9e !important;
-}
-
-.btn-cancelar:hover {
-  background-color: #757575 !important;
-}
-
-.compras-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
-
-.compras-table th,
-.compras-table td {
-  border: 1px solid #ddd;
-  padding: 10px;
-  text-align: center;
-}
-
-.compras-table th {
-  background-color: #d7ccc8;
-  color: #3e2723;
-}
-
-.compras-table tr:nth-child(even) {
-  background-color: #f1f1f1;
-}
-
-.btn-editar,
-.btn-eliminar {
-  margin: 0 5px;
-  padding: 6px 12px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.btn-editar {
-  background-color: #4caf50;
-  color: white;
-}
-
-.btn-editar:hover {
-  background-color: #388e3c;
-}
-
-.btn-eliminar {
-  background-color: #f44336;
-  color: white;
-}
-
-.btn-eliminar:hover {
-  background-color: #d32f2f;
-}
-
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
-  gap: 15px;
-}
-
-.pagination button {
-  background-color: #795548;
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.pagination button:hover {
-  background-color: #5d4037;
-}
-
-.pagination span {
-  color: #3e2723;
-  font-weight: 500;
-}
-
-.compras-container {
-  max-width: 1000px;
-  margin: 20px auto;
-  padding: 20px;
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.compras-form label {
-  display: block;
-  margin-top: 10px;
-  font-weight: bold;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .compras-form input,
 .compras-form select {
-  width: 100%;
-  padding: 8px;
-  margin-top: 5px;
-  border-radius: 5px;
+  padding: 0.8rem;
+  border-radius: 8px;
   border: 1px solid #ccc;
+  background: #f8f9fa;
+  font-size: 1rem;
 }
 
-.compra-item {
+.compras-form input:focus,
+.compras-form select:focus {
+  border-color: #ffb347;
+  box-shadow: 0 0 4px rgba(255, 180, 80, 0.4);
+  outline: none;
+}
+
+/* Items a agregar */
+.items-compra {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background: #fff7e6;
+}
+
+.items-compra h4 {
+  color: #d67a00;
+  margin-bottom: 0.8rem;
+  font-size: 1.2rem;
+}
+
+.items-compra select,
+.items-compra input {
+  margin-bottom: 0.6rem;
+}
+
+.items-compra button {
+  background: #ffb347;
+  color: #222;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.items-compra button:hover {
+  background: #ffa726;
+  transform: translateY(-2px);
+}
+
+/* Lista de items agregados */
+.items-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+}
+
+.items-list li {
+  background: #f6f6f6;
+  padding: 0.6rem;
+  border-radius: 8px;
   display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 10px;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
 }
 
-.compra-item select,
-.compra-item input {
-  flex: 1;
-}
-
-.btn-eliminar-item {
-  background-color: #ff4d4f;
+.items-list button {
+  background: #e74c3c;
   color: #fff;
   border: none;
-  padding: 6px 12px;
-  border-radius: 5px;
+  padding: 0.3rem 0.7rem;
+  border-radius: 6px;
   cursor: pointer;
+  transition: 0.2s ease;
 }
 
-.btn-eliminar-item:hover {
-  background-color: #ff7875;
+.items-list button:hover {
+  background: #c0392b;
 }
 
-.btn-agregar-item,
-.btn-registrar-compra {
-  margin-top: 15px;
-  padding: 8px 16px;
-  border-radius: 5px;
+/* Botón Registrar compra */
+.compras-form > button:last-child {
+  background: #27ae60;
+  color: white;
+  padding: 0.9rem;
+  border-radius: 10px;
+  font-weight: 600;
   border: none;
   cursor: pointer;
+  transition: 0.3s;
 }
 
-.btn-agregar-item {
-  background-color: #40a9ff;
-  color: #fff;
-  margin-right: 10px;
+.compras-form > button:last-child:hover {
+  background: #219a52;
+  transform: translateY(-2px);
 }
 
-.btn-agregar-item:hover {
-  background-color: #69c0ff;
-}
-
-.btn-registrar-compra {
-  background-color: #52c41a;
-  color: #fff;
-}
-
-.btn-registrar-compra:hover {
-  background-color: #73d13d;
-}
-
+/* ------------------------------------- */
+/* TABLA */
+/* ------------------------------------- */
 .compras-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
+  margin-top: 1rem;
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.compras-table thead {
+  background: #ffb347;
+  color: #222;
 }
 
 .compras-table th,
 .compras-table td {
-  border: 1px solid #ccc;
-  padding: 8px;
-  text-align: center;
+  padding: 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
 }
 
-.compras-table th {
-  background-color: #f0f0f0;
+.compras-table tr:hover {
+  background: #fff7e6;
 }
 
+/* ------------------------------------- */
+/* PAGINACIÓN */
+/* ------------------------------------- */
 .paginacionCompras {
-  margin-top: 15px;
+  margin-top: 1.5rem;
   display: flex;
   justify-content: center;
-  gap: 5px;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
 }
 
 .paginacionCompras button {
-  padding: 5px 10px;
-  border: 1px solid #ccc;
-  background-color: #fff;
-  border-radius: 5px;
+  padding: 0.5rem 0.9rem;
+  border: none;
+  background: #ddd;
+  border-radius: 6px;
   cursor: pointer;
-  transition: 0.2s;
+  font-weight: 600;
+  transition: 0.2s ease;
 }
 
 .paginacionCompras button:hover {
-  background-color: #007bff;
-  color: #fff;
-  border-color: #007bff;
+  background: #ccc;
 }
 
-.paginacionCompras button.activo {
-  background-color: #007bff;
-  color: #fff;
-  border-color: #007bff;
+.paginacionCompras span {
+  font-weight: 600;
+  color: #333;
 }
-
-.paginacionCompras button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-

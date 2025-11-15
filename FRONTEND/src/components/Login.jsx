@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import "../styles/Login.css";
 import { useNavigate } from "react-router-dom";
-import { HOME, MIPERFIL } from "../routers/router";
+import { MIPERFIL } from "../routers/router";
 import { useAuth } from "../context/AuthContext.jsx";
 
 function Login() {
@@ -27,7 +27,6 @@ function Login() {
           correo: data.usuario.correo,
           idRol: data.usuario.idRol || null,
           imagen_url: data.usuario.imagen_url || null,
-          // cualquier otro campo que quieras usar en Header
         };
 
         login(usuarioObj, data.tipo, data.token, usuarioObj.idRol);
@@ -48,14 +47,14 @@ function Login() {
         <h2>Iniciar sesión</h2>
         <input
           type="text"
-          placeholder="Correo o número de mesa"
+          placeholder="Correo electrónico"
           value={correo}
           onChange={(e) => setCorreo(e.target.value)}
           required
         />
         <input
           type="password"
-          placeholder="Contraseña (solo si aplica)"
+          placeholder="Contraseña"
           value={contraseña}
           onChange={(e) => setContraseña(e.target.value)}
         />

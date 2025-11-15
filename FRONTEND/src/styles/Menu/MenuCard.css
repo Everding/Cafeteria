@@ -1,302 +1,177 @@
-/* Contenedor general: grid 5 columnas infinitas */
-.menu-container {
-  display: grid;
-  grid-template-columns: repeat(5, 200px); /* 5 columnas de 200px */
-  gap: 20px;
-  justify-content: center; /* centra las 5 columnas en el contenedor */
-  padding: 20px;
-  box-sizing: border-box;
-  background: linear-gradient(135deg, #d7b89e, #442200);
-}
-
-/* Wrapper para card + botones */
-.menu-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* Card */
+/* ===== CARD (MÁS ANCHA: 600px) ===== */
 .menu-card {
-  background-color: #222;
-  padding: 15px;
-  border-radius: 10px;
-  width: 500px; /* ancho fijo */
-  height: 700px; /* alto fijo */
+  background: #fff;
+  border-radius: 14px;
+  padding: 30px;
+  width: 600px; /* ← MÁS ANCHA */
+  max-width: 600px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  transition: 0.3s ease;
   position: relative;
-  box-sizing: border-box;
-  color: #ffb347;
 }
 
-/* Título */
+.menu-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.22);
+}
+
+/* ===== TITULO ===== */
 .menu-card h3 {
-  margin-bottom: 10px;
+  font-size: 32px;
+  font-weight: 700;
+  color: #ffb347;
+  margin-bottom: 16px;
   text-align: center;
+  letter-spacing: 0.5px;
 }
 
-/* Imagen */
+/* ===== IMAGEN ===== */
 .menu-card img {
-  border-radius: 10px;
-  width: 80%;
-  height: 200px;
-  object-fit: cover;
-  margin-bottom: 10px;
-  border: 5px solid #ff9900;
-}
-
-/* Detalles */
-/* Detalles */
-.menu-details {
-  flex: 1;
   width: 100%;
+  max-width: 500px;
+  height: 300px;
+  border-radius: 14px;
+  object-fit: cover;
+  margin-bottom: 20px;
+  border: 3px solid #ffb347;
+}
+
+/* ===== DETALLES (descripción) ===== */
+.menu-details {
+  width: 100%;
+  max-height: 180px;
+  overflow-y: auto;
+  padding: 16px;
+  background: #fafafa;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  font-size: 16px;
+  color: #444;
+  line-height: 1.6;
   text-align: left;
-  background-color: rgba(0, 0, 0, 0.3); /* leve fondo para distinguir */
-  padding: 10px;
-  border-radius: 5px;
-  overflow-y: auto; /* agrega scroll si el contenido es largo */
-  max-height: 150px; /* altura máxima visible */
-  box-sizing: border-box;
 }
 
-/* Descripción dentro de los detalles */
 .menu-details p {
-  margin: 5px 0;
-  line-height: 1.4;
-  font-size: 1rem;
-  word-wrap: break-word; /* evita desbordes */
-}
-
-/* Texto antes de la descripción */
-.menu-details::before {
-  content: "Este menú contiene:";
-  display: block;
-  font-weight: bold;
-  color: #000000;
-  margin-bottom: 5px;
-  font-size: 1.1rem;
-}
-
-
-/* Botón agregar al carrito sobresaliendo */
-.add-to-cart {
-  background-color: #ff9999;
-  border: none;
-  padding: 10px 20px;
-  cursor: pointer;
-  border-radius: 5px;
-  width: 70%;
-  margin-top: 20px; /* sobresale de la card */
-  position: relative;
-  z-index: 1;
-}
-
-/* Botones fuera de la card */
-.menu-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 10px;
-  width: 200px; /* mismo ancho que la card */
-}
-
-.menu-buttons button {
-  padding: 8px 15px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-  color: white;
-}
-
-.menu-buttons button:first-child {
-  background-color: #00cc00; /* Editar */
-}
-
-.menu-buttons button:first-child:hover {
-  background-color: #009900;
-  transform: translateY(-2px);
-}
-
-.menu-buttons button:last-child {
-  background-color: #ff3333; /* Eliminar */
-}
-
-.menu-buttons button:last-child:hover {
-  background-color: #cc0000;
-  transform: translateY(-2px);
-}
-
-/* Inputs y textarea modo edición inline */
-.menu-card input,
-.menu-card textarea {
-  display: block;
-  width: 90%;
-  margin: 5px auto;
-  padding: 5px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-}
-
-/* Botón agregar menú */
-.add-menu {
-  margin: 15px 0;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  background-color: #ff3333;
-  color: white;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-/* Header de la sección */
-.menu-list h1 {
-  background-color: #ff3333;
-  color: black;
-  padding: 10px;
   margin: 0;
-  text-align: center;
+  word-wrap: break-word;
 }
 
 .menu-details-white {
-  background-color: white; /* fondo blanco */
-  width: 100%;
-  padding: 10px;
-  border-radius: 0 0 10px 10px; /* redondea solo la parte inferior */
-  box-sizing: border-box;
-  color: black;
-  margin-top: 10px;
-  font-size: 1.3rem;
-  text-align: left;
-  border: 6px solid #ff9900;
+  background: white;
+  border: 2px solid #ffb347;
+  color: #222;
+  font-weight: 500;
 }
 
+/* ===== PRECIO ===== */
+.menu-price {
+  font-size: 28px;
+  font-weight: 700;
+  color: #ffb347;
+  background: #222;
+  padding: 8px 20px;
+  border-radius: 10px;
+  border: 3px solid #ffb347;
+  margin-bottom: 16px;
+  letter-spacing: 1px;
+}
 
+/* ===== BOTÓN AGREGAR AL CARRITO (sobresaliente) ===== */
+.add-to-cart {
+  width: 80%;
+  padding: 14px;
+  background: #ffb347;
+  color: #222;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 18px;
+  cursor: pointer;
+  transition: 0.3s ease;
+  margin-top: 10px;
+  box-shadow: 0 4px 12px rgba(255, 179, 71, 0.4);
+  position: relative;
+  z-index: 10;
+}
 
-/* Botones de guardar y cancelar en modo edicion*/
+.add-to-cart:hover {
+  background: #ff9933;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(255, 153, 51, 0.5);
+}
 
+.add-to-cart:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
 
+/* ===== MODO EDICIÓN ===== */
+.menu-card input[type="text"],
+.menu-card input[type="number"],
+.menu-card textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 14px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+  font-family: inherit;
+}
 
+.menu-card input[type="file"] {
+  width: 100%;
+  padding: 8px 0;
+  margin-bottom: 14px;
+  font-size: 15px;
+}
+
+.menu-card textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* ===== ACCIONES (guardar/cancelar) ===== */
 .menu-actions {
   display: flex;
-  justify-content: center; /* centra los botones horizontalmente */
-  gap: 10px;               /* espacio entre botones */
-  margin-top: 15px;        /* separación de los inputs/textarea */
+  gap: 14px;
+  width: 100%;
+  margin-top: 10px;
 }
 
 .menu-actions button {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 5px;
-  font-weight: bold;
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.2s ease;
-  color: white;
+  border: none;
+  transition: 0.25s ease;
 }
 
-/* Botón Guardar */
+/* Guardar */
 .menu-actions button:first-child {
-  background-color: #00cc00; /* verde */
-}
-
-.menu-actions button:first-child:hover {
-  background-color: #009900;
-  transform: translateY(-2px); /* efecto leve al pasar el mouse */
-}
-
-/* Botón Cancelar */
-.menu-actions button:last-child {
-  background-color: #ff3333; /* rojo */
-}
-
-.menu-actions button:last-child:hover {
-  background-color: #cc0000;
-  transform: translateY(-2px);
-}
-
-/* Precio debajo del botón */
-.menu-price {
-  margin-top: 10px;
-  font-size: 1.4rem;
-  font-weight: bold;
-  color: #ffb347;
-  background-color: #222;
-  border: 2px solid #ff9900;
-  border-radius: 5px;
-  padding: 5px 10px;
-}
-
-.menu-materias-primas {
-  margin-top: 10px;
-}
-
-.materias-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.materia-row {
-  display: flex;
-  gap: 10px;
-}
-
-.materia-item {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  background: #f2f2f2;
-  padding: 5px;
-  border-radius: 5px;
-}
-
-.check-button {
-  cursor: pointer;
-  background: #4caf50;
-  border: none;
-  color: white;
-  padding: 2px 6px;
-  border-radius: 3px;
-}
-.menu-materias-primas {
-  margin-top: 10px;
-}
-
-.materia-search {
-  width: 100%;
-  margin-bottom: 5px;
-  padding: 4px 6px;
-  box-sizing: border-box;
-}
-
-.materias-grid-scroll {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 5px;
-  max-height: 150px; /* ajusta la altura de scroll */
-  overflow-y: auto;
-  padding: 5px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.materia-item {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  background: #f2f2f2;
-  padding: 3px 5px;
-  border-radius: 3px;
-  font-size: 0.9rem;
+  background: #ffb347;
   color: #222;
 }
 
-.menu-items-scroll {
-  max-height: 100px; /* ajusta según quieras */
-  overflow-y: auto;
-  padding-right: 5px; /* para que no se solapen los scrolls */
+.menu-actions button:first-child:hover {
+  background: #ffa733;
+  transform: translateY(-2px);
+}
+
+/* Cancelar */
+.menu-actions button:last-child {
+  background: #ddd;
+  color: #333;
+}
+
+.menu-actions button:last-child:hover {
+  background: #ccc;
+  transform: translateY(-2px);
 }

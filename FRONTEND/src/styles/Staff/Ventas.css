@@ -1,99 +1,100 @@
 .ventas-container {
-  padding: 2rem;
+  width: 95%;
   max-width: 1000px;
-  margin: 0 auto;
-  background-color: #f9f9f9;
-  border-radius: 16px;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-  font-family: 'Arial', sans-serif;
-  text-align: center;
+  margin: 30px auto;
+  padding: 50px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 .ventas-container h2 {
-  margin-bottom: 1.5rem;
-  color: #4a3f35;
-  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 22px;
+  font-weight: 600;
 }
 
-/* Tabla */
+/* Fecha */
+#fecha {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fafafa;
+  transition: 0.2s;
+}
+
+#fecha:focus {
+  outline: none;
+  border-color: #888;
+}
+
+/* TABLA */
 .ventas-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 1rem;
-  table-layout: fixed;
-}
-
-.ventas-table th,
-.ventas-table td {
-  border: 1px solid #ddd;
-  padding: 12px 15px;
-  text-align: center;
-  word-wrap: break-word;
+  margin-top: 15px;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 .ventas-table th {
-  background-color: #d7b89e;
-  color: #fff;
-  font-weight: bold;
+  background: #2b2b2b;
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  font-weight: 600;
+  color: #fdb021;
 }
 
-.ventas-table tbody tr:nth-child(even):not(.fila-vacia) {
-  background-color: #f2f2f2;
+.ventas-table td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+  color: #333;
 }
 
-.ventas-table tbody tr:hover:not(.fila-vacia) {
-  background-color: #e6d4c8;
-  transition: 0.3s;
+.ventas-table tr:hover td {
+  background: #f9f9f9;
 }
 
-/* Filas vacías */
-.fila-vacia {
-  background-color: #fafafa;
-  color: #bbb;
-  height: 40px;
+/* TOTAL DEL DÍA */
+.total-fila td {
+  background: #f8f8f8;
+  font-weight: 700;
+  border-top: 2px solid #ccc;
 }
 
-/* Productos */
-.producto-item {
-  display: inline-block;
-  margin: 0 3px;
-}
-
-/* Totales */
-.col-total {
-  font-weight: bold;
-  color: #4a3f35;
-  text-align: right;
-}
-
-/* Paginador */
-.paginador {
+/* PAGINACIÓN */
+.pagination {
   display: flex;
   justify-content: center;
-  margin-top: 1.5rem;
-  gap: 8px;
+  align-items: center;
+  margin-top: 20px;
+  gap: 15px;
 }
 
-.paginador button {
-  background-color: #795548;
-  color: white;
-  border: none;
+.pagination button {
   padding: 8px 14px;
   border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #fff;
   cursor: pointer;
-  transition: 0.3s;
-  font-weight: bold;
+  transition: 0.2s;
 }
 
-.paginador button:hover {
-  background-color: #5d4037;
+.pagination button:hover {
+  background: #f2f2f2;
 }
 
-.paginador button:disabled {
-  background-color: #ccc;
+.pagination button:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
-.pagina-activa {
-  background-color: #4a3f35 !important;
+.pagination span {
+  font-size: 15px;
+  color: #444;
 }

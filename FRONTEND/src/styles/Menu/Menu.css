@@ -1,32 +1,115 @@
+/* ====== CONTENEDOR PRINCIPAL ====== */
 .menu-list {
-  text-align: center;
-  background: linear-gradient(135deg, #d7b89e, #442200);
+  padding: 80px 5%;
+  min-height: 100vh;
+  background: #f4f4f4;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
-.menu-list h1 {
-  background-color: #ffb347;
-  color: black;
-  padding: 10px;
-  margin: 0;
-}
-
-.add-menuPage {
-  background-color: #ffb347;
-  border: none;
-  padding: 5px 10px;
-  margin: 10px;
-  cursor: pointer;
-  margin: 15px 0;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  font-weight: bold;
-  color: black;
-}
-
-.menu-container {
+/* ====== HEADER ====== */
+.menu-list-header {
   display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  background: linear-gradient(135deg, #d7b89e, #442200);
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 70px;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 40px;
+}
+
+.menu-list-header h1 {
+  font-size: 48px;
+  font-weight: 700;
+  color: #000;
+  letter-spacing: 1.5px;
+}
+
+/* ====== BOTÓN AGREGAR ====== */
+.add-menuPage {
+  background: #ffb347;
+  color: #222;
+  border: none;
+  padding: 16px 32px;
+  font-weight: 600;
+  font-size: 18px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.add-menuPage:hover {
+  background: #ff9933;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+}
+
+/* ====== GRID DE CARDS – ESPACIO MÁXIMO Y CENTRADO ====== */
+.menu-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  gap: 100px 120px; /* ← VERTICAL: 100px | HORIZONTAL: 120px */
+  justify-items: center;
+  align-items: start;
+  padding: 50px 60px; /* ← MÁS PADDING LATERAL */
+  max-width: 1600px; /* ← LIMITE MÁXIMO */
+  margin: 0 auto;
+  background: transparent;
+  box-sizing: border-box;
+}
+
+/* ====== WRAPPER DE LA CARD ====== */
+.menu-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px; /* ← MÁS ESPACIO ENTRE CARD Y BOTONES */
+  width: 100%;
+  max-width: 500px;
+  padding: 0 10px;
+}
+
+/* ====== BOTONERA ====== */
+.menu-buttons {
+  display: flex;
+  gap: 22px;
+  margin-top: 18px;
+}
+
+.menu-buttons button {
+  padding: 12px 24px;
+  border-radius: 14px;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* Editar */
+.menu-buttons button:first-child {
+  background: #ffb347;
+  color: #222;
+}
+
+.menu-buttons button:first-child:hover {
+  background: #ffa733;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(255, 179, 71, 0.4);
+}
+
+/* Eliminar */
+.menu-buttons button:last-child {
+  background: #e44;
+  color: white;
+}
+
+.menu-buttons button:last-child:hover {
+  background: #c33;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(228, 68, 68, 0.4);
 }

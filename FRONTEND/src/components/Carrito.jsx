@@ -81,7 +81,7 @@ const Carrito = () => {
         return;
       }
 
-      // 🔹 Mapear items al formato que espera el backend
+      //  Mapear items al formato que espera el backend
       const carritoItems = detalle.map(item => ({
         id_producto: item.id_producto,
         cantidad: item.cantidad,
@@ -97,7 +97,7 @@ const Carrito = () => {
         total,
         estado: "Pendiente",
         carritoItems,
-        id_metodo_pago: 1 // Puedes cambiar esto según la lógica de tu aplicación
+        id_metodo_pago: 1 
       };
 
       const { data: pedido } = await axios.post(
@@ -106,7 +106,7 @@ const Carrito = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      // 🔹 Vaciar carrito activo
+      //  Vaciar carrito activo
       for (let item of detalle) {
         await axios.delete(
           `http://localhost:3000/api/detalle-carrito/${item.id_detalle}`,
@@ -130,7 +130,7 @@ const Carrito = () => {
     }
   };
 
-  // 🔹 Total
+  //  Total
   const total = detalle.reduce((acc, item) => {
     const cantidad = Number(item.cantidad || 1);
     const precioUnitario = Number(item.subtotal / cantidad || 0);
@@ -142,7 +142,7 @@ const Carrito = () => {
   return (
     <div className="CarritoBack">
       <div className="carrito-container">
-        <h2>🛒 Mi Carrito</h2>
+        <h2> Mi Carrito</h2>
         <table className="carrito-tabla">
           <thead>
             <tr>
@@ -173,7 +173,7 @@ const Carrito = () => {
               })
             ) : (
               <tr>
-                <td colSpan="4" className="sin-productos">🌀 Sin productos agregados</td>
+                <td colSpan="4" className="sin-productos"> Sin productos agregados</td>
               </tr>
             )}
           </tbody>

@@ -49,7 +49,7 @@ localStorage.setItem("usuario", JSON.stringify({
 
 
 
-  // 🔹 Cambiar imagen
+  //  Cambiar imagen
 const handleImagenChange = async (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -65,11 +65,11 @@ const handleImagenChange = async (e) => {
       },
     });
 
-    // ✅ Actualiza el perfil local
+    // Actualiza el perfil local
     setPreviewImagen(res.data.imagen_url);
     setUsuario({ ...usuario, imagen_url: res.data.imagen_url });
 
-    // ✅ Actualiza el usuario global para reflejarlo en el Header
+    //  Actualiza el usuario global para reflejarlo en el Header
     setUser((prev) => {
   const actualizado = { ...prev, imagen_url: res.data.imagen_url };
   localStorage.setItem("usuario", JSON.stringify(actualizado));
@@ -84,12 +84,12 @@ const handleImagenChange = async (e) => {
 };
 
 
-  // 🔹 Editar campo
+  //  Editar campo
   const handleChange = (campo, valor) => {
     setUsuario({ ...usuario, [campo]: valor });
   };
 
-  // 🔹 Guardar cambios
+  //  Guardar cambios
   const guardarCambios = async () => {
     try {
       await axios.put(
@@ -119,7 +119,7 @@ const handleImagenChange = async (e) => {
   if (loading) return <p>Cargando perfil...</p>;
   if (!usuario) return <p>No se encontró el perfil</p>;
 
-  // 🔹 Campos distintos según tipo
+  // Campos distintos según tipo
   const campos =
     usuario.tipo === "personal"
       ? [
@@ -137,7 +137,7 @@ const handleImagenChange = async (e) => {
           { label: "Usuario", key: "usuario" },
         ];
 
-  // 🔹 Mostrar rol si es personal
+  //  Mostrar rol si es personal
   const obtenerRolPersonal = () => {
     if (usuario.tipo !== "personal") return `@${usuario.usuario || "Sin nombre"}`;
     switch (usuario.idPersonal) {
@@ -154,7 +154,7 @@ const handleImagenChange = async (e) => {
 
   return (
     <div className="miperfil-container">
-      {/* =================== HEADER =================== */}
+      {/*  HEADER  */}
       <div className="miperfil-header">
         <div className="foto-container">
           <img src={previewImagen} alt="Perfil" className="perfil-foto" />
@@ -168,7 +168,7 @@ const handleImagenChange = async (e) => {
         <div className="tipo-usuario">{obtenerRolPersonal()}</div>
       </div>
 
-      {/* =================== DATOS =================== */}
+      {/*  DATOS  */}
       <div className="datos-container">
         <h3>Mis Datos</h3>
         {campos.map(({ label, key }) => (
@@ -198,7 +198,7 @@ const handleImagenChange = async (e) => {
         </div>
       </div>
 
-      {/* =================== COMPRAS (solo usuariosapp) =================== */}
+      {/*  COMPRAS (solo usuariosapp)  */}
       {usuario.tipo === "usuariosapp" && (
         <div className="mis-compras">
           <h3>Mis Compras</h3>
@@ -225,7 +225,7 @@ const handleImagenChange = async (e) => {
         </div>
       )}
 
-      {/* =================== HORARIOS (solo personal) =================== */}
+      {/*  HORARIOS (solo personal)  */}
       {usuario.tipo === "personal" && (
         <div className="mis-horarios">
           <h3>Mis Horarios</h3>

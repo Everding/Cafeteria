@@ -87,7 +87,7 @@ const AppContent = () => {
       <Routes>
         {/* Rutas públicas */}
         <Route path={HOME} element={<Home />} />
-        <Route path={LOGIN} element={<LoginPage />} />
+        <Route path={LOGIN} element={ <RutaPublica><LoginPage /></RutaPublica>} />
         <Route path={MENUSPREFABRICADOS} element={<PrehechosPage />} />
         <Route path={REGISTER} element={<RutaPublica><RegisterPage /></RutaPublica>} />
         <Route path={ORDENAR} element={<OrdenarPage />} />
