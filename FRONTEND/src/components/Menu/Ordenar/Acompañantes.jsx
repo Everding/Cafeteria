@@ -11,7 +11,6 @@ const Acompañantes = () => {
 
   const { user } = useAuth();
 
-  // 🔹 Cargar todos los productos
   const fetchProductos = async () => {
     try {
       const res = await axios.get("http://localhost:3000/api/productos");
@@ -25,7 +24,6 @@ const Acompañantes = () => {
     fetchProductos();
   }, []);
 
-  // 🔹 Crear nuevo producto
   const agregarProducto = async () => {
     try {
       const nuevoProducto = {
@@ -33,7 +31,7 @@ const Acompañantes = () => {
         descripcion: "",
         precio_actual: 100,
         id_categoria: 2,
-        estado: "disponible",
+        estado: "habilitado",
         imagen_url: "/uploads/placeholder.png",
         subcategoria: "Acompañantes",
       };
@@ -45,13 +43,11 @@ const Acompañantes = () => {
     }
   };
 
-  // 🔹 Actualizar producto
   const actualizarProducto = (id, updatedProduct) => {
     setProducts(products.map(p => (p.id_producto === id ? updatedProduct : p)));
     setEditingId(null);
   };
 
-  // 🔹 Eliminar producto
   const eliminarProducto = async (id) => {
     if (!window.confirm("¿Eliminar este producto?")) return;
     try {
@@ -62,13 +58,24 @@ const Acompañantes = () => {
     }
   };
 
+  //  Habilitar / Deshabilitar producto
+  const toggleEstadoProducto = async (product) => {
+    try {
+      const nuevoEstado = product.estado === "habilitado" ? "deshabilitado" : "habilitado";
+      await axios.put(`http://localhost:3000/api/productos/estado/${product.id_producto}`, { estado: nuevoEstado });
+      setProducts(products.map(p => p.id_producto === product.id_producto ? { ...p, estado: nuevoEstado } : p));
+    } catch (error) {
+      console.error("Error al cambiar estado:", error);
+      alert("No se pudo cambiar el estado del producto");
+    }
+  };
+
   const mostrarBotones =
     user &&
     user.tipo !== "clientes" &&
     user.tipo !== "usuariosapp" &&
-    (user.idRol === 1);
+    user.idRol === 1;
 
-  // 🔹 Subcategorías
   const subcategoriasUnicas = [
     "Todas",
     ...Array.from(
@@ -76,9 +83,11 @@ const Acompañantes = () => {
     ),
   ];
 
+  //  Filtrado: solo mostrar habilitados para clientes
   const productosFiltrados = products
     .filter(p => p.id_categoria === 2)
-    .filter(p => filtroSubcategoria === "Todas" || (p.subcategoria || "Sin subcategoría") === filtroSubcategoria);
+    .filter(p => filtroSubcategoria === "Todas" || (p.subcategoria || "Sin subcategoría") === filtroSubcategoria)
+    .filter(p => user && user.tipo === "clientes" ? p.estado === "habilitado" : true);
 
   return (
     <div className="AcompañantesPage">
@@ -103,7 +112,11 @@ const Acompañantes = () => {
       <div className="AcompañantesPage-container">
         {productosFiltrados.length ? (
           productosFiltrados.map(product => (
-            <div key={product.id_producto} className="AcompañantesCard-wrapper">
+            <div
+              key={product.id_producto}
+              className="AcompañantesCard-wrapper"
+              style={{ opacity: product.estado === "deshabilitado" ? 0.5 : 1 }}
+            >
               <AcompañantesCard
                 product={product}
                 onUpdate={actualizarProducto}
@@ -113,6 +126,12 @@ const Acompañantes = () => {
                 <div className="AcompañantesCard-editDelete">
                   <button onClick={() => setEditingId(product.id_producto)}>Editar</button>
                   <button onClick={() => eliminarProducto(product.id_producto)}>Eliminar</button>
+                  <button
+                    onClick={() => toggleEstadoProducto(product)}
+                    className={product.estado === "habilitado" ? "btn-deshabilitar" : "btn-habilitar"}
+                  >
+                    {product.estado === "habilitado" ? "Deshabilitar" : "Habilitar"}
+                  </button>
                 </div>
               )}
             </div>

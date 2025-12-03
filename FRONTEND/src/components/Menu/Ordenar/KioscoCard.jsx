@@ -15,15 +15,17 @@ const KioscoCard = ({ product, onUpdate, triggerEdit }) => {
   const { token } = useAuth();
 
   // --- Materias primas ---
-  const [materiasPrimas, setMateriasPrimas] = useState([]); 
+  const [materiasPrimas, setMateriasPrimas] = useState([]); // solo habilitadas
   const [busqueda, setBusqueda] = useState("");
-  const [seleccionadas, setSeleccionadas] = useState([]); 
+  const [seleccionadas, setSeleccionadas] = useState([]); // { id_materia, cantidad_necesaria }
 
+  // cargar todas las materias primas habilitadas
   useEffect(() => {
     const fetchMaterias = async () => {
       try {
         const res = await axios.get("http://localhost:3000/api/materia-prima");
-        setMateriasPrimas(res.data || []);
+        const habilitadas = res.data.filter(mp => mp.estado === "habilitado");
+        setMateriasPrimas(habilitadas);
       } catch (err) {
         console.error("Error al obtener materias primas:", err);
       }
@@ -31,23 +33,23 @@ const KioscoCard = ({ product, onUpdate, triggerEdit }) => {
     fetchMaterias();
   }, []);
 
+  // abrir modo edición si triggerEdit viene true
   useEffect(() => {
     if (triggerEdit) setEditing(true);
   }, [triggerEdit]);
 
+  // cargar materias asignadas al producto
   useEffect(() => {
     const fetchAsignadas = async () => {
       if (!editing) return;
       try {
         const res = await axios.get(
-          `http://localhost:3000/api/materia-prima/producto/${product.id_producto}/stock`
+          `http://localhost:3000/api/materia-prima/producto/${product.id_producto}`
         );
-
         const asignadas = (res.data || []).map((m) => ({
           id_materia: m.id_materia,
           cantidad_necesaria: m.cantidad_necesaria != null ? m.cantidad_necesaria : 1,
         }));
-
         setSeleccionadas(asignadas);
       } catch (err) {
         console.error("Error al cargar materias asignadas:", err);
@@ -58,7 +60,7 @@ const KioscoCard = ({ product, onUpdate, triggerEdit }) => {
     fetchAsignadas();
   }, [editing, product.id_producto]);
 
-  function toggleMateriaPrima(id_materia) {
+  const toggleMateriaPrima = (id_materia) => {
     setSeleccionadas((prev) => {
       if (prev.some((m) => m.id_materia === id_materia)) {
         return prev.filter((m) => m.id_materia !== id_materia);
@@ -66,29 +68,27 @@ const KioscoCard = ({ product, onUpdate, triggerEdit }) => {
         return [...prev, { id_materia, cantidad_necesaria: 1 }];
       }
     });
-  }
+  };
 
-  function setCantidadNecesaria(id_materia, nuevaCantidad) {
+  const setCantidadNecesaria = (id_materia, nuevaCantidad) => {
     setSeleccionadas((prev) =>
       prev.map((m) =>
         m.id_materia === id_materia ? { ...m, cantidad_necesaria: nuevaCantidad } : m
       )
     );
-  }
+  };
 
   const guardarMateriasPrimas = async () => {
     if (!product.id_producto) {
       alert("ID de producto inválido");
       return;
     }
-
     try {
       await axios.put(
         `http://localhost:3000/api/materia-prima/producto/${product.id_producto}/stock`,
-        { materiasPrimas: seleccionadas },
+        { materiasPrimas: seleccionadas }, // <-- objeto con array
         { headers: token ? { Authorization: `Bearer ${token}` } : {} }
       );
-
       alert("Materias primas guardadas correctamente ✅");
     } catch (error) {
       console.error("Error al guardar materias primas:", error.response || error);
@@ -149,7 +149,6 @@ const KioscoCard = ({ product, onUpdate, triggerEdit }) => {
       const { data: carrito } = await axios.get("http://localhost:3000/api/carrito/activo", {
         headers: { Authorization: `Bearer ${token}` },
       });
-
       if (!carrito?.id_carrito) throw new Error("No se pudo obtener carrito activo");
 
       await axios.post(
@@ -175,9 +174,7 @@ const KioscoCard = ({ product, onUpdate, triggerEdit }) => {
     mp.nombre.toLowerCase().includes(busqueda.toLowerCase())
   );
 
-  const isSeleccionada = (id_materia) =>
-    seleccionadas.some((m) => m.id_materia === id_materia);
-
+  const isSeleccionada = (id_materia) => seleccionadas.some((m) => m.id_materia === id_materia);
   const getCantidadSeleccionada = (id_materia) => {
     const found = seleccionadas.find((m) => m.id_materia === id_materia);
     return found ? found.cantidad_necesaria : 1;
@@ -195,11 +192,7 @@ const KioscoCard = ({ product, onUpdate, triggerEdit }) => {
           />
           <img
             className="KioscoCard-image"
-            src={
-              product.imagen_url
-                ? `http://localhost:3000${product.imagen_url}`
-                : "https://via.placeholder.com/120"
-            }
+            src={product.imagen_url ? `http://localhost:3000${product.imagen_url}` : "https://via.placeholder.com/120"}
             alt={titulo}
           />
           <input type="file" onChange={(e) => setFile(e.target.files[0])} />
@@ -215,10 +208,8 @@ const KioscoCard = ({ product, onUpdate, triggerEdit }) => {
             onChange={(e) => setPrecio(Number(e.target.value))}
           />
 
-          {/* MATERIAS PRIMAS */}
           <div className="KioscoCard-materias">
             <h4>Materias primas</h4>
-
             <input
               type="text"
               placeholder="Buscar materia prima..."
@@ -226,7 +217,6 @@ const KioscoCard = ({ product, onUpdate, triggerEdit }) => {
               onChange={(e) => setBusqueda(e.target.value)}
               className="MateriaPrimaSearch"
             />
-
             <div className="MateriasList">
               {materiasFiltradas.map((mp) => (
                 <label key={mp.id_materia} className="MateriaPrimaItem">
@@ -236,7 +226,6 @@ const KioscoCard = ({ product, onUpdate, triggerEdit }) => {
                     onChange={() => toggleMateriaPrima(mp.id_materia)}
                   />
                   <span style={{ marginLeft: 8 }}>{mp.nombre}</span>
-
                   {isSeleccionada(mp.id_materia) && (
                     <input
                       type="number"
@@ -252,7 +241,6 @@ const KioscoCard = ({ product, onUpdate, triggerEdit }) => {
               ))}
               {materiasFiltradas.length === 0 && <p>No hay materias que coincidan.</p>}
             </div>
-
             <div style={{ marginTop: 8 }}>
               <button className="SaveButton" onClick={guardarMateriasPrimas}>
                 Guardar Materias Primas
@@ -270,25 +258,18 @@ const KioscoCard = ({ product, onUpdate, triggerEdit }) => {
           <h3 className="KioscoCard-title">{titulo}</h3>
           <img
             className="KioscoCard-image"
-            src={
-              product.imagen_url
-                ? `http://localhost:3000${product.imagen_url}`
-                : "https://via.placeholder.com/120"
-            }
+            src={product.imagen_url ? `http://localhost:3000${product.imagen_url}` : "https://via.placeholder.com/120"}
             alt={titulo}
           />
           <p className="KioscoCard-description">{descripcion}</p>
-
           <div className="KioscoCard-quantity">
             <button onClick={decrementar}>-</button>
             <span>{cantidad}</span>
             <button onClick={incrementar}>+</button>
           </div>
-
           <p className="KioscoCard-price">
             <strong>Precio:</strong> ${precio}
           </p>
-
           <button
             className="KioscoCard-add"
             onClick={agregarAlCarrito}

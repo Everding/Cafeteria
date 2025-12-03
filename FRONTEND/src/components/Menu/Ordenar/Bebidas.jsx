@@ -30,8 +30,8 @@ const Bebidas = () => {
         nombre: "Nueva Bebida",
         descripcion: "",
         precio_actual: 100,
-        id_categoria: 1, // Bebidas
-        estado: "disponible",
+        id_categoria: 1,
+        estado: "habilitado",
         imagen_url: "/uploads/placeholder.png",
         subcategoria: "Bebidas",
       };
@@ -58,28 +58,35 @@ const Bebidas = () => {
     }
   };
 
-  const mostrarBotones =
-    user &&
-    user.tipo !== "clientes" &&
-    user.tipo !== "usuariosapp" &&
-    (user.idRol === 1);
+  const toggleEstadoProducto = async (producto) => {
+    try {
+      const nuevoEstado = producto.estado === "habilitado" ? "deshabilitado" : "habilitado";
+      await axios.put(`http://localhost:3000/api/productos/estado/${producto.id_producto}`, { estado: nuevoEstado });
+      setProducts(products.map(p => (p.id_producto === producto.id_producto ? { ...p, estado: nuevoEstado } : p)));
+    } catch (error) {
+      console.error("Error al cambiar estado:", error);
+    }
+  };
+
+  const mostrarBotonesAdmin =
+    user && user.tipo !== "clientes" && user.tipo !== "usuariosapp" && user.idRol === 1;
 
   const subcategoriasUnicas = [
     "Todas",
-    ...Array.from(
-      new Set(products.filter(p => p.id_categoria === 1).map(p => p.subcategoria || "Sin subcategoría"))
-    ),
+    ...Array.from(new Set(products.filter(p => p.id_categoria === 1).map(p => p.subcategoria || "Sin subcategoría")))
   ];
 
+  // Filtrado: solo mostrar habilitados a clientes
   const productosFiltrados = products
     .filter(p => p.id_categoria === 1)
-    .filter(p => filtroSubcategoria === "Todas" || (p.subcategoria || "Sin subcategoría") === filtroSubcategoria);
+    .filter(p => filtroSubcategoria === "Todas" || (p.subcategoria || "Sin subcategoría") === filtroSubcategoria)
+    .filter(p => user && (user.tipo !== "clientes" && user.tipo !== "usuariosapp") ? true : p.estado === "habilitado");
 
   return (
     <div className="BebidasPage">
       <div className="BebidasPage-header">
         <h2>Bebidas</h2>
-        {mostrarBotones && (
+        {mostrarBotonesAdmin && (
           <button className="BebidasPage-addProduct" onClick={agregarProducto}>Agregar Bebida</button>
         )}
       </div>
@@ -96,16 +103,24 @@ const Bebidas = () => {
       <div className="BebidasPage-container">
         {productosFiltrados.length ? (
           productosFiltrados.map(product => (
-            <div key={product.id_producto} className="BebidasCard-wrapper">
+            <div
+              key={product.id_producto}
+              className="BebidasCard-wrapper"
+              style={{ opacity: product.estado === "deshabilitado" ? 0.5 : 1 }}
+            >
               <BebidasCard
                 product={product}
                 onUpdate={actualizarProducto}
                 triggerEdit={editingId === product.id_producto}
               />
-              {mostrarBotones && (
+
+              {mostrarBotonesAdmin && (
                 <div className="BebidasCard-editDelete">
                   <button className="BebidasCard-botonEditar" onClick={() => setEditingId(product.id_producto)}>Editar</button>
                   <button className="BebidasCard-botonEliminar" onClick={() => eliminarProducto(product.id_producto)}>Eliminar</button>
+                  <button onClick={() => toggleEstadoProducto(product)}>
+                    {product.estado === "habilitado" ? "Deshabilitar" : "Habilitar"}
+                  </button>
                 </div>
               )}
             </div>

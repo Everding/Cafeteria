@@ -2,7 +2,6 @@ import db from "../config/dataBase.js";
 
 
 // Obtener todos los pedidos
-
 export const getAllPedidos = async (req, res) => {
   try {
     const [rows] = await db.query(`
@@ -11,6 +10,7 @@ export const getAllPedidos = async (req, res) => {
         p.id_usuario_app,
         u.usuario,
         u.imagen_url AS foto,
+        p.id_cliente,               -- <-- incluimos id_cliente
         p.estado,
         dp.id_producto,
         prod.nombre AS nombre_producto,
@@ -22,7 +22,7 @@ export const getAllPedidos = async (req, res) => {
       ORDER BY p.idPedido DESC
     `);
 
-    // Agrupamos productos por pedido
+    // Agrupar productos por pedido
     const pedidosMap = new Map();
 
     rows.forEach(row => {
@@ -31,10 +31,12 @@ export const getAllPedidos = async (req, res) => {
           idPedido: row.idPedido,
           usuario: row.usuario,
           foto: row.foto,
+          id_cliente: row.id_cliente,  // <-- agregamos id_cliente
           estado: row.estado,
           productos: []
         });
       }
+
       if (row.id_producto) {
         pedidosMap.get(row.idPedido).productos.push({
           nombre: row.nombre_producto,
@@ -44,7 +46,6 @@ export const getAllPedidos = async (req, res) => {
     });
 
     const pedidos = Array.from(pedidosMap.values());
-
     res.json(pedidos);
   } catch (error) {
     console.error("Error al obtener pedidos:", error);
@@ -79,42 +80,55 @@ export const getPedidoById = async (req, res) => {
   }
 };
 
+// Crear un nuevo pedido (AHORA ES INDEPENDIENTE DE req/res → funciona perfecto desde la ruta)
+// Crear un nuevo pedido (AHORA ES INDEPENDIENTE DE req/res → funciona perfecto desde la ruta)
+export const createPedido = async ({
+  carritoItems,
+  id_usuario_app = null,
+  id_cliente = null,
+  id_sucursal,
+  total,
+  estado = "Pendiente",
+  id_metodo_pago = null
+} = {}) => {
+  // Validación temprana
+  if (!id_sucursal || total == null || !estado || !Array.isArray(carritoItems) || carritoItems.length === 0) {
+    throw new Error("Faltan datos obligatorios para crear el pedido");
+  }
 
-// Crear un nuevo pedido
-export const createPedido = async (req, res) => {
-  const { id_cliente, id_usuario_app, id_sucursal, total, estado, carritoItems, id_metodo_pago } = req.body;
-
-  if ((!id_cliente && !id_usuario_app) || !id_sucursal || total == null || !estado || !Array.isArray(carritoItems) || carritoItems.length === 0) {
-    return res.status(400).json({ message: "Faltan datos obligatorios" });
+  if (!id_usuario_app && !id_cliente) {
+    throw new Error("Debe proporcionar id_usuario_app o id_cliente");
   }
 
   let connection;
   try {
-    // Obtener conexión del pool
-    connection = await db.getConnection ? await db.getConnection() : db;
+    connection = await db.getConnection?.() || db;
     await connection.beginTransaction?.();
 
-    // 1️⃣ Crear pedido
+    // 1. Crear el pedido
     const [pedidoResult] = await connection.query(
       `INSERT INTO pedidos (id_cliente, id_usuario_app, id_sucursal, fecha_pedido, total, estado)
        VALUES (?, ?, ?, NOW(), ?, ?)`,
-      [id_cliente || null, id_usuario_app || null, id_sucursal, total, estado]
+      [id_cliente, id_usuario_app, id_sucursal, total, estado]
     );
     const idPedido = pedidoResult.insertId;
 
-    // 2️⃣ Guardar detalle de cada item y reducir materia prima
-    for (let item of carritoItems) {
-      const { id_producto, id_menu_prefabricado, cantidad, precio_actual } = item;
-      const subtotal = cantidad * precio_actual;
+    // 2. Procesar cada ítem del carrito
+    for (const item of carritoItems) {
+      const { id_producto, id_menu_prefabricado, cantidad = 1, precio_actual } = item;
+      const subtotal = Number(cantidad) * Number(precio_actual);
+
+      if (!id_producto && !id_menu_prefabricado) {
+        throw new Error("Cada item debe tener id_producto o id_menu_prefabricado");
+      }
 
       if (id_producto) {
-        // Guardar detalle pedido
         await connection.query(
           "INSERT INTO detallepedidos (idPedido, id_producto, cantidad, subtotal) VALUES (?, ?, ?, ?)",
           [idPedido, id_producto, cantidad, subtotal]
         );
 
-        // Reducir stock de materias primas asociadas al producto
+        // Reducir stock de materias primas
         const [materias] = await connection.query(
           `SELECT s.id_materia, s.cantidad_necesaria, m.stock_actual
            FROM stock s
@@ -123,9 +137,11 @@ export const createPedido = async (req, res) => {
           [id_producto]
         );
 
-        for (let mat of materias) {
-          const nuevoStock = mat.stock_actual - mat.cantidad_necesaria * cantidad;
-          if (nuevoStock < 0) throw new Error(`No hay suficiente stock de ${mat.id_materia}`);
+        for (const mat of materias) {
+          const nuevoStock = mat.stock_actual - (mat.cantidad_necesaria * cantidad);
+          if (nuevoStock < 0) {
+            throw new Error(`Stock insuficiente para materia prima ID: ${mat.id_materia}`);
+          }
           await connection.query(
             `UPDATE materiaprima SET stock_actual = ? WHERE id_materia = ?`,
             [nuevoStock, mat.id_materia]
@@ -134,36 +150,42 @@ export const createPedido = async (req, res) => {
       }
 
       if (id_menu_prefabricado) {
-        // Guardar detalle pedido (si manejas menus prefabricados)
         await connection.query(
           "INSERT INTO detallepedidos (idPedido, id_menu_prefabricado, cantidad, subtotal) VALUES (?, ?, ?, ?)",
           [idPedido, id_menu_prefabricado, cantidad, subtotal]
         );
-
-        // 🔹 Aquí podrías agregar reducción de materias primas si los menús tienen stock definido
+        // Aquí puedes agregar lógica para menús prefabricados si tenés stock asociado
       }
     }
 
-    // 3️⃣ Registrar venta
+    // 3. Registrar venta
     await connection.query(
       "INSERT INTO ventas (idPedido, id_metodo_pago, total, fecha_venta) VALUES (?, ?, ?, NOW())",
-      [idPedido, id_metodo_pago || null, total]
+      [idPedido, id_metodo_pago, total]
     );
 
-    // 4️⃣ Vaciar carrito
+    // 4. Vaciar carrito del usuario app (si aplica)
     if (id_usuario_app) {
       await connection.query(
-        "DELETE FROM detallecarrito WHERE id_carrito = (SELECT id_carrito FROM carrito WHERE id_usuario_app = ? AND activo = true)",
+        `DELETE dc FROM detallecarrito dc
+         INNER JOIN carrito c ON dc.id_carrito = c.id_carrito
+         WHERE c.id_usuario_app = ? AND c.activo = true`,
         [id_usuario_app]
       );
     }
 
     await connection.commit?.();
-    res.status(201).json({ message: "Pedido y venta registrados correctamente, stock actualizado", idPedido });
-  } catch (error) {
-    await connection.rollback?.();
-    console.error("Error al crear pedido:", error);
-    res.status(500).json({ message: "Error al crear pedido", error: error.message });
+
+    return {
+      success: true,
+      idPedido,
+      message: "Pedido creado correctamente"
+    };
+
+    } catch (error) {
+    if (connection) await connection.rollback?.();
+    console.error("Error en createPedido:", error);
+    throw error;
   }
 };
 

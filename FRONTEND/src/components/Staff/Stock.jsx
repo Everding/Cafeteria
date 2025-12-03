@@ -21,9 +21,21 @@ const Stock = () => {
   const API_URL = "http://localhost:3000/api/materia-prima";
   const API_PROVEEDORES = "http://localhost:3000/api/proveedores";
 
-  
-  // Cargar datos iniciales
- 
+  // 🔹 Revisar stock mínimo
+  const revisarStockMinimo = (materias) => {
+    const criticas = materias.filter(
+      (mp) => Number(mp.stock_actual) <= Number(mp.stock_minimo)
+    );
+
+    if (criticas.length > 0) {
+      const mensaje = criticas
+        .map((mp) => `"${mp.nombre}" (Stock: ${mp.stock_actual}, Mínimo: ${mp.stock_minimo})`)
+        .join("\n");
+      alert(`¡Atención! Las siguientes materias primas han llegado al mínimo:\n${mensaje}`);
+    }
+  };
+
+  // 🔹 Cargar datos iniciales
   useEffect(() => {
     obtenerMateriasPrimas();
     obtenerProveedores();
@@ -33,6 +45,7 @@ const Stock = () => {
     try {
       const res = await axios.get(API_URL);
       setMateriasPrimas(res.data);
+      revisarStockMinimo(res.data); // <-- revisar stock al cargar
     } catch (error) {
       console.error("Error al obtener materias primas:", error);
       alert("Error al cargar materias primas.");
@@ -48,9 +61,19 @@ const Stock = () => {
     }
   };
 
- 
-  // Abrir modal para agregar o editar
- 
+  // 🔹 Cambiar estado
+  const cambiarEstado = async (id_materia, estadoActual) => {
+    const nuevoEstado = estadoActual === "habilitado" ? "deshabilitado" : "habilitado";
+    try {
+      await axios.put(`${API_URL}/${id_materia}/estado`, { estado: nuevoEstado });
+      obtenerMateriasPrimas(); // refrescar lista y revisar stock
+    } catch (error) {
+      console.error("Error al cambiar estado:", error);
+      alert("No se pudo cambiar el estado.");
+    }
+  };
+
+  // 🔹 Abrir modal
   const abrirModal = (materia = null) => {
     if (materia) {
       setFormData({
@@ -76,9 +99,7 @@ const Stock = () => {
 
   const cerrarModal = () => setModalVisible(false);
 
- 
-  // Guardar cambios (crear o editar)
- 
+  // 🔹 Guardar cambios (crear o editar)
   const guardarMateriaPrima = async () => {
     const { id_materia, nombre, unidad_medida, stock_actual, stock_minimo, id_proveedor } = formData;
 
@@ -88,25 +109,23 @@ const Stock = () => {
 
     try {
       if (id_materia) {
-        // Editar
         await axios.put(`${API_URL}/${id_materia}`, formData);
         alert("Materia prima actualizada correctamente");
       } else {
-        // Crear
         await axios.post(API_URL, formData);
         alert("Materia prima creada correctamente");
       }
       cerrarModal();
-      obtenerMateriasPrimas();
+      const res = await axios.get(API_URL);
+      setMateriasPrimas(res.data);
+      revisarStockMinimo(res.data); // <-- revisar stock al guardar
     } catch (error) {
       console.error("Error al guardar materia prima:", error);
       alert("No se pudo guardar la materia prima.");
     }
   };
 
-  // ===============================
-  // Eliminar materia prima
-  // ===============================
+  // 🔹 Eliminar materia prima
   const eliminarMateriaPrima = async (id_materia) => {
     if (!window.confirm("¿Seguro que deseas eliminar esta materia prima?")) return;
 
@@ -120,9 +139,7 @@ const Stock = () => {
     }
   };
 
- 
-  // Filtrado y paginación
- 
+  // 🔹 Filtrado y paginación
   const materiasFiltradas = materiasPrimas.filter((mp) =>
     mp.nombre.toLowerCase().includes(busqueda.toLowerCase())
   );
@@ -136,9 +153,6 @@ const Stock = () => {
     setPaginaActual(num);
   };
 
- 
-  // Renderizado
- 
   return (
     <div className="Stock-Principal">
       <div className="stock-container">
@@ -176,7 +190,7 @@ const Stock = () => {
           <tbody>
             {materiasPaginadas.length > 0 ? (
               materiasPaginadas.map((mp) => (
-                <tr key={mp.id_materia}>
+                <tr key={mp.id_materia} className={mp.estado === "deshabilitado" ? "fila-deshabilitada" : ""}>
                   <td>{mp.id_materia}</td>
                   <td>{mp.nombre}</td>
                   <td>{mp.unidad_medida}</td>
@@ -186,6 +200,12 @@ const Stock = () => {
                   <td className="acciones">
                     <button className="btn-actualizar" onClick={() => abrirModal(mp)}>Editar</button>
                     <button className="btn-eliminar" onClick={() => eliminarMateriaPrima(mp.id_materia)}>Eliminar</button>
+                    <button
+                      className={mp.estado === "habilitado" ? "btn-deshabilitar" : "btn-habilitar"}
+                      onClick={() => cambiarEstado(mp.id_materia, mp.estado)}
+                    >
+                      {mp.estado === "habilitado" ? "Deshabilitar" : "Habilitar"}
+                    </button>
                   </td>
                 </tr>
               ))

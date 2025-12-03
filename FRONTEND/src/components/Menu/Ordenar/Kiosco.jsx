@@ -31,7 +31,7 @@ const Kiosco = () => {
         descripcion: "",
         precio_actual: 50,
         id_categoria: 3,
-        estado: "disponible",
+        estado: "habilitado",
         imagen_url: "/uploads/placeholder.png",
         subcategoria: "Snacks",
       };
@@ -58,6 +58,18 @@ const Kiosco = () => {
     }
   };
 
+  // Habilitar / Deshabilitar producto
+  const toggleEstadoProducto = async (product) => {
+    try {
+      const nuevoEstado = product.estado === "habilitado" ? "deshabilitado" : "habilitado";
+      await axios.put(`http://localhost:3000/api/productos/estado/${product.id_producto}`, { estado: nuevoEstado });
+      setProducts(products.map(p => p.id_producto === product.id_producto ? { ...p, estado: nuevoEstado } : p));
+    } catch (error) {
+      console.error("Error al cambiar estado:", error);
+      alert("No se pudo cambiar el estado del producto");
+    }
+  };
+
   const mostrarBotones =
     user &&
     user.tipo !== "clientes" &&
@@ -71,9 +83,11 @@ const Kiosco = () => {
     ),
   ];
 
+  // Filtrado: solo mostrar habilitados para clientes
   const productosFiltrados = products
     .filter(p => p.id_categoria === 3)
-    .filter(p => filtroSubcategoria === "Todas" || (p.subcategoria || "Sin subcategoría") === filtroSubcategoria);
+    .filter(p => filtroSubcategoria === "Todas" || (p.subcategoria || "Sin subcategoría") === filtroSubcategoria)
+    .filter(p => user && user.tipo === "clientes" ? p.estado === "habilitado" : true);
 
   return (
     <div className="KioscoPage">
@@ -96,7 +110,11 @@ const Kiosco = () => {
       <div className="KioscoPage-container">
         {productosFiltrados.length ? (
           productosFiltrados.map(product => (
-            <div key={product.id_producto} className="KioscoCard-wrapper">
+            <div
+              key={product.id_producto}
+              className="KioscoCard-wrapper"
+              style={{ opacity: product.estado === "deshabilitado" ? 0.5 : 1 }}
+            >
               <KioscoCard
                 product={product}
                 onUpdate={actualizarProducto}
@@ -104,8 +122,14 @@ const Kiosco = () => {
               />
               {mostrarBotones && (
                 <div className="KioscoCard-editDelete">
-                  <button className="KioscoCard-botonEditar" onClick={() => setEditingId(product.id_producto)}>Editar</button>
-                  <button className="KioscoCard-botonEliminar" onClick={() => eliminarProducto(product.id_producto)}>Eliminar</button>
+                  <button onClick={() => setEditingId(product.id_producto)}>Editar</button>
+                  <button onClick={() => eliminarProducto(product.id_producto)}>Eliminar</button>
+                  <button
+                    onClick={() => toggleEstadoProducto(product)}
+                    className={product.estado === "habilitado" ? "btn-deshabilitar" : "btn-habilitar"}
+                  >
+                    {product.estado === "habilitado" ? "Deshabilitar" : "Habilitar"}
+                  </button>
                 </div>
               )}
             </div>

@@ -15,16 +15,17 @@ const BebidasCard = ({ product, onUpdate, triggerEdit }) => {
   const { token } = useAuth();
 
   // --- Materias primas ---
-  const [materiasPrimas, setMateriasPrimas] = useState([]); // todas las materias disponibles
+  const [materiasPrimas, setMateriasPrimas] = useState([]); // solo habilitadas
   const [busqueda, setBusqueda] = useState("");
   const [seleccionadas, setSeleccionadas] = useState([]); // { id_materia, cantidad_necesaria }
 
-  // cargar todas las materias primas una vez
+  // cargar todas las materias primas habilitadas
   useEffect(() => {
     const fetchMaterias = async () => {
       try {
         const res = await axios.get("http://localhost:3000/api/materia-prima");
-        setMateriasPrimas(res.data || []);
+        const habilitadas = res.data.filter(mp => mp.estado === "habilitado");
+        setMateriasPrimas(habilitadas);
       } catch (err) {
         console.error("Error al obtener materias primas:", err);
       }
@@ -37,31 +38,30 @@ const BebidasCard = ({ product, onUpdate, triggerEdit }) => {
     if (triggerEdit) setEditing(true);
   }, [triggerEdit]);
 
-  // cuando se entra a editar, cargar materias asignadas al producto
-  useEffect(() => {
-    const fetchAsignadas = async () => {
-      if (!editing) return;
-      try {
-        const res = await axios.get(
-          `http://localhost:3000/api/materia-prima/producto/${product.id_producto}/stock`
-        );
-        // Respuesta esperada: lista de materias asignadas con id_materia y cantidad_necesaria
-        const asignadas = (res.data || []).map((m) => ({
-          id_materia: m.id_materia,
-          cantidad_necesaria: m.cantidad_necesaria != null ? m.cantidad_necesaria : 1,
-        }));
-        setSeleccionadas(asignadas);
-      } catch (err) {
-        console.error("Error al cargar materias asignadas:", err);
-        setSeleccionadas([]); // fallback
-      }
-    };
+  // cargar materias asignadas al producto (solo habilitadas)
+// cargar materias asignadas al producto
+useEffect(() => {
+  const fetchAsignadas = async () => {
+    if (!editing) return;
+    try {
+      const res = await axios.get(
+        `http://localhost:3000/api/materia-prima/producto/${product.id_producto}`
+      );
+      const asignadas = (res.data || []).map((m) => ({
+        id_materia: m.id_materia,
+        cantidad_necesaria: m.cantidad_necesaria != null ? m.cantidad_necesaria : 1,
+      }));
+      setSeleccionadas(asignadas); // <-- no filtrar
+    } catch (err) {
+      console.error("Error al cargar materias asignadas:", err);
+      setSeleccionadas([]);
+    }
+  };
 
-    fetchAsignadas();
-  }, [editing, product.id_producto]);
+  fetchAsignadas();
+}, [editing, product.id_producto]);
 
-  // toggle de selección
-  function toggleMateriaPrima(id_materia) {
+  const toggleMateriaPrima = (id_materia) => {
     setSeleccionadas((prev) => {
       if (prev.some((m) => m.id_materia === id_materia)) {
         return prev.filter((m) => m.id_materia !== id_materia);
@@ -69,18 +69,16 @@ const BebidasCard = ({ product, onUpdate, triggerEdit }) => {
         return [...prev, { id_materia, cantidad_necesaria: 1 }];
       }
     });
-  }
+  };
 
-  // cambiar cantidad necesaria para una materia seleccionada
-  function setCantidadNecesaria(id_materia, nuevaCantidad) {
+  const setCantidadNecesaria = (id_materia, nuevaCantidad) => {
     setSeleccionadas((prev) =>
       prev.map((m) =>
         m.id_materia === id_materia ? { ...m, cantidad_necesaria: nuevaCantidad } : m
       )
     );
-  }
+  };
 
-  // guardar materias primas asignadas al producto
   const guardarMateriasPrimas = async () => {
     if (!product.id_producto) {
       alert("ID de producto inválido");
@@ -173,12 +171,10 @@ const BebidasCard = ({ product, onUpdate, triggerEdit }) => {
   const incrementar = () => setCantidad(cantidad + 1);
   const decrementar = () => setCantidad(cantidad > 1 ? cantidad - 1 : 1);
 
-  // Filtrado de materias por búsqueda (asegura que se muestren todas al no buscar)
-  const materiasFiltradas = materiasPrimas.filter((mp) =>
-    mp.nombre.toLowerCase().includes(busqueda.toLowerCase())
-  );
+ const materiasFiltradas = materiasPrimas.filter((mp) =>
+  mp.nombre.toLowerCase().includes(busqueda.toLowerCase())
+);
 
-  // helper para saber si una materia está seleccionada
   const isSeleccionada = (id_materia) => seleccionadas.some((m) => m.id_materia === id_materia);
   const getCantidadSeleccionada = (id_materia) => {
     const found = seleccionadas.find((m) => m.id_materia === id_materia);
@@ -213,7 +209,6 @@ const BebidasCard = ({ product, onUpdate, triggerEdit }) => {
             onChange={(e) => setPrecio(Number(e.target.value))}
           />
 
-          {/* --- Materias primas (se muestran todas, con búsqueda) --- */}
           <div className="BebidasCard-materias">
             <h4>Materias primas</h4>
             <input
@@ -232,8 +227,6 @@ const BebidasCard = ({ product, onUpdate, triggerEdit }) => {
                     onChange={() => toggleMateriaPrima(mp.id_materia)}
                   />
                   <span style={{ marginLeft: 8 }}>{mp.nombre}</span>
-
-                  {/* Si está seleccionada, permitir editar cantidad necesaria */}
                   {isSeleccionada(mp.id_materia) && (
                     <input
                       type="number"
@@ -249,7 +242,6 @@ const BebidasCard = ({ product, onUpdate, triggerEdit }) => {
               ))}
               {materiasFiltradas.length === 0 && <p>No hay materias que coincidan.</p>}
             </div>
-
             <div style={{ marginTop: 8 }}>
               <button className="SaveButton" onClick={guardarMateriasPrimas}>
                 Guardar Materias Primas
@@ -259,13 +251,7 @@ const BebidasCard = ({ product, onUpdate, triggerEdit }) => {
 
           <div className="BebidasCard-actions">
             <button onClick={handleGuardar}>Guardar</button>
-            <button
-              onClick={() => {
-                setEditing(false);
-              }}
-            >
-              Cancelar
-            </button>
+            <button onClick={() => setEditing(false)}>Cancelar</button>
           </div>
         </>
       ) : (

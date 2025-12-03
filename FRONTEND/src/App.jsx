@@ -6,7 +6,8 @@ import axios from 'axios';
 import {
   LOGIN, HOME, MENUSPREFABRICADOS, ORDENAR, BEBIDAS, ACOMPAÑANTES, POSTRES,
   KIOSCO, NUESTROSPRODUCTOS, PEDIDOS, EMPLEADOS, ADMINISTRAREMPLEADOS, STOCK,
-  VENTAS, COMPRAS, REGISTER, MIPERFIL, CARRITO, EQUIPO, NUESTRAHISTORIA, SUCURSALES, RESEÑA, CONTACTANOS
+  VENTAS, COMPRAS, REGISTER, MIPERFIL, CARRITO, EQUIPO, NUESTRAHISTORIA, SUCURSALES, RESEÑA, CONTACTANOS, RECUPERAR,
+  RESTABLECER, SUCCESS, FAIL, PENDING
 } from './routers/router';
 
 import LoginPage from "./pages/LoginPage";
@@ -35,6 +36,12 @@ import ReseñaPage from './pages/nosotros/ReseñasPage';
 import ContactanosPage from './pages/ContactanosPage';
 import RutaProtegida from "./components/RutasProtegidas.jsx";
 import RutaPublica from "./components/RutasPublicas.jsx";
+import RecuperarcontraseñaPage from './pages/RecuperarcontraseñaPage.jsx';
+import RestablecercontraseñaPage from './pages/Restablecercontraseña.jsx'
+import PagoExitosoPage from './pages/PagoExitosoPage.jsx';
+import PagoPendientePage from './pages/PagoPendientePage.jsx';
+import PagoRechazadoPage from './pages/PagoRechazadoPage.jsx';
+
 
 const AppContent = () => {
   const location = useLocation();
@@ -45,7 +52,7 @@ const AppContent = () => {
   const cargarCantidadCarrito = async () => {
     if (!token) return;
     try {
-      // 1️⃣ Obtener carrito activo del usuario
+      //  Obtener carrito activo del usuario
       const { data: carrito } = await axios.get(
         "http://localhost:3000/api/carrito/activo",
         { headers: { Authorization: `Bearer ${token}` } }
@@ -56,7 +63,7 @@ const AppContent = () => {
         return;
       }
 
-      // 2️⃣ Obtener cantidad total de productos en el carrito
+      // Obtener cantidad total de productos en el carrito
       const { data } = await axios.get(
         `http://localhost:3000/api/detalle-carrito/count/${carrito.id_carrito}`,
         { headers: { Authorization: `Bearer ${token}` } }
@@ -101,6 +108,12 @@ const AppContent = () => {
         <Route path={SUCURSALES} element={<SucursalesPage />} />
         <Route path={RESEÑA} element={<ReseñaPage />} />
         <Route path={CONTACTANOS} element={<ContactanosPage />} />
+        <Route path={RECUPERAR} element= {<RecuperarcontraseñaPage/>} />
+        <Route path={RESTABLECER} element={<RestablecercontraseñaPage/>} />
+        <Route path={SUCCESS} element={<PagoExitosoPage/>} />
+        <Route path={FAIL} element={<PagoRechazadoPage/>} />
+        <Route path={PENDING} element={<PagoPendientePage/>} />
+
 
         {/* Rutas privadas */}
         <Route path={PEDIDOS} element={<RutaProtegida tiposPermitidos={["personal"]} rolesPermitidos={[1,2,3]}><PedidosentrantesPage /></RutaProtegida>} />

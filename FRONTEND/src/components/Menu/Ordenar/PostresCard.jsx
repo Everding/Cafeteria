@@ -14,17 +14,18 @@ const PostresCard = ({ product, onUpdate, triggerEdit }) => {
 
   const { token } = useAuth();
 
-  // --- materias primas ---
-  const [materiasPrimas, setMateriasPrimas] = useState([]);
+  // --- Materias primas ---
+  const [materiasPrimas, setMateriasPrimas] = useState([]); // solo habilitadas
   const [busqueda, setBusqueda] = useState("");
-  const [seleccionadas, setSeleccionadas] = useState([]);
+  const [seleccionadas, setSeleccionadas] = useState([]); // { id_materia, cantidad_necesaria }
 
-  // cargar materias disponibles
+  // cargar todas las materias primas habilitadas
   useEffect(() => {
     const fetchMaterias = async () => {
       try {
         const res = await axios.get("http://localhost:3000/api/materia-prima");
-        setMateriasPrimas(res.data || []);
+        const habilitadas = res.data.filter(mp => mp.estado === "habilitado");
+        setMateriasPrimas(habilitadas);
       } catch (err) {
         console.error("Error al obtener materias primas:", err);
       }
@@ -32,25 +33,23 @@ const PostresCard = ({ product, onUpdate, triggerEdit }) => {
     fetchMaterias();
   }, []);
 
-  // activar edición si vino triggerEdit
+  // abrir modo edición si triggerEdit viene true
   useEffect(() => {
     if (triggerEdit) setEditing(true);
   }, [triggerEdit]);
 
-  // obtener materias asignadas al producto al entrar a editar
+  // cargar materias asignadas al producto
   useEffect(() => {
     const fetchAsignadas = async () => {
       if (!editing) return;
       try {
         const res = await axios.get(
-          `http://localhost:3000/api/materia-prima/producto/${product.id_producto}/stock`
+          `http://localhost:3000/api/materia-prima/producto/${product.id_producto}`
         );
-
         const asignadas = (res.data || []).map((m) => ({
           id_materia: m.id_materia,
-          cantidad_necesaria: m.cantidad_necesaria ?? 1,
+          cantidad_necesaria: m.cantidad_necesaria != null ? m.cantidad_necesaria : 1,
         }));
-
         setSeleccionadas(asignadas);
       } catch (err) {
         console.error("Error al cargar materias asignadas:", err);
@@ -65,22 +64,25 @@ const PostresCard = ({ product, onUpdate, triggerEdit }) => {
     setSeleccionadas((prev) => {
       if (prev.some((m) => m.id_materia === id_materia)) {
         return prev.filter((m) => m.id_materia !== id_materia);
+      } else {
+        return [...prev, { id_materia, cantidad_necesaria: 1 }];
       }
-      return [...prev, { id_materia, cantidad_necesaria: 1 }];
     });
   };
 
   const setCantidadNecesaria = (id_materia, nuevaCantidad) => {
     setSeleccionadas((prev) =>
       prev.map((m) =>
-        m.id_materia === id_materia
-          ? { ...m, cantidad_necesaria: nuevaCantidad }
-          : m
+        m.id_materia === id_materia ? { ...m, cantidad_necesaria: nuevaCantidad } : m
       )
     );
   };
 
   const guardarMateriasPrimas = async () => {
+    if (!product.id_producto) {
+      alert("ID de producto inválido");
+      return;
+    }
     try {
       await axios.put(
         `http://localhost:3000/api/materia-prima/producto/${product.id_producto}/stock`,
@@ -88,8 +90,8 @@ const PostresCard = ({ product, onUpdate, triggerEdit }) => {
         { headers: token ? { Authorization: `Bearer ${token}` } : {} }
       );
       alert("Materias primas guardadas correctamente ✅");
-    } catch (err) {
-      console.error("Error al guardar materias primas:", err);
+    } catch (error) {
+      console.error("Error al guardar materias primas:", error.response || error);
       alert("Error al guardar materias primas ❌");
     }
   };
@@ -100,10 +102,10 @@ const PostresCard = ({ product, onUpdate, triggerEdit }) => {
         nombre: titulo,
         descripcion,
         precio_actual: precio,
-        id_categoria: product.id_categoria,
         estado: product.estado,
         subcategoria: product.subcategoria,
         imagen_url: product.imagen_url,
+        id_categoria: product.id_categoria,
       };
 
       if (file) {
@@ -112,9 +114,9 @@ const PostresCard = ({ product, onUpdate, triggerEdit }) => {
         formData.append("nombre", titulo);
         formData.append("descripcion", descripcion);
         formData.append("precio_actual", precio);
-        formData.append("id_categoria", product.id_categoria);
         formData.append("estado", product.estado);
         formData.append("subcategoria", product.subcategoria);
+        formData.append("id_categoria", product.id_categoria);
 
         const res = await axios.put(
           `http://localhost:3000/api/productos/${product.id_producto}`,
@@ -144,28 +146,22 @@ const PostresCard = ({ product, onUpdate, triggerEdit }) => {
 
     try {
       setLoading(true);
-
-      const { data: carrito } = await axios.get(
-        "http://localhost:3000/api/carrito/activo",
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const { data: carrito } = await axios.get("http://localhost:3000/api/carrito/activo", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!carrito?.id_carrito) throw new Error("No se pudo obtener carrito activo");
 
       await axios.post(
         "http://localhost:3000/api/detalle-carrito",
-        {
-          id_carrito: carrito.id_carrito,
-          id_producto: product.id_producto,
-          cantidad,
-          subtotal: precio,
-        },
+        { id_carrito: carrito.id_carrito, id_producto: product.id_producto, cantidad, subtotal: precio * cantidad },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       window.dispatchEvent(new Event("carritoActualizado"));
-      alert("Producto agregado al carrito");
-    } catch (err) {
-      console.error("Error al agregar al carrito:", err);
-      alert("Error al agregar al carrito");
+      alert("Producto agregado al carrito ✅");
+    } catch (error) {
+      console.error("Error al agregar al carrito:", error.response?.data || error);
+      alert(error.response?.data?.message || "Error al agregar al carrito");
     } finally {
       setLoading(false);
     }
@@ -178,9 +174,7 @@ const PostresCard = ({ product, onUpdate, triggerEdit }) => {
     mp.nombre.toLowerCase().includes(busqueda.toLowerCase())
   );
 
-  const isSeleccionada = (id_materia) =>
-    seleccionadas.some((m) => m.id_materia === id_materia);
-
+  const isSeleccionada = (id_materia) => seleccionadas.some((m) => m.id_materia === id_materia);
   const getCantidadSeleccionada = (id_materia) => {
     const found = seleccionadas.find((m) => m.id_materia === id_materia);
     return found ? found.cantidad_necesaria : 1;
@@ -196,25 +190,17 @@ const PostresCard = ({ product, onUpdate, triggerEdit }) => {
             value={titulo}
             onChange={(e) => setTitulo(e.target.value)}
           />
-
           <img
             className="PostresCard-image"
-            src={
-              product.imagen_url
-                ? `http://localhost:3000${product.imagen_url}`
-                : "https://via.placeholder.com/120"
-            }
+            src={product.imagen_url ? `http://localhost:3000${product.imagen_url}` : "https://via.placeholder.com/120"}
             alt={titulo}
           />
-
           <input type="file" onChange={(e) => setFile(e.target.files[0])} />
-
           <textarea
             className="PostresCard-description-edit"
             value={descripcion}
             onChange={(e) => setDescripcion(e.target.value)}
           />
-
           <input
             className="PostresCard-title-edit"
             type="number"
@@ -222,10 +208,8 @@ const PostresCard = ({ product, onUpdate, triggerEdit }) => {
             onChange={(e) => setPrecio(Number(e.target.value))}
           />
 
-          {/* MATERIAS PRIMAS */}
           <div className="PostresCard-materias">
             <h4>Materias primas</h4>
-
             <input
               type="text"
               placeholder="Buscar materia prima..."
@@ -233,7 +217,6 @@ const PostresCard = ({ product, onUpdate, triggerEdit }) => {
               onChange={(e) => setBusqueda(e.target.value)}
               className="MateriaPrimaSearch"
             />
-
             <div className="MateriasList">
               {materiasFiltradas.map((mp) => (
                 <label key={mp.id_materia} className="MateriaPrimaItem">
@@ -242,29 +225,20 @@ const PostresCard = ({ product, onUpdate, triggerEdit }) => {
                     checked={isSeleccionada(mp.id_materia)}
                     onChange={() => toggleMateriaPrima(mp.id_materia)}
                   />
-
                   <span style={{ marginLeft: 8 }}>{mp.nombre}</span>
-
                   {isSeleccionada(mp.id_materia) && (
                     <input
                       type="number"
                       min="1"
                       value={getCantidadSeleccionada(mp.id_materia)}
-                      onChange={(e) =>
-                        setCantidadNecesaria(
-                          mp.id_materia,
-                          Number(e.target.value || 1)
-                        )
-                      }
+                      onChange={(e) => setCantidadNecesaria(mp.id_materia, Number(e.target.value || 1))}
                       style={{ marginLeft: 12, width: 70 }}
                     />
                   )}
                 </label>
               ))}
-
-              {materiasFiltradas.length === 0 && <p>No hay coincidencias.</p>}
+              {materiasFiltradas.length === 0 && <p>No hay materias que coincidan.</p>}
             </div>
-
             <div style={{ marginTop: 8 }}>
               <button className="SaveButton" onClick={guardarMateriasPrimas}>
                 Guardar Materias Primas
@@ -280,29 +254,20 @@ const PostresCard = ({ product, onUpdate, triggerEdit }) => {
       ) : (
         <>
           <h3 className="PostresCard-title">{titulo}</h3>
-
           <img
             className="PostresCard-image"
-            src={
-              product.imagen_url
-                ? `http://localhost:3000${product.imagen_url}`
-                : "https://via.placeholder.com/120"
-            }
+            src={product.imagen_url ? `http://localhost:3000${product.imagen_url}` : "https://via.placeholder.com/120"}
             alt={titulo}
           />
-
           <p className="PostresCard-description">{descripcion}</p>
-
           <div className="PostresCard-quantity">
             <button onClick={decrementar}>-</button>
             <span>{cantidad}</span>
             <button onClick={incrementar}>+</button>
           </div>
-
           <p className="PostresCard-price">
             <strong>Precio:</strong> ${precio}
           </p>
-
           <button
             className="PostresCard-add"
             onClick={agregarAlCarrito}

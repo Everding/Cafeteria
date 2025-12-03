@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import '../styles/HeaderHome.css';
 import { RiAccountCircleFill } from "react-icons/ri";
 import { TiShoppingCart } from "react-icons/ti";
@@ -21,7 +21,7 @@ const HeaderHome = () => {
   const isLoggedIn = !!token;
   const fotoPerfil = user?.imagen_url || null;
 
-  // 🖱 Manejo dropdowns
+  // Manejo dropdowns
   const handleMouseEnter = (menu) => setOpenDropdown({ ...openDropdown, [menu]: true });
   const handleMouseLeave = (menu) => setTimeout(() => setOpenDropdown({ ...openDropdown, [menu]: false }), 200);
   const handleDropdownClick = (menu) => setOpenDropdown({ ...openDropdown, [menu]: !openDropdown[menu] });

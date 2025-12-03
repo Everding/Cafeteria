@@ -18,6 +18,62 @@ export const getAllProductos = async (req, res) => {
   }
 };
 
+// Crear nuevo producto
+export const createProducto = async (req, res) => {
+  try {
+    const { nombre, descripcion, precio_actual, id_categoria, estado, imagen_url, subcategoria } = req.body;
+
+    if (!nombre || precio_actual == null || !id_categoria || !estado) {
+      return res.status(400).json({ message: "Faltan datos obligatorios" });
+    }
+
+    const [result] = await db.query(`
+      INSERT INTO productos (nombre, descripcion, precio_actual, id_categoria, estado, imagen_url, subcategoria)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `, [nombre, descripcion || "", precio_actual, id_categoria, estado, imagen_url || null, subcategoria || null]);
+
+    const [rows] = await db.query("SELECT * FROM productos WHERE id_producto = ?", [result.insertId]);
+    res.status(201).json(rows[0]);
+  } catch (error) {
+    console.error("Error al crear producto:", error);
+    res.status(500).json({ message: "Error al crear producto" });
+  }
+};
+
+// Actualizar producto con imagen
+export const updateProductoConImagen = async (req, res) => {
+  try {
+    const { id_producto } = req.params;
+    const { nombre, descripcion, precio_actual, id_categoria, estado, subcategoria } = req.body;
+    const imagen_url = req.file ? `/uploads/${req.file.filename}` : null;
+
+    await db.query(
+      `UPDATE productos
+       SET nombre = ?, descripcion = ?, precio_actual = ?, id_categoria = ?, estado = ?, subcategoria = ?, imagen_url = COALESCE(?, imagen_url)
+       WHERE id_producto = ?`,
+      [nombre, descripcion, precio_actual, id_categoria, estado, subcategoria, imagen_url, id_producto]
+    );
+
+    const [rows] = await db.query("SELECT * FROM productos WHERE id_producto = ?", [id_producto]);
+    res.json(rows[0]);
+  } catch (error) {
+    console.error("Error al actualizar producto:", error);
+    res.status(500).json({ message: "Error al actualizar producto", error });
+  }
+};
+
+// Eliminar producto
+export const deleteProducto = async (req, res) => {
+  try {
+    const { id_producto } = req.params;
+    await db.query("DELETE FROM productos WHERE id_producto = ?", [id_producto]);
+    res.json({ message: "Producto eliminado correctamente" });
+  } catch (error) {
+    console.error("Error al eliminar producto:", error);
+    res.status(500).json({ message: "Error al eliminar producto" });
+  }
+};
+
 // Obtener producto por ID
 export const getProductoById = async (req, res) => {
   try {
@@ -40,62 +96,21 @@ export const getProductoById = async (req, res) => {
   }
 };
 
-// Crear nuevo producto
-export const createProducto = async (req, res) => {
-  try {
-    const { nombre, descripcion, precio_actual, id_categoria, estado, imagen_url, subcategoria } = req.body;
 
-    if (!nombre || precio_actual == null || !id_categoria || !estado) {
-      return res.status(400).json({ message: "Faltan datos obligatorios" });
-    }
-
-    const [result] = await db.query(`
-      INSERT INTO productos (nombre, descripcion, precio_actual, id_categoria, estado, imagen_url, subcategoria)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `, [nombre, descripcion || "", precio_actual, id_categoria, estado, imagen_url || null, subcategoria || null]);
-
-    // Devolver producto creado completo
-    const [rows] = await db.query("SELECT * FROM productos WHERE id_producto = ?", [result.insertId]);
-    res.status(201).json(rows[0]);
-  } catch (error) {
-    console.error("Error al crear producto:", error);
-    res.status(500).json({ message: "Error al crear producto" });
-  }
-};
-
-export const updateProductoConImagen = async (req, res) => {
+// Cambiar estado del producto (habilitado/deshabilitado)
+export const cambiarEstadoProducto = async (req, res) => {
   try {
     const { id_producto } = req.params;
-    const { nombre, descripcion, precio_actual, id_categoria, estado, subcategoria } = req.body;
+    const { estado } = req.body;
 
-    // Si se subió un archivo, construimos la ruta pública
-    const imagen_url = req.file ? `/uploads/${req.file.filename}` : null;
-
-    // Actualizar producto en la DB, usando COALESCE para no sobreescribir si no hay imagen nueva
     await db.query(
-      `UPDATE productos
-       SET nombre = ?, descripcion = ?, precio_actual = ?, id_categoria = ?, estado = ?, subcategoria = ?, imagen_url = COALESCE(?, imagen_url)
-       WHERE id_producto = ?`,
-      [nombre, descripcion, precio_actual, id_categoria, estado, subcategoria, imagen_url, id_producto]
+      "UPDATE productos SET estado = ? WHERE id_producto = ?",
+      [estado, id_producto]
     );
 
-    // Devolver producto actualizado
-    const [rows] = await db.query("SELECT * FROM productos WHERE id_producto = ?", [id_producto]);
-    res.json(rows[0]);
+    res.json({ message: "Estado del producto actualizado correctamente" });
   } catch (error) {
-    console.error("Error al actualizar producto:", error);
-    res.status(500).json({ message: "Error al actualizar producto", error });
-  }
-};
-
-// Eliminar producto
-export const deleteProducto = async (req, res) => {
-  try {
-    const { id_producto } = req.params;
-    await db.query("DELETE FROM productos WHERE id_producto = ?", [id_producto]);
-    res.json({ message: "Producto eliminado correctamente" });
-  } catch (error) {
-    console.error("Error al eliminar producto:", error);
-    res.status(500).json({ message: "Error al eliminar producto" });
+    console.error("Error al cambiar estado del producto:", error);
+    res.status(500).json({ message: "Error al cambiar estado del producto" });
   }
 };

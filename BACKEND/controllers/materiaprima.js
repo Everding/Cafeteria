@@ -1,34 +1,49 @@
 import db from "../config/dataBase.js";
 
-
-// Obtener todas las materias primas
+// =======================================================
+//  Obtener todas las materias primas
+// =======================================================
 export const getAllMateriasPrimas = async (req, res) => {
   try {
     const [rows] = await db.query(`
-      SELECT m.id_materia, m.nombre, m.unidad_medida, m.stock_actual, m.stock_minimo,
-             p.nombre AS proveedor
+      SELECT 
+        m.id_materia,
+        m.nombre,
+        m.unidad_medida,
+        m.stock_actual,
+        m.stock_minimo,
+        m.estado,
+        p.nombre AS proveedor,
+        p.id_proveedor
       FROM materiaprima m
       LEFT JOIN proveedores p ON m.id_proveedor = p.id_proveedor
       ORDER BY m.nombre ASC
     `);
 
-    res.json(rows);
+    res.json(rows); // envía todo, habilitados y deshabilitados
   } catch (error) {
     console.error("Error al obtener materias primas:", error);
     res.status(500).json({ message: "Error al obtener materias primas" });
   }
 };
 
-
-// Obtener materia prima por ID
-
+// =======================================================
+//  Obtener materia prima por ID
+// =======================================================
 export const getMateriaPrimaById = async (req, res) => {
   try {
     const { id_materia } = req.params;
 
     const [rows] = await db.query(`
-      SELECT m.id_materia, m.nombre, m.unidad_medida, m.stock_actual, m.stock_minimo,
-             p.nombre AS proveedor
+      SELECT 
+        m.id_materia,
+        m.nombre,
+        m.unidad_medida,
+        m.stock_actual,
+        m.stock_minimo,
+        m.estado,
+        p.nombre AS proveedor,
+        p.id_proveedor
       FROM materiaprima m
       LEFT JOIN proveedores p ON m.id_proveedor = p.id_proveedor
       WHERE m.id_materia = ?
@@ -43,9 +58,9 @@ export const getMateriaPrimaById = async (req, res) => {
   }
 };
 
-
-// Crear nueva materia prima
-
+// =======================================================
+//  Crear nueva materia prima
+// =======================================================
 export const createMateriaPrima = async (req, res) => {
   try {
     const { nombre, unidad_medida, stock_actual, stock_minimo, id_proveedor } = req.body;
@@ -55,8 +70,9 @@ export const createMateriaPrima = async (req, res) => {
     }
 
     const [result] = await db.query(`
-      INSERT INTO materia_prima (nombre, unidad_medida, stock_actual, stock_minimo, id_proveedor)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO materiaprima 
+        (nombre, unidad_medida, stock_actual, stock_minimo, id_proveedor, estado)
+      VALUES (?, ?, ?, ?, ?, 'habilitado')
     `, [nombre, unidad_medida, stock_actual, stock_minimo, id_proveedor]);
 
     res.status(201).json({ message: "Materia prima creada", id_materia: result.insertId });
@@ -66,9 +82,9 @@ export const createMateriaPrima = async (req, res) => {
   }
 };
 
-
-// Actualizar materia prima
-
+// =======================================================
+//  Actualizar materia prima
+// =======================================================
 export const updateMateriaPrima = async (req, res) => {
   try {
     const { id_materia } = req.params;
@@ -87,9 +103,9 @@ export const updateMateriaPrima = async (req, res) => {
   }
 };
 
-
-// Eliminar materia prima
-
+// =======================================================
+//  Eliminar materia prima
+// =======================================================
 export const deleteMateriaPrima = async (req, res) => {
   try {
     const { id_materia } = req.params;
@@ -101,35 +117,32 @@ export const deleteMateriaPrima = async (req, res) => {
   }
 };
 
+// =======================================================
+//  Cambiar estado (habilitado / deshabilitado)
+// =======================================================
+export const cambiarEstado = async (req, res) => {
+  const { id_materia } = req.params;
+  const { estado } = req.body;
 
-// Actualizar el stock (relación producto ↔ materias primas)
-export const actualizarStockProducto = async (req, res) => {
-  const { id_producto } = req.params;
-  const { materiasPrimas } = req.body; // array de objetos { id_materia, cantidad_necesaria }
-
-  if (!Array.isArray(materiasPrimas))
-    return res.status(400).json({ error: "materiasPrimas debe ser un array" });
+  if (!estado || (estado !== "habilitado" && estado !== "deshabilitado")) {
+    return res.status(400).json({ message: "Estado inválido" });
+  }
 
   try {
-    // 1️⃣ Eliminar registros previos de este producto
-    await db.query("DELETE FROM stock WHERE id_producto = ?", [id_producto]);
-
-    // 2️⃣ Insertar los nuevos vínculos
-    for (const { id_materia, cantidad_necesaria } of materiasPrimas) {
-      await db.query(
-        "INSERT INTO stock (id_producto, id_materia, cantidad_necesaria) VALUES (?, ?, ?)",
-        [id_producto, id_materia, cantidad_necesaria || 1] // si no envían cantidad, ponemos 1
-      );
-    }
-
-    res.json({ message: "Materias primas actualizadas correctamente" });
+    await db.query(
+      "UPDATE materiaprima SET estado = ? WHERE id_materia = ?",
+      [estado, id_materia]
+    );
+    res.json({ message: "Estado actualizado correctamente" });
   } catch (error) {
-    console.error("Error al actualizar stock:", error);
-    res.status(500).json({ error: "Error al actualizar stock" });
+    console.error("Error cambiando estado:", error);
+    res.status(500).json({ error: "Error al cambiar estado" });
   }
 };
 
-// Actualizar solo stock_actual de una materia prima
+// =======================================================
+//  Actualizar solo stock_actual de una materia prima
+// =======================================================
 export const actualizarStockMateria = async (req, res) => {
   const { id_materia } = req.params;
   const { cantidad } = req.body;
@@ -148,7 +161,40 @@ export const actualizarStockMateria = async (req, res) => {
   }
 };
 
+// =======================================================
+//  Actualizar stock de todas las materias primas de un producto
+// =======================================================
+export const actualizarStockProducto = async (req, res) => {
+  const { id_producto } = req.params;
+  const materias = req.body; // debe ser [{ id_materia, cantidad_necesaria }, ...]
 
+  if (!Array.isArray(materias)) {
+    return res.status(400).json({ message: "Debe enviarse un array de materias primas" });
+  }
+
+  try {
+    // Primero eliminamos las asignaciones anteriores
+    await db.query("DELETE FROM stock WHERE id_producto = ?", [id_producto]);
+
+    // Insertamos las nuevas
+    for (const m of materias) {
+      if (!m.id_materia || m.cantidad_necesaria == null) continue;
+
+      await db.query(
+        "INSERT INTO stock (id_producto, id_materia, cantidad_necesaria) VALUES (?, ?, ?)",
+        [id_producto, m.id_materia, m.cantidad_necesaria]
+      );
+    }
+
+    res.json({ message: "Materias primas guardadas correctamente" });
+  } catch (error) {
+    console.error("Error actualizando stock del producto:", error);
+    res.status(500).json({ message: "Error al actualizar stock del producto" });
+  }
+};
+// =======================================================
+//  Obtener materias necesarias para un producto
+// =======================================================
 export const obtenerStockProducto = async (req, res) => {
   const { id_producto } = req.params;
 
@@ -166,6 +212,3 @@ export const obtenerStockProducto = async (req, res) => {
     res.status(500).json({ error: "Error al obtener stock del producto" });
   }
 };
-
-
-

@@ -9,7 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // 🔹 Cargar datos desde localStorage
+  // Cargar datos desde localStorage
   useEffect(() => {
     const usuarioGuardado = localStorage.getItem("usuario");
     const tipoGuardado = localStorage.getItem("tipo");
@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  // 🔹 Guardar sesión
+  // Guardar sesión
   const login = (usuarioObj, tipoUsuario, tokenRecibido, idRolUsuario = null) => {
     setUser(usuarioObj);
     setTipo(tipoUsuario);
@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("token", tokenRecibido);
   };
 
-  // 🔹 Cerrar sesión
+  //  Cerrar sesión
   const logout = () => {
     setUser(null);
     setTipo(null);

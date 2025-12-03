@@ -7,6 +7,7 @@ import {
   createProducto,
   updateProductoConImagen,
   deleteProducto,
+  cambiarEstadoProducto
 } from "../controllers/productos.js";
 
 const router = express.Router();
@@ -27,5 +28,6 @@ router.get("/:id_producto", getProductoById);
 router.post("/", createProducto);
 router.put("/:id_producto", upload.single("imagen"), updateProductoConImagen);
 router.delete("/:id_producto", deleteProducto);
+router.put("/estado/:id_producto", cambiarEstadoProducto);
 
 export default router;

@@ -11,7 +11,7 @@ const MiPerfil = () => {
   const [loading, setLoading] = useState(true);
 
 
-  // 🔹 Cargar perfil
+  // Cargar perfil
 useEffect(() => {
   const cargarPerfil = async () => {
     try {

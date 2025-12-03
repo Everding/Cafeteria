@@ -30,7 +30,7 @@ const Postres = () => {
         descripcion: "",
         precio_actual: 100,
         id_categoria: 4,
-        estado: "disponible",
+        estado: "habilitado",
         imagen_url: "/uploads/placeholder.png",
         subcategoria: "Torta",
       };
@@ -57,6 +57,18 @@ const Postres = () => {
     }
   };
 
+  // Habilitar / Deshabilitar producto
+  const toggleEstadoProducto = async (product) => {
+    try {
+      const nuevoEstado = product.estado === "habilitado" ? "deshabilitado" : "habilitado";
+      await axios.put(`http://localhost:3000/api/productos/estado/${product.id_producto}`, { estado: nuevoEstado });
+      setProducts(products.map(p => p.id_producto === product.id_producto ? { ...p, estado: nuevoEstado } : p));
+    } catch (error) {
+      console.error("Error al cambiar estado:", error);
+      alert("No se pudo cambiar el estado del producto");
+    }
+  };
+
   const mostrarBotones =
     user &&
     user.tipo !== "clientes" &&
@@ -70,9 +82,11 @@ const Postres = () => {
     ),
   ];
 
+  //  Filtrado: solo mostrar habilitados para clientes
   const productosFiltrados = products
     .filter(p => p.id_categoria === 4)
-    .filter(p => filtroSubcategoria === "Todas" || (p.subcategoria || "Sin subcategoría") === filtroSubcategoria);
+    .filter(p => filtroSubcategoria === "Todas" || (p.subcategoria || "Sin subcategoría") === filtroSubcategoria)
+    .filter(p => user && user.tipo === "clientes" ? p.estado === "habilitado" : true);
 
   return (
     <div className="PostresPage">
@@ -95,7 +109,11 @@ const Postres = () => {
       <div className="PostresPage-container">
         {productosFiltrados.length ? (
           productosFiltrados.map(product => (
-            <div key={product.id_producto} className="PostresCard-wrapper">
+            <div
+              key={product.id_producto}
+              className="PostresCard-wrapper"
+              style={{ opacity: product.estado === "deshabilitado" ? 0.5 : 1 }}
+            >
               <PostresCard
                 product={product}
                 onUpdate={actualizarProducto}
@@ -103,8 +121,14 @@ const Postres = () => {
               />
               {mostrarBotones && (
                 <div className="PostresCard-editDelete">
-                  <button className="PostresCard-botonEditar" onClick={() => setEditingId(product.id_producto)}>Editar</button>
-                  <button className="PostresCard-botonEliminar" onClick={() => eliminarProducto(product.id_producto)}>Eliminar</button>
+                  <button onClick={() => setEditingId(product.id_producto)}>Editar</button>
+                  <button onClick={() => eliminarProducto(product.id_producto)}>Eliminar</button>
+                  <button
+                    onClick={() => toggleEstadoProducto(product)}
+                    className={product.estado === "habilitado" ? "btn-deshabilitar" : "btn-habilitar"}
+                  >
+                    {product.estado === "habilitado" ? "Deshabilitar" : "Habilitar"}
+                  </button>
                 </div>
               )}
             </div>

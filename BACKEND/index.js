@@ -1,5 +1,9 @@
 import express from "express";
 import cors from "cors";
+import path from "path";
+import multer from "multer";
+
+// ─── RUTAS ───────────────────────────
 import categoriasRoutes from "./router/categorias.js";
 import comprasRoutes from "./router/compras.js";
 import detalleMenuRoutes from "./router/detallemenu.js";
@@ -27,13 +31,22 @@ import ventasRoutes from "./router/ventas.js";
 import registerRoutes from "./router/register.js";
 import perfilRoutes from "./router/perfil.js";
 import authRouter from "./router/auth.js";
-import multer from "multer";
-import path from "path";
+import mpRoutes from "./router/mercadopago.js";
+import mpWebhook from "./router/mercadopago_webhook.js";
 
+// ─── CONFIG EXPRESS ─────────────────
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+// ─── CONFIG MULTER ─────────────────
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, "uploads"),
+  filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
+});
+const upload = multer({ storage });
+
+// ─── RUTAS API ─────────────────────
 app.use("/api/categorias", categoriasRoutes);
 app.use("/api/compras", comprasRoutes);
 app.use("/api/detalle-menu", detalleMenuRoutes);
@@ -60,26 +73,14 @@ app.use("/api/turnos", turnosRoutes);
 app.use("/api/ventas", ventasRoutes);
 app.use("/api", registerRoutes);
 app.use("/api/perfil", perfilRoutes);
-app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
-app.use("/uploads", express.static(path.join("BACKEND", "uploads")));
-app.use("/uploads/personal", express.static(path.join(process.cwd(), "uploads/personal")));
 app.use("/api/auth", authRouter);
+app.use("/api/mercadopago", mpRoutes);
+app.use("/mp", mpWebhook); // <-- webhook aquí
 
+// ─── RUTAS DE ARCHIVOS ESTÁTICOS ───
+app.use("/uploads", express.static(path.resolve("uploads")));
+app.use("/uploads/personal", express.static(path.resolve("uploads/personal")));
 
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads"); // guarda en /uploads
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, Date.now() + ext); // nombre único
-  },
-});
-
-const upload = multer({ storage });
-
-
-
-app.listen(3000, () => console.log("Servidor corriendo en http://localhost:3000"));
-
+// ─── INICIAR SERVIDOR ──────────────
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Servidor corriendo en http://localhost:${PORT}`));
