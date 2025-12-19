@@ -59,10 +59,10 @@ function Login() {
     onChange={(e) => setContraseña(e.target.value)}
   />
   <button type="submit">Ingresar</button>
-  <p className="forgot-password">
+  <p className="login-extra-link">
     <a href="/recuperar-contraseña">¿Olvidaste tu contraseña?</a>
   </p>
-    <p className="registerNew">
+    <p className="login-extra-link register">
     <a href="/Register">¿No tienes cuenta? Registrate </a>
   </p>
 </form>

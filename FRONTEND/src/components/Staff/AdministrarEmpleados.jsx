@@ -121,8 +121,8 @@ const AdministrarEmpleado = () => {
   // ==========================
   // Filtrar por rol
   // ==========================
-  const encargados = empleados.filter((e) => e.idRol === 1);
-  const empleadosComunes = empleados.filter((e) => e.idRol === 2);
+  const encargados = empleados.filter((e) => e.idRol === 2);
+  const empleadosComunes = empleados.filter((e) => e.idRol === 3);
 
   // ==========================
   // Render

@@ -11,6 +11,10 @@ const BebidasCard = ({ product, onUpdate, triggerEdit }) => {
   const [cantidad, setCantidad] = useState(1);
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [subcategoria, setSubcategoria] = useState(product.subcategoria || "");
+  const [nuevaSubcategoria, setNuevaSubcategoria] = useState("");
+  const [subcategoriasExistentes, setSubcategoriasExistentes] = useState([]);
+
 
   const { token } = useAuth();
 
@@ -33,33 +37,58 @@ const BebidasCard = ({ product, onUpdate, triggerEdit }) => {
     fetchMaterias();
   }, []);
 
+
+  useEffect(() => {
+    const fetchSubcategorias = async () => {
+      try {
+        const res = await axios.get("http://localhost:3000/api/productos");
+
+        const subs = [
+          ...new Set(
+            res.data
+              .filter(p => p.id_categoria === product.id_categoria)
+              .map(p => p.subcategoria)
+              .filter(Boolean)
+          ),
+        ];
+
+        setSubcategoriasExistentes(subs);
+      } catch (error) {
+        console.error("Error al cargar subcategorías:", error);
+      }
+    };
+
+    fetchSubcategorias();
+  }, [product.id_categoria]);
+
+
   // abrir modo edición si triggerEdit viene true
   useEffect(() => {
     if (triggerEdit) setEditing(true);
   }, [triggerEdit]);
 
   // cargar materias asignadas al producto (solo habilitadas)
-// cargar materias asignadas al producto
-useEffect(() => {
-  const fetchAsignadas = async () => {
-    if (!editing) return;
-    try {
-      const res = await axios.get(
-        `http://localhost:3000/api/materia-prima/producto/${product.id_producto}`
-      );
-      const asignadas = (res.data || []).map((m) => ({
-        id_materia: m.id_materia,
-        cantidad_necesaria: m.cantidad_necesaria != null ? m.cantidad_necesaria : 1,
-      }));
-      setSeleccionadas(asignadas); // <-- no filtrar
-    } catch (err) {
-      console.error("Error al cargar materias asignadas:", err);
-      setSeleccionadas([]);
-    }
-  };
+  // cargar materias asignadas al producto
+  useEffect(() => {
+    const fetchAsignadas = async () => {
+      if (!editing) return;
+      try {
+        const res = await axios.get(
+          `http://localhost:3000/api/materia-prima/producto/${product.id_producto}`
+        );
+        const asignadas = (res.data || []).map((m) => ({
+          id_materia: m.id_materia,
+          cantidad_necesaria: m.cantidad_necesaria != null ? m.cantidad_necesaria : 1,
+        }));
+        setSeleccionadas(asignadas); // <-- no filtrar
+      } catch (err) {
+        console.error("Error al cargar materias asignadas:", err);
+        setSeleccionadas([]);
+      }
+    };
 
-  fetchAsignadas();
-}, [editing, product.id_producto]);
+    fetchAsignadas();
+  }, [editing, product.id_producto]);
 
   const toggleMateriaPrima = (id_materia) => {
     setSeleccionadas((prev) => {
@@ -97,6 +126,9 @@ useEffect(() => {
     }
   };
 
+  const subcategoriaFinal =
+    nuevaSubcategoria.trim() || subcategoria || null;
+
   const handleGuardar = async () => {
     try {
       let updatedProduct = {
@@ -104,7 +136,7 @@ useEffect(() => {
         descripcion,
         precio_actual: precio,
         estado: product.estado,
-        subcategoria: product.subcategoria,
+        subcategoria: subcategoriaFinal,
         imagen_url: product.imagen_url,
         id_categoria: product.id_categoria,
       };
@@ -116,7 +148,7 @@ useEffect(() => {
         formData.append("descripcion", descripcion);
         formData.append("precio_actual", precio);
         formData.append("estado", product.estado);
-        formData.append("subcategoria", product.subcategoria);
+        formData.append("subcategoria", subcategoriaFinal);
         formData.append("id_categoria", product.id_categoria);
 
         const res = await axios.put(
@@ -171,9 +203,9 @@ useEffect(() => {
   const incrementar = () => setCantidad(cantidad + 1);
   const decrementar = () => setCantidad(cantidad > 1 ? cantidad - 1 : 1);
 
- const materiasFiltradas = materiasPrimas.filter((mp) =>
-  mp.nombre.toLowerCase().includes(busqueda.toLowerCase())
-);
+  const materiasFiltradas = materiasPrimas.filter((mp) =>
+    mp.nombre.toLowerCase().includes(busqueda.toLowerCase())
+  );
 
   const isSeleccionada = (id_materia) => seleccionadas.some((m) => m.id_materia === id_materia);
   const getCantidadSeleccionada = (id_materia) => {
@@ -208,6 +240,35 @@ useEffect(() => {
             value={precio}
             onChange={(e) => setPrecio(Number(e.target.value))}
           />
+
+          <div className="BebidasCard-subcategoria">
+            <label>Subcategoría</label>
+
+            <select
+              value={subcategoria}
+              onChange={(e) => {
+                setSubcategoria(e.target.value);
+                setNuevaSubcategoria("");
+              }}
+            >
+              <option value="">-- Seleccionar subcategoría --</option>
+              {subcategoriasExistentes.map((sub, i) => (
+                <option key={i} value={sub}>
+                  {sub}
+                </option>
+              ))}
+            </select>
+
+            <p style={{ margin: "6px 0", fontSize: 13 }}>o crear una nueva</p>
+
+            <input
+              type="text"
+              placeholder="Nueva subcategoría"
+              value={nuevaSubcategoria}
+              onChange={(e) => setNuevaSubcategoria(e.target.value)}
+            />
+          </div>
+
 
           <div className="BebidasCard-materias">
             <h4>Materias primas</h4>

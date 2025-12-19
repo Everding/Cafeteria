@@ -178,3 +178,19 @@
   background: #ffc66a;
   transform: translateY(-2px);
 }
+.boton-pendiente {
+  padding: 12px;
+  font-size: 15px;
+  background: #ffb347; /* mismo color */
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+  color: #222;
+  transition: 0.25s;
+}
+
+.boton-pendiente:hover {
+  background: #ffc66a;
+  transform: translateY(-2px);
+}

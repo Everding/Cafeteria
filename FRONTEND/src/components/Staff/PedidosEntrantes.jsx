@@ -6,6 +6,10 @@ const PedidosEntrantes = () => {
   const [comandas, setComandas] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // ✔️ Fecha actual por defecto
+  const hoy = new Date().toISOString().split("T")[0];
+  const [fechaSeleccionada, setFechaSeleccionada] = useState(hoy);
+
   useEffect(() => {
     const obtenerPedidos = async () => {
       try {
@@ -46,13 +50,29 @@ const PedidosEntrantes = () => {
 
   if (loading) return <p>Cargando pedidos...</p>;
 
+  // ✔️ Filtrar por fecha
+  const comandasFiltradas = comandas.filter(c => {
+    if (!c.fecha_pedido) return false;
+    const fechaPedido = c.fecha_pedido.split("T")[0];
+    return fechaPedido === fechaSeleccionada;
+  });
+
   return (
     <div className="pedidos-container">
       <h2 className="pedidos-titulo">Pedidos Entrantes</h2>
 
+      {/* ✔️ Selector de fecha */}
+      <div style={{ marginBottom: "15px", textAlign: "center" }}>
+        <label>Filtrar por fecha: </label>
+        <input
+          type="date"
+          value={fechaSeleccionada}
+          onChange={(e) => setFechaSeleccionada(e.target.value)}
+        />
+      </div>
+
       <div className="pedidos-lista">
-        {comandas.map((comanda) => {
-          // Mostrar usuario o Mesa X
+        {comandasFiltradas.map((comanda) => {
           const nombreMostrar = comanda.usuario
             ? comanda.usuario
             : `Mesa ${comanda.id_cliente ?? '-'}`;

@@ -9,6 +9,8 @@ const Carrito = () => {
   const [cargando, setCargando] = useState(true);
   const [mostrarComprobante, setMostrarComprobante] = useState(false);
   const [detalleComprobante, setDetalleComprobante] = useState([]);
+  const [metodoPago, setMetodoPago] = useState("mp"); // mp = Mercado Pago (default)
+
 
   // Cargar carrito activo
   const cargarCarrito = async () => {
@@ -63,7 +65,7 @@ const Carrito = () => {
   };
 
   // Manejar pago según tipo de usuario
-const manejarPago = async () => {
+ const manejarPago = async () => {
   if (!token) return alert("No hay token válido");
   if (!detalle.length) return alert("El carrito está vacío");
 
@@ -82,6 +84,11 @@ const manejarPago = async () => {
 
   const total = carritoItems.reduce((acc, item) => acc + Number(item.precio_actual) * item.cantidad, 0);
 
+  // 🔥 NUEVO: si es usuarioApp, se elige el método
+  let idMetodoPago = 1; // Mercado Pago
+  if (tipo === "clientes") idMetodoPago = 2; // Efectivo obligatorio
+  if (tipo === "usuariosapp" && metodoPago === "efectivo") idMetodoPago = 2;
+
   const payload = {
     carritoItems,
     id_usuario_app: idUsuarioApp,
@@ -89,7 +96,7 @@ const manejarPago = async () => {
     id_sucursal: 1,
     total,
     estado: "Pendiente",
-    id_metodo_pago: tipo === "clientes" ? 2 : 1, // 2 = Simulado, 1 = Mercado Pago
+    id_metodo_pago: idMetodoPago,
   };
 
   try {
@@ -108,18 +115,21 @@ const manejarPago = async () => {
     console.log("Respuesta del backend:", data);
 
     if (data.success && data.init_point) {
-      // Es usuarioapp → redirige a Mercado Pago
-      window.location.href = data.init_point;
-    } else if (data.success && data.pedidoId) {
-      // Es cliente → pago simulado exitoso
+      // Mercado Pago
+      return (window.location.href = data.init_point);
+    }
+
+    if (data.success && data.pedidoId) {
+      // Pago en efectivo (cliente o usuarioApp)
       setDetalleComprobante(detalle);
       setMostrarComprobante(true);
-      setDetalle([]); // Vacía el carrito
+      setDetalle([]);
       window.dispatchEvent(new Event("carritoActualizado"));
-      alert("¡Pago simulado con éxito!");
-    } else {
-      alert("Error: " + (data.message || "No se pudo procesar el pago"));
+      return alert("¡Pago en efectivo registrado!");
     }
+
+    alert("Error: " + (data.message || "No se pudo procesar el pago"));
+
   } catch (error) {
     console.error("Error en pago:", error);
     alert("Error de conexión");
@@ -172,12 +182,41 @@ const manejarPago = async () => {
             )}
           </tbody>
         </table>
+        {/* SOLO para usuarios app mostrar método de pago */}
+        {tipo === "usuariosapp" && (
+          <div className="metodo-pago-box">
+            <h4>Seleccionar método de pago:</h4>
+            <label>
+              <input
+                type="radio"
+                name="pago"
+                value="mp"
+                checked={metodoPago === "mp"}
+                onChange={() => setMetodoPago("mp")}
+              />
+              Mercado Pago
+            </label>
+
+            <label>
+              <input
+                type="radio"
+                name="pago"
+                value="efectivo"
+                checked={metodoPago === "efectivo"}
+                onChange={() => setMetodoPago("efectivo")}
+              />
+              Efectivo
+            </label>
+          </div>
+        )}
+
+
 
         {detalle.length > 0 && (
           <div className="carrito-total">
             <h3>Total: ${total.toLocaleString("es-AR", { minimumFractionDigits: 2 })}</h3>
             <button className="btn-simular-pago" onClick={manejarPago}>
-              {tipo === "clientes" ? "Simular pago" : "Pagar con Mercado Pago"}
+              {tipo === "clientes" ? "Pagar" : "Pagar"}
             </button>
           </div>
         )}

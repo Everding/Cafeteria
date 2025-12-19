@@ -35,7 +35,7 @@ export default function RecuperarContraseña() {
 
         <button type="submit">Enviar enlace</button>
 
-        {mensaje && <p>{mensaje}</p>}
+        {mensaje && <p className="recover-message">{mensaje}</p>}
       </form>
     </div>
   );

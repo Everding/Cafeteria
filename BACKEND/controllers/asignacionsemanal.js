@@ -155,14 +155,17 @@ export const getEmpleadosSinAsignar = async (req, res) => {
         p.correo,
         p.idRol
       FROM personal p
-      WHERE p.idPersonal NOT IN (
-        SELECT idPersonal FROM asignacionsemanal
-      )
+      WHERE p.idRol <> 1
+        AND p.idPersonal NOT IN (
+          SELECT idPersonal FROM asignacionsemanal
+        )
       ORDER BY p.nombre;
     `);
+
     res.json(rows);
   } catch (error) {
     console.error("Error al obtener empleados sin asignar:", error);
     res.status(500).json({ error: "Error al obtener empleados sin asignar" });
   }
 };
+

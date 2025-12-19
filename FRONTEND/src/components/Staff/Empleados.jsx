@@ -197,7 +197,7 @@ const Empleados = () => {
                   </p>
                   <p>
                     <strong>Rol:</strong>{" "}
-                    {emp.idRol === 1 ? "Encargado" : emp.idRol === 2 ? "Empleado" : "Desconocido"}
+                    {emp.idRol === 2 ? "Encargado" : emp.idRol === 3 ? "Empleado" : "Desconocido"}
                   </p>
                 </div>
                 <div className="accionesEmpleadosCard">

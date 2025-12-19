@@ -10,6 +10,8 @@ const Bebidas = () => {
   const [editingId, setEditingId] = useState(null);
 
   const { user } = useAuth();
+  
+
 
   const fetchProductos = async () => {
     try {
@@ -78,9 +80,23 @@ const Bebidas = () => {
 
   // Filtrado: solo mostrar habilitados a clientes
   const productosFiltrados = products
+  
     .filter(p => p.id_categoria === 1)
     .filter(p => filtroSubcategoria === "Todas" || (p.subcategoria || "Sin subcategoría") === filtroSubcategoria)
-    .filter(p => user && (user.tipo !== "clientes" && user.tipo !== "usuariosapp") ? true : p.estado === "habilitado");
+    
+    .filter(p => {
+  if (!user) return false;
+
+  const estado = (p.estado || "").toLowerCase().trim();
+
+  // Admin (idRol = 1) ve todo
+  if (user.idRol === 1) return true;
+
+  // Clientes y UsuarioApp → solo habilitados
+  return estado === "habilitado";
+});
+
+    
 
   return (
     <div className="BebidasPage">

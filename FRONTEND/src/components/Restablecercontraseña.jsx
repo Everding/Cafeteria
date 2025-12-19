@@ -15,14 +15,14 @@ export default function RestablecerContraseña() {
     try {
       const response = await axios.post("http://localhost:3000/api/login/restablecer", {
   token,
-  nuevaContrasena: nueva, // ⚡ debe coincidir con lo que espera el backend
+  nuevaContrasena: nueva, // 
 });
 
 
       setMensaje(response.data.message);
     } catch (err) {
       console.log(err);
-      setMensaje("Error al restablecer contraseña");
+      setMensaje("Error al restablecer contraseña: Solicitud inválida o expirada.");
     }
   };
 
@@ -41,7 +41,7 @@ export default function RestablecerContraseña() {
 
         <button type="submit">Guardar nueva contraseña</button>
 
-        {mensaje && <p>{mensaje}</p>}
+        {mensaje && <p className="recover-message">{mensaje}</p>}
       </form>
     </div>
   );

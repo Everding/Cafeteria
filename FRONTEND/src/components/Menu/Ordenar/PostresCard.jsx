@@ -11,6 +11,9 @@ const PostresCard = ({ product, onUpdate, triggerEdit }) => {
   const [cantidad, setCantidad] = useState(1);
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [subcategoria, setSubcategoria] = useState(product.subcategoria || "");
+  const [nuevaSubcategoria, setNuevaSubcategoria] = useState("");
+  const [subcategoriasExistentes, setSubcategoriasExistentes] = useState([]);
 
   const { token } = useAuth();
 
@@ -32,6 +35,27 @@ const PostresCard = ({ product, onUpdate, triggerEdit }) => {
     };
     fetchMaterias();
   }, []);
+
+  // Cargar subcategorías de postres para el selector
+  useEffect(() => {
+    const fetchSubcategorias = async () => {
+      try {
+        const res = await axios.get("http://localhost:3000/api/productos");
+        const subs = [
+          ...new Set(
+            res.data
+              .filter(p => p.id_categoria === product.id_categoria)
+              .map(p => p.subcategoria)
+              .filter(Boolean)
+          ),
+        ];
+        setSubcategoriasExistentes(subs);
+      } catch (error) {
+        console.error("Error al cargar subcategorías:", error);
+      }
+    };
+    fetchSubcategorias();
+  }, [product.id_categoria]);
 
   // abrir modo edición si triggerEdit viene true
   useEffect(() => {
@@ -96,6 +120,8 @@ const PostresCard = ({ product, onUpdate, triggerEdit }) => {
     }
   };
 
+  const subcategoriaFinal = nuevaSubcategoria.trim() || subcategoria || null;
+
   const handleGuardar = async () => {
     try {
       let updatedProduct = {
@@ -103,7 +129,7 @@ const PostresCard = ({ product, onUpdate, triggerEdit }) => {
         descripcion,
         precio_actual: precio,
         estado: product.estado,
-        subcategoria: product.subcategoria,
+        subcategoria: subcategoriaFinal,
         imagen_url: product.imagen_url,
         id_categoria: product.id_categoria,
       };
@@ -115,7 +141,7 @@ const PostresCard = ({ product, onUpdate, triggerEdit }) => {
         formData.append("descripcion", descripcion);
         formData.append("precio_actual", precio);
         formData.append("estado", product.estado);
-        formData.append("subcategoria", product.subcategoria);
+        formData.append("subcategoria", subcategoriaFinal);
         formData.append("id_categoria", product.id_categoria);
 
         const res = await axios.put(
@@ -208,6 +234,29 @@ const PostresCard = ({ product, onUpdate, triggerEdit }) => {
             onChange={(e) => setPrecio(Number(e.target.value))}
           />
 
+          <div className="PostresCard-subcategoria">
+            <label>Subcategoría</label>
+            <select
+              value={subcategoria}
+              onChange={(e) => {
+                setSubcategoria(e.target.value);
+                setNuevaSubcategoria("");
+              }}
+            >
+              <option value="">-- Seleccionar subcategoría --</option>
+              {subcategoriasExistentes.map((sub, i) => (
+                <option key={i} value={sub}>{sub}</option>
+              ))}
+            </select>
+            <p style={{ margin: "6px 0", fontSize: 13 }}>o crear una nueva</p>
+            <input
+              type="text"
+              placeholder="Nueva subcategoría"
+              value={nuevaSubcategoria}
+              onChange={(e) => setNuevaSubcategoria(e.target.value)}
+            />
+          </div>
+
           <div className="PostresCard-materias">
             <h4>Materias primas</h4>
             <input
@@ -237,7 +286,6 @@ const PostresCard = ({ product, onUpdate, triggerEdit }) => {
                   )}
                 </label>
               ))}
-              {materiasFiltradas.length === 0 && <p>No hay materias que coincidan.</p>}
             </div>
             <div style={{ marginTop: 8 }}>
               <button className="SaveButton" onClick={guardarMateriasPrimas}>

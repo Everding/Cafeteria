@@ -11,6 +11,9 @@ const KioscoCard = ({ product, onUpdate, triggerEdit }) => {
   const [cantidad, setCantidad] = useState(1);
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [subcategoria, setSubcategoria] = useState(product.subcategoria || "");
+  const [nuevaSubcategoria, setNuevaSubcategoria] = useState("");
+  const [subcategoriasExistentes, setSubcategoriasExistentes] = useState([]);
 
   const { token } = useAuth();
 
@@ -32,6 +35,27 @@ const KioscoCard = ({ product, onUpdate, triggerEdit }) => {
     };
     fetchMaterias();
   }, []);
+
+  // Cargar subcategorías existentes de la misma categoría (Kiosco)
+  useEffect(() => {
+    const fetchSubcategorias = async () => {
+      try {
+        const res = await axios.get("http://localhost:3000/api/productos");
+        const subs = [
+          ...new Set(
+            res.data
+              .filter(p => p.id_categoria === product.id_categoria)
+              .map(p => p.subcategoria)
+              .filter(Boolean)
+          ),
+        ];
+        setSubcategoriasExistentes(subs);
+      } catch (error) {
+        console.error("Error al cargar subcategorías:", error);
+      }
+    };
+    fetchSubcategorias();
+  }, [product.id_categoria]);
 
   // abrir modo edición si triggerEdit viene true
   useEffect(() => {
@@ -56,7 +80,6 @@ const KioscoCard = ({ product, onUpdate, triggerEdit }) => {
         setSeleccionadas([]);
       }
     };
-
     fetchAsignadas();
   }, [editing, product.id_producto]);
 
@@ -86,7 +109,7 @@ const KioscoCard = ({ product, onUpdate, triggerEdit }) => {
     try {
       await axios.put(
         `http://localhost:3000/api/materia-prima/producto/${product.id_producto}/stock`,
-        { materiasPrimas: seleccionadas }, // <-- objeto con array
+        { materiasPrimas: seleccionadas },
         { headers: token ? { Authorization: `Bearer ${token}` } : {} }
       );
       alert("Materias primas guardadas correctamente ✅");
@@ -96,6 +119,8 @@ const KioscoCard = ({ product, onUpdate, triggerEdit }) => {
     }
   };
 
+  const subcategoriaFinal = nuevaSubcategoria.trim() || subcategoria || null;
+
   const handleGuardar = async () => {
     try {
       let updatedProduct = {
@@ -103,7 +128,7 @@ const KioscoCard = ({ product, onUpdate, triggerEdit }) => {
         descripcion,
         precio_actual: precio,
         estado: product.estado,
-        subcategoria: product.subcategoria,
+        subcategoria: subcategoriaFinal,
         imagen_url: product.imagen_url,
         id_categoria: product.id_categoria,
       };
@@ -115,7 +140,7 @@ const KioscoCard = ({ product, onUpdate, triggerEdit }) => {
         formData.append("descripcion", descripcion);
         formData.append("precio_actual", precio);
         formData.append("estado", product.estado);
-        formData.append("subcategoria", product.subcategoria);
+        formData.append("subcategoria", subcategoriaFinal);
         formData.append("id_categoria", product.id_categoria);
 
         const res = await axios.put(
@@ -143,7 +168,6 @@ const KioscoCard = ({ product, onUpdate, triggerEdit }) => {
 
   const agregarAlCarrito = async () => {
     if (!token) return alert("Debes iniciar sesión para agregar productos al carrito");
-
     try {
       setLoading(true);
       const { data: carrito } = await axios.get("http://localhost:3000/api/carrito/activo", {
@@ -208,6 +232,30 @@ const KioscoCard = ({ product, onUpdate, triggerEdit }) => {
             onChange={(e) => setPrecio(Number(e.target.value))}
           />
 
+          {/* --- Nueva sección Subcategoría --- */}
+          <div className="KioscoCard-subcategoria">
+            <label>Subcategoría</label>
+            <select
+              value={subcategoria}
+              onChange={(e) => {
+                setSubcategoria(e.target.value);
+                setNuevaSubcategoria("");
+              }}
+            >
+              <option value="">-- Seleccionar subcategoría --</option>
+              {subcategoriasExistentes.map((sub, i) => (
+                <option key={i} value={sub}>{sub}</option>
+              ))}
+            </select>
+            <p style={{ margin: "6px 0", fontSize: 13 }}>o crear una nueva</p>
+            <input
+              type="text"
+              placeholder="Nueva subcategoría"
+              value={nuevaSubcategoria}
+              onChange={(e) => setNuevaSubcategoria(e.target.value)}
+            />
+          </div>
+
           <div className="KioscoCard-materias">
             <h4>Materias primas</h4>
             <input
@@ -231,9 +279,7 @@ const KioscoCard = ({ product, onUpdate, triggerEdit }) => {
                       type="number"
                       min="1"
                       value={getCantidadSeleccionada(mp.id_materia)}
-                      onChange={(e) =>
-                        setCantidadNecesaria(mp.id_materia, Number(e.target.value || 1))
-                      }
+                      onChange={(e) => setCantidadNecesaria(mp.id_materia, Number(e.target.value || 1))}
                       style={{ marginLeft: 12, width: 70 }}
                     />
                   )}
@@ -267,14 +313,8 @@ const KioscoCard = ({ product, onUpdate, triggerEdit }) => {
             <span>{cantidad}</span>
             <button onClick={incrementar}>+</button>
           </div>
-          <p className="KioscoCard-price">
-            <strong>Precio:</strong> ${precio}
-          </p>
-          <button
-            className="KioscoCard-add"
-            onClick={agregarAlCarrito}
-            disabled={loading}
-          >
+          <p className="KioscoCard-price"><strong>Precio:</strong> ${precio}</p>
+          <button className="KioscoCard-add" onClick={agregarAlCarrito} disabled={loading}>
             {loading ? "Agregando..." : "Agregar al carrito"}
           </button>
         </>

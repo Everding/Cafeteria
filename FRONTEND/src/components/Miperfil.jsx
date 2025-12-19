@@ -200,7 +200,7 @@ const handleImagenChange = async (e) => {
 
       {/*  COMPRAS (solo usuariosapp)  */}
       {usuario.tipo === "usuariosapp" && (
-        <div className="mis-compras">
+        <div className="mis-horarios">
           <h3>Mis Compras</h3>
           {usuario.compras.length > 0 ? (
             <table>

@@ -34,6 +34,7 @@ export const generarPreferenciaMP = async (carritoItems, idPedido) => {
     };
 
     const response = await preference.create({ body });
+    console.log("Preferencia MP creada:", response);
     return { init_point: response.init_point };
 
   } catch (error) {

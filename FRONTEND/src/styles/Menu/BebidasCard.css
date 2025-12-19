@@ -217,3 +217,56 @@
 .BebidasCard-actions button:last-child:hover {
   background: #ccc;
 }
+
+
+.BebidasCard-subcategoria {
+  margin-top: 12px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fafafa;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Label */
+.BebidasCard-subcategoria label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Select e input */
+.BebidasCard-subcategoria select,
+.BebidasCard-subcategoria input {
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  outline: none;
+  background-color: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Focus */
+.BebidasCard-subcategoria select:focus,
+.BebidasCard-subcategoria input:focus {
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+/* Texto "o crear una nueva" */
+.BebidasCard-subcategoria p {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #777;
+  margin: 4px 0;
+  user-select: none;
+}
+
+/* Placeholder */
+.BebidasCard-subcategoria input::placeholder {
+  color: #aaa;
+}
+

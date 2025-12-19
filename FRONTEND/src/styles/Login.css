@@ -68,41 +68,59 @@
   transform: translateY(-2px);
 }
 
-.forgot-password {
-  text-align: center; /* Centrar el enlace */
-  margin-top: 15px;
-  font-size: 0.9rem;
-}
 
-.forgot-password a {
-  color: #007bff; /* Color azul */
-  text-decoration: none; /* Quita el subrayado */
-  transition: color 0.3s ease, text-decoration 0.3s ease;
-}
+/* -------------- ENLACES DE ACCIONES -------------- */
 
-.forgot-password a:hover {
-  color: #0056b3; /* Azul más oscuro al pasar el mouse */
-  text-decoration: underline; /* Subrayado al pasar el mouse */
-}
-
-.registerNew {
-  text-align: center; /* Centrar el enlace */
-  margin-top: 5px; /* Separación respecto al enlace de "Olvidaste tu contraseña" */
+.login-extra-link {
+  text-align: center;
+  margin-top: 12px;
   font-size: 0.95rem;
-  font-weight: 500; /* Un poquito más de énfasis */
+  color: #ffb347; /* Mismo dorado del título y acentos */
+  font-weight: 500;
+  transition: color 0.3s ease, text-decoration 0.3s ease, transform 0.2s ease;
 }
 
-.registerNew a {
-  color: #28a745; /* Verde agradable */
+.login-extra-link a {
+  color: #ffb347;
   text-decoration: none;
   transition: color 0.3s ease, text-decoration 0.3s ease;
 }
 
-.registerNew a:hover {
-  color: #218838; /* Verde más oscuro al pasar el mouse */
+.login-extra-link a:hover {
+  color: #ffc47d; /* Mismo tono hover del botón */
   text-decoration: underline;
+  transform: translateY(-1px);
 }
 
+/* Versión especial para el registro (un poquito más marcada) */
+.login-extra-link.register {
+  margin-top: 6px;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+
+
+.recover-message {
+  text-align: center;
+  background-color: #2b2b2b;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #444;
+  color: #ffb347;
+  font-size: 0.95rem;
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Responsive */
+@media (max-width: 500px) {
+  .login-extra-link {
+    font-size: 0.9rem;
+  }
+  .login-extra-link.register {
+    font-size: 0.95rem;
+  }
+}
 
 
 /* -------------- ANIMACIÓN -------------- */

@@ -195,6 +195,35 @@
 }
 
 
+.metodo-pago-box {
+  margin: 15px 0;
+  background: #333;
+  padding: 15px;
+  border-radius: 10px;
+  color: #ffb347;
+  border: 1px solid #444;
+}
+
+.metodo-pago-box h4 {
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+}
+
+.metodo-pago-box label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+  cursor: pointer;
+  color: #fff;
+}
+
+.metodo-pago-box input[type="radio"] {
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+
 /* --------------- RESPONSIVE --------------- */
 @media (max-width: 600px) {
   .carrito-tabla th,

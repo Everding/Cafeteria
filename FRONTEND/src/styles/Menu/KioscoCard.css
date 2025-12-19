@@ -217,3 +217,55 @@
 .KioscoCard-actions button:last-child:hover {
   background: #ccc;
 }
+
+.KioscoCard-subcategoria {
+  margin-top: 12px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fafafa;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Label */
+.KioscoCard-subcategoria label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Select e input */
+.KioscoCard-subcategoria select,
+.KioscoCard-subcategoria input {
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  outline: none;
+  background-color: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Focus */
+.KioscoCard-subcategoria select:focus,
+.KioscoCard-subcategoria input:focus {
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+/* Texto "o crear una nueva" */
+.KioscoCard-subcategoria p {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #777;
+  margin: 4px 0;
+  user-select: none;
+}
+
+/* Placeholder */
+.KioscoCard-subcategoria input::placeholder {
+  color: #aaa;
+}
+

@@ -2,6 +2,7 @@ import db from "../config/dataBase.js";
 
 
 // Obtener todos los pedidos
+
 export const getAllPedidos = async (req, res) => {
   try {
     const [rows] = await db.query(`
@@ -10,8 +11,9 @@ export const getAllPedidos = async (req, res) => {
         p.id_usuario_app,
         u.usuario,
         u.imagen_url AS foto,
-        p.id_cliente,               -- <-- incluimos id_cliente
+        p.id_cliente,
         p.estado,
+        p.fecha_pedido,     -- ✔️ AGREGADO
         dp.id_producto,
         prod.nombre AS nombre_producto,
         dp.cantidad
@@ -22,7 +24,6 @@ export const getAllPedidos = async (req, res) => {
       ORDER BY p.idPedido DESC
     `);
 
-    // Agrupar productos por pedido
     const pedidosMap = new Map();
 
     rows.forEach(row => {
@@ -31,8 +32,9 @@ export const getAllPedidos = async (req, res) => {
           idPedido: row.idPedido,
           usuario: row.usuario,
           foto: row.foto,
-          id_cliente: row.id_cliente,  // <-- agregamos id_cliente
+          id_cliente: row.id_cliente,
           estado: row.estado,
+          fecha_pedido: row.fecha_pedido,   // ✔️ AGREGADO
           productos: []
         });
       }
@@ -52,6 +54,7 @@ export const getAllPedidos = async (req, res) => {
     res.status(500).json({ message: "Error al obtener pedidos" });
   }
 };
+
 
 // Obtener pedido por ID
 
